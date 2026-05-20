@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-display text-ink;
+  }
+
+  body {
+    @apply bg-bg text-ink antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-border bg-card shadow-sm;
+  }
+
+  .section-label {
+    @apply font-display text-[11px] font-bold uppercase tracking-[0.2em] text-accent;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-5 py-2.5 font-display text-[13px] font-bold text-accentFg transition-opacity hover:opacity-90 active:scale-[0.97];
+  }
+}
