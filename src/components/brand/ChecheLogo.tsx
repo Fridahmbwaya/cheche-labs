@@ -1,54 +1,28 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type ChecheLogoProps = {
   className?: string;
-  /** Use image asset when available; falls back to wordmark */
-  variant?: "wordmark" | "image";
   size?: "sm" | "md" | "lg";
+  /** variant kept for backwards compatibility — always renders text logo */
+  variant?: "wordmark" | "image";
 };
 
 const sizeClasses = {
-  sm: "text-lg",
-  md: "text-xl",
-  lg: "text-2xl",
+  sm: "text-sm px-3 py-1",
+  md: "text-base px-3.5 py-1.5",
+  lg: "text-lg px-4 py-2",
 };
 
-const imageHeights = {
-  sm: 28,
-  md: 40,
-  lg: 48,
-};
-
-export function ChecheLogo({
-  className,
-  variant = "wordmark",
-  size = "md",
-}: ChecheLogoProps) {
-  if (variant === "image") {
-    const height = imageHeights[size];
-    return (
-      <Image
-        src="/cheche-logo.png"
-        alt="Cheche Labs"
-        width={140}
-        height={70}
-        className={cn("w-auto object-contain", className)}
-        style={{ height }}
-        priority
-      />
-    );
-  }
-
+export function ChecheLogo({ className, size = "md" }: ChecheLogoProps) {
   return (
     <span
       className={cn(
-        "font-display font-bold tracking-display text-primary",
+        "inline-flex items-center rounded-full bg-primary font-display font-bold tracking-display text-white",
         sizeClasses[size],
         className
       )}
     >
-      cheche<span className="text-accent">.</span>
+      cheche<span style={{ color: "#F75B0D" }}>.</span>
     </span>
   );
 }

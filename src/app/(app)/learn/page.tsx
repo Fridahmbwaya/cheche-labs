@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ChecheLogo } from "@/components/brand/ChecheLogo";
+import { SignOutButton } from "@/components/learn/SignOutButton";
 
 type Unit = { id: string; title: string; order_index: number };
 type Module = { id: string; title: string; description: string; units: Unit[] };
@@ -48,7 +49,10 @@ export default async function LearnPage() {
       <header className="sticky top-0 z-10 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <ChecheLogo variant="wordmark" size="sm" />
-          <span className="section-label">CBK · AML</span>
+          <div className="flex items-center gap-4">
+            <span className="section-label">CBK · AML</span>
+            <SignOutButton />
+          </div>
         </div>
       </header>
 
