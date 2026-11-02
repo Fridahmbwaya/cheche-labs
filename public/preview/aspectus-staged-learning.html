@@ -930,8 +930,7 @@ function moduleView(id){
         const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.appendChild(tag);
       }
       pane.appendChild(content);
-      const sub=document.createElement("div");sub.className="lesson-bottomline";sub.innerHTML='<span class="lesson-symbol" aria-hidden="true">'+({spotlight:"☀",story:"✦",insight:"↗",principles:"◈",highlights:"✓",people:"◎"}[kind])+'</span><span>Take this idea with you as you continue.</span>';
-      pane.appendChild(sub);parent.insertBefore(pane,prose);
+      parent.insertBefore(pane,prose);
     });
     prose.remove();
   }
