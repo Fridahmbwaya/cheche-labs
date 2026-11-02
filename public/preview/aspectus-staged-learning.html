@@ -333,19 +333,17 @@ body:has(.guided-step) .guided-controls .btn.orange{background:#FAA954;color:#37
 /* Expanded visual learning theme */
 body:has(.guided-step) #app>.wrap{max-width:100%;width:100%}
 body:has(.guided-step) .lesson-card{padding:26px 34px!important}
-body:has(.guided-step) .lesson-content .card{position:relative;border-radius:18px;padding:19px 22px 19px 51px;box-shadow:0 3px 14px #3734350a}
-body:has(.guided-step) .lesson-content .card:before{content:"✦";position:absolute;left:17px;top:19px;color:#A55F12;font-size:20px}
-body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2){background:#D3F2E2;border-color:#00A859}
-body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2):before{content:"✓";color:#00753E}
-body:has(.guided-step) .lesson-content .card:nth-of-type(3n){background:#FFFBF6;border-color:#EADFD3}
-body:has(.guided-step) .lesson-content .card:nth-of-type(3n):before{content:"☀"}
+body:has(.guided-step) .lesson-content .card{position:relative;border:1px solid #EADFD3;background:#FFFFFF;border-radius:18px;padding:19px 22px;box-shadow:0 3px 14px #3734350a}
+body:has(.guided-step) .lesson-content .card:before{content:none!important}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2){background:#FFFBF6;border-color:#F1D6B7}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n){background:#FFFFFF;border-color:#EADFD3}
 body:has(.guided-step) .lesson-content .card h4{font-size:1.14rem;line-height:1.3;margin-bottom:8px}
 body:has(.guided-step) .lesson-content table th{background:#FEEBD5;color:#373435}
 body:has(.guided-step) .lesson-content table tr:nth-child(even) td{background:#FFFBF6}
 body:has(.guided-step) .lesson-content .tbl{border-radius:17px}
 body:has(.guided-step) .lesson-content figure,body:has(.guided-step) .lesson-content img{display:block;max-width:100%;height:auto;margin:16px auto;text-align:center}
 body:has(.guided-step) .lesson-content li{line-height:1.6;margin-bottom:10px}
-@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:17px!important}body:has(.guided-step) .lesson-content .card{padding:15px 14px 15px 42px}body:has(.guided-step) .lesson-content .card:before{left:12px;top:15px}}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:17px!important}body:has(.guided-step) .lesson-content .card{padding:15px 16px}}
 /* Aspectus color and legibility refinement */
 body:has(.guided-step) .modhead .kicker{color:#A55F12;font-size:.87rem;font-weight:900;letter-spacing:.09em}
 body:has(.guided-step) .modhead h1{color:#373435;font-size:clamp(1.65rem,3vw,2.2rem)!important;line-height:1.15}
@@ -452,6 +450,15 @@ body:has(.guided-step) .lesson-content .card{min-width:0}
 /* Consistent chip icon baseline and centered labels */
 body:has(.guided-step) .lesson-chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.2;vertical-align:middle;text-align:center;white-space:normal}
 body:has(.guided-step) .lesson-eyebrow{align-items:center}
+
+/* A balanced, chronological story layout with no floating decorative marks. */
+body:has(.guided-step) .lesson-content .aspectus-timeline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:1/-1;align-items:stretch}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card{min-width:0;width:auto;background:#FFFFFF!important;border:1px solid #F0C58C!important;padding:16px 18px!important;margin:0!important;box-shadow:none}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card h4{font-size:1.07rem}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card p{font-size:.98rem;line-height:1.5}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:before{content:none!important}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:1/-1}
+@media(max-width:620px){body:has(.guided-step) .lesson-content .aspectus-timeline{grid-template-columns:1fr}body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:auto}}
 </style>
 </head>
 <body>
@@ -544,10 +551,11 @@ const MODULES = [
 <h3>The big idea: our story changes, so our facts need checking</h3><p>Aspectus has evolved since 2015. The latest approved information guides what we say today, while older documents help us understand our journey.</p><div class="card"><h4>What you will take away</h4><p>You will be able to trace a claim to its source, decide whether it is current and approved, and keep a simple fact-checking tracker for your posts.</p></div><div class="card"><h4>Picture yourself at work</h4><p>You find three versions of the company story: a 2024 deck, a saved caption and a current company profile. They disagree. Your job is not to guess — it is to verify.</p></div>
 <h3>How the Aspectus story has evolved</h3>
 <p>Aspectus was founded in 2015, but the company you are joining today is not identical to the one described in older files. Here are four chapters to help you understand the journey. The chapter labels are a helpful learning framework; they are not a verified year-by-year corporate history.</p>
-<div class="card"><h4>2015–2019 · Starting out and winning trust</h4><p>Aspectus began in 2015. The early story is about introducing solar solutions, demonstrating technical credibility and earning clients' trust. The 2024 profile shows the breadth of that work: solar power, water heating, pumping, lighting and agricultural applications.</p></div>
-<div class="card"><h4>2020–2021 · Working through a changed world</h4><p>COVID-19 changed the wider business environment. Use this chapter to remember that old business plans were written for their own circumstances. The supplied company profiles do <b>not</b> document precisely how the pandemic affected Aspectus, so do not invent a company-specific impact.</p></div>
-<div class="card"><h4>2022–2024 · Reflecting and repositioning</h4><p>The 2024 company profile presents Aspectus through sustainability, its range of solutions, its people and its installation portfolio. It also documents Real Estate 100 recognition in 2022 and 2023. “Restructuring” can be a useful working label, but neither profile establishes a formal restructuring or its dates — Brenda should confirm that separately.</p></div>
-<div class="card"><h4>2024–2026 · Evidence-led growth and clearer positioning</h4><p>The 2026 profile places more emphasis on specific customer outcomes, case studies, a concise product portfolio, partnerships and a stated vision to become the sustainable energy solutions company of choice in Africa by 2040. It lists Real Estate 100 awards through 2025. That is an evolution in how the company tells its story; the profiles alone cannot prove exactly when each operational change happened.</p></div>
+<div class="aspectus-timeline"><div class="card timeline-card"><h4>2015–2019 · Starting out and winning trust</h4><p>Aspectus began in 2015. The early story is about introducing solar solutions, demonstrating technical credibility and earning clients' trust. The 2024 profile shows the breadth of that work: solar power, water heating, pumping, lighting and agricultural applications.</p></div>
+<div class="card timeline-card"><h4>2020–2021 · Working through a changed world</h4><p>COVID-19 changed the wider business environment. Use this chapter to remember that old business plans were written for their own circumstances. The supplied company profiles do <b>not</b> document precisely how the pandemic affected Aspectus, so do not invent a company-specific impact.</p></div>
+<div class="card timeline-card"><h4>2022–2024 · Reflecting and repositioning</h4><p>The 2024 company profile presents Aspectus through sustainability, its range of solutions, its people and its installation portfolio. It also documents Real Estate 100 recognition in 2022 and 2023. “Restructuring” can be a useful working label, but neither profile establishes a formal restructuring or its dates — Brenda should confirm that separately.</p></div>
+<div class="card timeline-card"><h4>2024–2026 · Evidence-led growth and clearer positioning</h4><p>The 2026 profile places more emphasis on specific customer outcomes, case studies, a concise product portfolio, partnerships and a stated vision to become the sustainable energy solutions company of choice in Africa by 2040. It lists Real Estate 100 awards through 2025. That is an evolution in how the company tells its story; the profiles alone cannot prove exactly when each operational change happened.</p></div>
+</div>
 <h3>Same company, different ways of telling its story</h3>
 <div class="tbl"><table><tr><th>Look for</th><th>2024 company profile</th><th>2026 company profile</th></tr>
 <tr><td>First impression</td><td>“Shine brightest with Solar Power”; a broad sustainability story</td><td>“Simply Stellar, Simply Solar”; clean-energy solutions supported by customer examples</td></tr>
@@ -556,7 +564,7 @@ const MODULES = [
 <tr><td>Recognition</td><td>Images of 2022 and 2023 Real Estate 100 awards</td><td>Lists Real Estate 100 awards for 2022–2025 alongside other recognition</td></tr>
 <tr><td>Long-term direction</td><td>Emphasis on access, sustainability and improving lives</td><td>Explicit vision: company of choice for sustainable energy solutions in Africa by 2040</td></tr>
 </table></div>
-<div class="card"><h4>Ian's real-world example</h4><p>You're drafting an Instagram caption about a solar installation. The 2024 profile has several photographs and a system size; the 2026 profile includes a customer-result claim. <b>Don't combine them blindly.</b> First confirm that both refer to the same installation, ask the technical team to check specifications, and confirm that the customer has approved public use.</p></div>
+<div class="card"><h4>Your real-world example</h4><p>You're drafting an Instagram caption about a solar installation. The 2024 profile has several photographs and a system size; the 2026 profile includes a customer-result claim. <b>Don't combine them blindly.</b> First confirm that both refer to the same installation, ask the technical team to check specifications, and confirm that the customer has approved public use.</p></div>
 <div class="card"><h4>What you should remember</h4><p>Old documents aren't necessarily wrong. They may simply describe a different moment in the company's history. The job is to preserve the history while checking the current message, evidence and permission before publishing.</p></div>
 <h3>Why one source of truth matters</h3>
 <p>Information can conflict because teams update decks, documents get reused and facts change. A <b>single source of truth</b> is the agreed, maintained reference for a particular kind of information. There is not necessarily one file for everything: the company profile explains current positioning; project records and the technical team confirm specifications; Brenda approves what goes public.</p>
