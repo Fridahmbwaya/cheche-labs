@@ -417,6 +417,11 @@ body:has(.guided-step) .modhead{display:flex;flex-direction:column;gap:5px;posit
 body:has(.guided-step) .modhead .kicker{font-size:.72rem!important;letter-spacing:.13em!important;color:#A55F12!important;font-weight:900!important;margin:0!important}
 body:has(.guided-step) .modhead h1{font-size:clamp(1.5rem,3vw,1.95rem)!important;line-height:1.12!important;letter-spacing:-.04em!important;margin:0!important;color:#373435!important}
 body:has(.guided-step) .modhead .lede{font-size:.87rem!important;margin:0!important;color:#6B6466!important;line-height:1.35!important}
+
+.retry-notice{margin-top:16px;padding:16px 18px;border:1px solid #FAA954;background:#FFF0D9;border-radius:14px}
+.retry-notice strong{display:block;color:#A55F12;font-size:1rem}
+.retry-notice p{margin:5px 0 12px;color:#6B6466}
+.retry-quiz-action{cursor:pointer!important;background:#FAA954!important;color:#373435!important;border-color:#FAA954!important;opacity:1!important;pointer-events:auto!important}
 </style>
 </head>
 <body>
@@ -921,8 +926,8 @@ function moduleView(id){
     <div class="prose">${m.body}</div>
     ${m.scenario?`<div class="stage"><p class="label">What would you do?</p><p class="qt"><b>${m.scenario.q}</b></p>${m.scenario.o.map((o,j)=>{ let cls=""; if(st.scen!=null){ if(o.ok) cls="right"; else if(j===st.scen) cls="wrong"; } return `<button class="opt ${cls}" data-s="${j}" ${st.scen!=null?"disabled":""}>${o.t}</button>`; }).join("")}${st.scen!=null?`<div class="fb">${m.scenario.o[st.scen].fb}${m.scenario.o[st.scen].ok?"":" The highlighted option is the stronger response."}</div>`:""}</div>`:""}
     <div class="stage"><p class="label">Quick check · you need ${Math.round(CONFIG.passMark*100)}% to complete the module</p>${quizHTML(m.quiz, st.quiz, "q")}
-      ${allAnswered && !passed?`<button class="btn ghost" id="retry">Try the quiz again</button>`:""}</div>
-    <div class="done-bar"><div><p class="label">STEP 2 · APPLY YOUR LEARNING</p><h3 style="margin:5px 0 7px">Ready to put it into practice?</h3><p style="margin:0">Your quiz score: ${q.c}/${q.total}. ${passed?"Next, share your practical assignment with Brenda.":"Review the questions and retry to unlock your assignment."}</p><p style="margin:9px 0 0;font-size:.9rem;color:#6B6466">${m.task.prompt}</p></div>${allAnswered&&!passed?`<button class="btn orange" id="retryFromFinish">↻ Retry quiz →</button>`:`<button class="btn green" id="complete" ${allAnswered&&passed?"":"disabled"}>Continue to assignment →</button>`}
+      ${allAnswered && !passed?`<div class="retry-notice"><strong>Retry the quiz to unlock your assignment.</strong><p>Review the explanations above, then try again.</p><button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button></div>`:""}</div>
+    <div class="done-bar"><div><p class="label">STEP 2 · APPLY YOUR LEARNING</p><h3 style="margin:5px 0 7px">Ready to put it into practice?</h3><p style="margin:0">Your quiz score: ${q.c}/${q.total}. ${passed?"Next, share your practical assignment with Brenda.":"Retry the quiz to unlock your assignment."}</p><p style="margin:9px 0 0;font-size:.9rem;color:#6B6466">${m.task.prompt}</p></div>${allAnswered&&!passed?`<button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button>`:`<button class="btn green" id="complete" ${allAnswered&&passed?"":"disabled"}>Continue to assignment →</button>`}
     </div></div>`;
   // Present one small learning step at a time, preserving the original content and quizzes.
   const steps=[];
@@ -999,14 +1004,16 @@ function moduleView(id){
   app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ st.scen=+b.dataset.s; save(); moduleView(id); });
   app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
   const ta=document.getElementById("task"); let t; ta.oninput=()=>{ st.task=ta.value; const forward=app.querySelector("#forwardStep");if(forward)forward.disabled=!st.task.trim(); clearTimeout(t); t=setTimeout(()=>{ save(); document.getElementById("savedMsg").textContent="Saved on this device"; },400); };
-  const r=document.getElementById("retry"); if(r) r.onclick=()=>{ st.quiz={}; st.page=0; save(); const y=window.scrollY; moduleView(id); window.scrollTo(0,y); };
-  const retryFinish=document.getElementById("retryFromFinish");
-  if(retryFinish)retryFinish.onclick=()=>{
+  // Both the final knowledge-check screen and the completion screen restart at question one.
+  app.querySelectorAll(".retry-quiz-action").forEach(button=>button.addEventListener("click",event=>{
+    event.preventDefault();
     st.quiz={};
-    const firstQuiz=panes.findIndex(p=>!!p.querySelector(".q"));
-    st.page=Math.max(0,firstQuiz);
-    save();moduleView(id);window.scrollTo(0,0);
-  };
+    const firstQuestion=panes.findIndex(p=>p.querySelector(".q"));
+    st.page=firstQuestion<0?0:firstQuestion;
+    save();
+    moduleView(id);
+    window.scrollTo(0,0);
+  }));
   const c=document.getElementById("complete"); if(c) c.onclick=()=>{if(!allAnswered||!passed)return;window.parent.postMessage({source:"aspectus-original-quiz",type:"open-assignment",moduleOrder:idx+1},"*");};
   const n=document.getElementById("nextMod"); if(n) n.onclick=()=>go("module",{id:nextM.id});
 }
