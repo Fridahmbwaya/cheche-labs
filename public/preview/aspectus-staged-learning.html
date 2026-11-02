@@ -386,6 +386,31 @@ body:has(.guided-step) .lesson-card:has(.lesson-playful-tag) .lesson-content{mar
 body:has(.guided-step) .lesson-principles .lesson-content h3{grid-column:1/-1}
 body:has(.guided-step) .lesson-principles .lesson-content .card{box-shadow:4px 5px 0 #FAA95444}
 @media(max-width:600px){.lesson-big-fact strong{font-size:4.2rem}body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-spotlight::after{font-size:5rem}}
+
+/* Visual storytelling pass: changes in rhythm, emphasis and shape without extra copy */
+body:has(.guided-step) .lesson-card{gap:12px}
+body:has(.guided-step) .lesson-card .lesson-eyebrow{position:relative;z-index:2}
+body:has(.guided-step) .lesson-card .lesson-content{z-index:2}
+body:has(.guided-step) .lesson-spotlight{background:linear-gradient(148deg,#FAA954 0%,#FEEBD5 62%,#fff 100%)}
+body:has(.guided-step) .lesson-spotlight::after{content:"";width:170px;height:170px;position:absolute;right:-35px;bottom:-55px;border:24px solid #00A859;border-radius:50%;opacity:.15;pointer-events:none}
+body:has(.guided-step) .lesson-spotlight .lesson-content h3{max-width:16ch;font-size:clamp(2.15rem,4.2vw,3rem);line-height:1.07}
+body:has(.guided-step) .lesson-story .lesson-content{border-left:0;padding-left:0}
+body:has(.guided-step) .lesson-story .lesson-content h3{display:inline-block;max-width:95%;background:linear-gradient(transparent 67%,#FAA95488 67%);padding-right:8px}
+body:has(.guided-step) .lesson-story .lesson-lead{font-weight:750;font-size:clamp(1.2rem,2.3vw,1.42rem);line-height:1.4}
+body:has(.guided-step) .lesson-insight{background:radial-gradient(circle at 90% 15%,#D3F2E2 0 22%,transparent 22%),#fff}
+body:has(.guided-step) .lesson-insight .lesson-content h3{color:#00753E}
+body:has(.guided-step) .lesson-highlights .lesson-content ul,body:has(.guided-step) .lesson-highlights .lesson-content ol{display:grid;gap:9px;margin:10px 0}
+body:has(.guided-step) .lesson-highlights .lesson-content li{margin:0;border:1px solid #EADFD3;border-left:6px solid #FAA954;border-radius:13px;padding:12px 16px;background:#fff;font-size:1.08rem;box-shadow:0 3px 0 #FEEBD5}
+body:has(.guided-step) .lesson-highlights .lesson-content li::before{display:none}
+body:has(.guided-step) .lesson-principles .lesson-content .card:nth-of-type(even){background:#D3F2E2;border-color:#00A859;box-shadow:5px 5px 0 #00A85922}
+body:has(.guided-step) .lesson-principles .lesson-content .card:nth-of-type(odd){background:#fff;border-color:#FAA954;box-shadow:5px 5px 0 #FAA95433}
+body:has(.guided-step) .lesson-people .lesson-content .tbl{border-radius:15px;border-color:#EADFD3}
+body:has(.guided-step) .lesson-people .lesson-content th{background:#FAA954;color:#373435}
+body:has(.guided-step) .lesson-people .lesson-content tr:nth-child(even) td{background:#FFF4E7}
+body:has(.guided-step) .lesson-card .lesson-content b,body:has(.guided-step) .lesson-card .lesson-content strong{font-weight:850}
+body:has(.guided-step) .guided-controls{box-shadow:0 5px 16px #3734350D}
+body:has(.guided-step) .guided-controls .small{font-weight:800;color:#A55F12}
+@media(max-width:600px){body:has(.guided-step) .lesson-highlights .lesson-content li{font-size:1rem;padding:9px 12px}body:has(.guided-step) .lesson-spotlight .lesson-content h3{font-size:1.85rem}}
 </style>
 </head>
 <body>
@@ -916,7 +941,7 @@ function moduleView(id){
       const pane=document.createElement("section");
       const kind=group.some(c=>c.classList.contains("tbl"))?"people":group.some(c=>c.classList.contains("card"))?"principles":group.some(c=>c.tagName==="UL"||c.tagName==="OL")?"highlights":i%3===0?"spotlight":i%3===1?"story":"insight";
       pane.className="stage guided-step lesson-card lesson-"+kind;
-      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">✦ DISCOVER</span><span>PART '+String(i+1).padStart(2,"0")+'</span></div>';
+      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">'+({spotlight:"☀ THE BIG PICTURE",story:"✦ THE STORY",insight:"↗ WHY IT MATTERS",principles:"◈ OUR FOUNDATIONS",highlights:"✓ KEY TAKEAWAYS",people:"◎ MEET THE TEAM"}[kind])+'</span><span>'+String(i+1).padStart(2,"0")+' / '+String(steps.length).padStart(2,"0")+'</span></div>';
       const content=document.createElement("div");content.className="lesson-content";
       group.forEach(c=>content.appendChild(c));
       const topic=(content.querySelector("h3")?.textContent||"").toLowerCase();
@@ -928,6 +953,14 @@ function moduleView(id){
         const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="WHAT WE STAND FOR ✳";pane.appendChild(tag);
       }else if(topic.includes("recognition")){
         const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.appendChild(tag);
+      }
+      // Larger ideas and shorter facts deserve different visual rhythms.
+      if(kind==="highlights"){
+        content.querySelectorAll("li").forEach((li,j)=>{li.style.setProperty("--item-index",String(j+1));});
+      }
+      if(kind==="story"||kind==="insight"){
+        const paragraphs=content.querySelectorAll(":scope > p");
+        if(paragraphs.length>1)paragraphs[0].classList.add("lesson-lead");
       }
       pane.appendChild(content);
       parent.insertBefore(pane,prose);
