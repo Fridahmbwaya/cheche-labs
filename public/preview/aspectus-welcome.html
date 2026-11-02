@@ -29,7 +29,7 @@ form.addEventListener("submit",async e=>{
   if(!email)return;
   submit.disabled=true;submit.textContent="Sending sign-in link…";
   try {
-    const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+"/aspectus"}});
+    const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+"/aspectus/auth/callback"}});
     if(error)throw error;
     toast.textContent="Check your inbox for your secure sign-in link. Open the newest email.";
   } catch(error){
