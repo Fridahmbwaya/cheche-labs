@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
+// Aspectus preview uses its dedicated Supabase project through branch-scoped Vercel environment variables.
 const db=createClient();
 type Row={id:string;module_id:string;learner_id:string;response_text:string;deliverable_url:string|null;status:string;submitted_at:string};
 type Mod={id:string;title:string;order_index:number};
