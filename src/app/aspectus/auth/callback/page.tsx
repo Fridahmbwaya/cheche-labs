@@ -24,7 +24,7 @@ export default function AspectusAuthCallback() {
     }
     const {data:{user},error:authError}=await db.auth.getUser();
     if(authError||!user)throw new Error("Sign-in link could not establish a session. Please request a new link.");
-    const {data:profile,error:profileError}=await db.from("users").select("id,role,org_id").eq("id",user.id).single();
+    const {data:profile}=await db.from("users").select("id,role,org_id").eq("id",user.id).single();
     if(!profile){await db.rpc("aspectus_claim_pending_account");const check=await db.from("users").select("id").eq("id",user.id).maybeSingle();if(!check.data)throw new Error("This email is not yet registered as an Aspectus learner or manager.");}
     if(!cancelled)window.location.replace("/aspectus");
    }catch(e){if(!cancelled)setMessage(e instanceof Error?e.message:"Sign-in failed. Please request another link.");}
