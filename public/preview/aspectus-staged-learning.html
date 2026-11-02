@@ -504,7 +504,7 @@ const MODULES = [
   {q:"You want to post that a project produces a certain amount of power. Who checks it first?", o:["Nereah","Javis or Julius on the technical team","Nobody, if it’s from the profile","The client"], a:1, why:"Technical claims are checked with the technical team before Brenda approves the post."},
   {q:"Which of these is one of Sarah’s three priorities?", o:["Opening an office in Uganda","Growing servicing and maintenance","Stopping solar water heaters","Reducing the number of agents"], a:1, why:"Servicing and maintenance is one of the three bets. It’s a strong theme for your content."}
  ],
- task:{prompt:"In your own words, write a three-sentence introduction to Aspectus you could use in an Instagram bio or a LinkedIn “About” section. Keep it accurate to this module."}
+ task:{prompt:"Revisit the social media graphic you submitted during your application. Refine it into an Instagram post that reintroduces Aspectus using the brand colors and accurate company information. Submit the improved graphic, a caption of no more than 100 words, and one sentence explaining what you changed. Draft only; Brenda approves anything published."}
 },
 
 {id:"m2", track:"know", title:"What changed since 2024", mins:6,
@@ -541,7 +541,7 @@ const MODULES = [
   {q:"Can you post “We are NCA 3 certified”?", o:["Yes","No. We are NCA 4; NCA 3 is a goal","Only on LinkedIn","Only in tenders"], a:1, why:"Claiming a rating we don’t hold yet could hurt us, especially in tenders."},
   {q:"A follower asks how much revenue Aspectus made last year. What do you do?", o:["Share the board figure","Share the company profile figure","Don’t share financials; thank them and redirect to what we do","Guess"], a:2, why:"Financials are internal. Keep the reply friendly and point to our projects instead."}
  ],
- task:{prompt:"Look through Aspectus’s current Instagram, Facebook and LinkedIn pages. List anything you find that looks outdated (old tagline, old team, old numbers) and where it is. You’ll share this list with Brenda."}
+ task:{prompt:"Review Aspectus Instagram, Facebook and LinkedIn profiles. Capture screenshots of three specific improvements you recommend. Submit each screenshot with its platform, what should change, and a proposed fix."}
 },
 
 {id:"m3", track:"know", title:"What we sell and who buys it", mins:10,
@@ -590,7 +590,7 @@ const MODULES = [
   {q:"Which segment converts best once they enquire?", o:["Homeowners","Schools","Managed estates","Commercial"], a:0, why:"Homeowners have the highest closing rate. Facebook and Instagram ads aimed at them pay off."},
   {q:"For a large solar PV quote, what does sales usually need from the client?", o:["Their favourite colour","3 to 6 months of power bills","Their KRA PIN","Nothing"], a:1, why:"Bills show how much power they really use, which drives the system size."}
  ],
- task:{prompt:"Pick one product. Write how you’d explain it to a homeowner in four plain-English sentences, with no jargon. Then list two questions you’d need the technical team to answer before posting about it."}
+ task:{prompt:"Choose one Aspectus solar product. Create one educational post concept with a simple graphic or photo and a caption of up to 100 words explaining one customer benefit. Add two technical claims to check with Javis before publishing."}
 },
 
 {id:"m4", track:"know", title:"How Aspectus runs", mins:7,
@@ -630,7 +630,7 @@ const MODULES = [
   {q:"A client’s phone number came through a DM. Can you share it in a public reply?", o:["Yes","No, customer details stay private","Only with their name","Only on WhatsApp"], a:1, why:"Customer privacy is part of our policy and Kenyan law."},
   {q:"You realise you won’t finish a task by Friday. When do you tell Brenda?", o:["On Monday","Before Friday","Never","Only if she asks"], a:1, why:"Flag it before the due date so the plan can change."}
  ],
- task:{prompt:"Write the reply you would post publicly to the delayed-installation comment above. Keep it under 40 words."}
+ task:{prompt:"Respond to three realistic social interactions: a new product enquiry, a price question and a customer concerned about an installation delay. Submit three replies (40 words maximum each), plus one sentence identifying anything to escalate to Brenda."}
 },
 
 /* ---------------- TRACK 2: MARKET ---------------- */
@@ -671,7 +671,7 @@ const MODULES = [
   {q:"Who gives final approval for your posts?", o:["You","Brenda","Javis","Any agent"], a:1, why:"Brenda approves every post. Technical claims get checked by the technical team first."},
   {q:"Which caption follows our voice best?", o:["“Leveraging cutting-edge photovoltaic synergies.”","“No more blackouts in Kitengela: a 12 kW system, installed in a week.”","“BEST SOLAR EVER!!!”","“Solar is good.”"], a:1, why:"Outcome first, specific, plain English."}
  ],
- task:{prompt:"Pick one 2026 completed project from the list above. Draft a LinkedIn post about it: the outcome, the system, one line on the client type, and a call to action. Note which details need checking with the technical team."}
+ task:{prompt:"Choose one verified Aspectus installation. Create a three-slide social carousel storyboard showing the customer need, the solution and the outcome, plus a short caption. Flag facts, photos or client details that need approval."}
 },
 
 {id:"m6", track:"market", title:"The social media playbook", mins:10,
@@ -705,7 +705,7 @@ const MODULES = [
   {q:"What do we measure for WhatsApp Status posts?", o:["Likes","Messages received per post","Shares on X","Nothing"], a:1, why:"WhatsApp Status is about direct conversations with warm leads."},
   {q:"A new enquiry comes in by DM. After replying, what’s the next step?", o:["Nothing","Log it in the pipeline sheet and hand it to sales","Post about it","Wait for them to call"], a:1, why:"A lead that isn’t logged gets lost."}
  ],
- task:{prompt:"Draft three Tuesday Energy Tips. For each one, write: the visual idea, the caption, the call to action, and the technical claim that needs checking. Brenda will review them."}
+ task:{prompt:"Build a one-week content calendar with five posts: education, product, project proof, engagement and enquiry generation. For each include platform, format, hook, call to action and needed asset. Design only one example post."}
 },
 
 /* ---------------- TRACK 3: SELL ---------------- */
@@ -743,54 +743,36 @@ const MODULES = [
   {q:"Who prepares quotations?", o:["You","Sales, after sizing","The client","Nobody"], a:1, why:"Quotes come after a site visit and sizing by the team."},
   {q:"At which two stages does marketing contribute most?", o:["Lead generation and follow-up","Installation and testing","Invoicing and payment","Sourcing materials"], a:0, why:"You bring leads in and help keep clients engaged afterwards."}
  ],
- task:{prompt:"Write a short WhatsApp message template you could use to reply to any new enquiry and collect the five details sales needs. Keep it warm and under 60 words."}
+ task:{prompt:"A follower sends a direct message asking for a solar solution. Draft a friendly opening reply, a simple five-field lead capture checklist, and a concise handoff message to sales. Include a short follow-up when the customer has not replied."}
 },
 
-{id:"m8", track:"sell", title:"Tenders 101", mins:9,
- intro:"Tenders bring the biggest projects. Your job is to make sure nothing is missing and nothing is late.",
+{id:"m8", track:"market", title:"Planning a social media campaign", mins:10,
+ intro:"Put everything together: audience, message, content plan, creative and measurement.",
  body:`
-<h3>The words you’ll hear</h3>
-<div class="tbl"><table><tr><th>Term</th><th>Meaning</th></tr>
-<tr><td>Tender</td><td>A formal invitation to bid for a job</td></tr>
-<tr><td>RFQ / RFP</td><td>Request for quotation / request for proposal: smaller or less formal versions</td></tr>
-<tr><td>Prequalification (PQQ)</td><td>Getting onto an organisation’s approved supplier list before tenders come out</td></tr>
-<tr><td>BOQ</td><td>Bill of quantities: the itemised list of materials and work to price</td></tr>
-<tr><td>Tender security</td><td>A bank or insurance guarantee some tenders require with the bid</td></tr>
-<tr><td>Power of attorney</td><td>A document authorising someone to sign on the company’s behalf</td></tr>
-</table></div>
-<h3>How Aspectus does a tender</h3>
-<ol>
-<li>Read the entire tender.</li>
-<li>Pick out every requirement, mandatory and technical.</li>
-<li>Check with the team that we can deliver.</li>
-<li>Go through the BOQ and note what’s needed.</li>
-<li>Start sourcing materials.</li>
-<li>Start filling in the tender document.</li>
-<li>Gather the required documents (tender security, power of attorney and others).</li>
-<li>Cost the BOQ in a spreadsheet, comparing markups.</li>
-<li>Transfer the final prices into the tender’s BOQ.</li>
-<li>Confirm every document is ready and correctly filled, then submit.</li>
-</ol>
-<h3>Your part (to start)</h3>
-<ul><li>Keep the company document pack current and in one place.</li><li>Pull together the company profile, project references and photos.</li><li>Track deadlines and remind the team early.</li><li>Do the final completeness check against the requirements list.</li></ul>
-<p>Pricing and costing stay with sales and finance.</p>
-<h3>Documents commonly requested</h3>
-<p>Every tender lists its own; always check. These come up often:</p>
-<ul><li>Certificate of incorporation and CR12</li><li>KRA PIN and a valid tax compliance certificate</li><li>EPRA licences</li><li>NCA certificate</li><li>Business permit</li><li>Company profile and list of past projects</li><li>Reference letters from past clients</li><li>Tender security, if required</li><li>Power of attorney, if required</li><li>Signed and stamped forms</li></ul>
-<h3>Recent examples</h3>
-<p>This year Aspectus did prequalifications with KASNEB, CEMASTEA, Murang’a Water, CUEA and KCB, and submitted bids such as an RFQ for IHS Tatu City and a tender for NCCK.</p>
-<div class="warn"><strong>Never</strong> submit an expired certificate, and never state a licence or rating we don’t hold (we are NCA 4, not NCA 3).</div>
+<h3>Start with one objective</h3>
+<p>A campaign is a group of posts working toward one outcome. For Aspectus, choose an objective such as awareness of solar water heating, more qualified enquiries, or education about solar PV. Avoid trying to achieve everything at once.</p>
+<div class="card"><h4>Campaign brief</h4><p>Record four things: the audience, the goal, the one key message and the action you want them to take.</p></div>
+<h3>Choose the audience</h3>
+<p>A homeowner looking at monthly energy bills and a developer specifying systems for new apartments need different messages. Choose one audience and write for their concerns.</p>
+<h3>Build a three-post sequence</h3>
+<ol><li><b>Get attention.</b> Introduce a customer problem or surprising insight.</li><li><b>Build confidence.</b> Explain how an Aspectus solution works or show a verified installation.</li><li><b>Invite action.</b> Make the next step simple: send an enquiry, ask for advice or request a consultation.</li></ol>
+<h3>The content calendar</h3>
+<p>For each post, capture: day, platform, format (photo, carousel or graphic), opening hook, visual asset, caption angle and call to action. Three clear rows are enough for this mini-campaign.</p>
+<div class="card"><h4>Keep production manageable</h4><p>Plan all three posts, but fully design only one creative. Reuse approved Aspectus photos and your existing templates where possible.</p></div>
+<h3>Measure what matters</h3>
+<p>Match metrics to your goal. Reach and saves can help assess awareness or education; relevant direct messages and qualified enquiries are more useful when the objective is lead generation.</p>
+<h3>Before anything goes live</h3>
+<ul><li>Check technical claims with Javis or Julius.</li><li>Confirm photo and client permissions.</li><li>Use Aspectus colors and approved branding.</li><li>Send every post to Brenda for approval before publishing.</li></ul>
 `,
- scenario:{q:"A tender closes in two days and the tax compliance certificate has expired. What do you do?",
-  o:[{t:"Submit the expired one and hope nobody checks.", ok:false, fb:"An expired mandatory document usually disqualifies the whole bid."},
-     {t:"Tell Brenda immediately so finance can renew it today, and keep preparing everything else.", ok:true, fb:"Right. Raise it early, keep the rest moving. KRA renewals can often be done quickly online."},
-     {t:"Leave it out quietly.", ok:false, fb:"A missing mandatory document also disqualifies the bid."}]},
+ scenario:{q:"The objective is to generate enquiries from homeowners about solar water heating. Which call to action fits best?",
+  o:[{t:"Send us a DM with your household's hot-water needs.",ok:true,fb:"Right. A specific next step can start a useful sales conversation."},{t:"Like this post if you love sunshine.",ok:false,fb:"Likes are engagement, not necessarily customer enquiries."},{t:"Follow for more inspiration.",ok:false,fb:"Following may build an audience but does not directly qualify a lead."}]},
  quiz:[
-  {q:"What is a BOQ?", o:["A bank guarantee","The itemised list of materials and work to price","A licence","A testimonial"], a:1, why:"The bill of quantities is what gets priced."},
-  {q:"What is the very first step in a tender?", o:["Price it","Read the entire tender","Submit","Order materials"], a:1, why:"Missing one requirement can disqualify the bid, so read it all first."},
-  {q:"What’s a prequalification?", o:["A final bid","Getting onto an approved supplier list before tenders come out","A discount","A site visit"], a:1, why:"Being prequalified means we get invited to future tenders."}
+  {q:"What should a campaign brief clarify first?",o:["Every hashtag","One objective and target audience","The final photo filter","The number of likes to promise"],a:1,why:"Start with a clear goal and the people you want to reach."},
+  {q:"Which content calendar entry is most useful?",o:["Tuesday: post something","Tuesday: carousel, homeowner audience, hook, visual, CTA","Three emojis","Post whenever free"],a:1,why:"A usable plan identifies the message, format, asset and next step."},
+  {q:"Which metric best supports a lead-generation campaign?",o:["Any impression","Qualified product enquiries","Logo size","Number of words"],a:1,why:"Meaningful enquiries reflect the campaign objective."},
+  {q:"What must happen before publishing a project photo?",o:["Nothing if it looks professional","Only add a hashtag","Confirm permissions, verify claims and get Brenda's approval","Let the app approve automatically"],a:2,why:"Company and client approval rules still apply."}
  ],
- task:{prompt:"Make a checklist you would use to track the document pack for one tender: each document, who holds it, and its expiry date. Ask Brenda which recent tender you can use as a practice example."}
+ task:{prompt:"Plan a three-post, one-week social campaign for one Aspectus solution. Submit a short campaign brief (audience, objective, key message), a three-row content calendar (format, hook and CTA), one sample graphic or carousel slide with a caption, and two success metrics. Submit for Brenda review; do not publish."}
 }
 ];
 
