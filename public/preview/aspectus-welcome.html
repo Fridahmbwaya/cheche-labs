@@ -8,23 +8,12 @@ const supabase = createClient("https://lzumqcyhsiegkmzwmlsl.supabase.co","sb_pub
 // Supabase can fall back to the configured Site URL when the requested redirect
 // isn't allowlisted. In that case tokens arrive on this welcome page.
 // Establish the session here and immediately clear credentials from the URL.
-async function finishEmailSignIn(){
+function finishEmailSignIn(){
  const fragment=new URLSearchParams(window.location.hash.slice(1));
- const accessToken=fragment.get("access_token");
- const refreshToken=fragment.get("refresh_token");
- const error=fragment.get("error_description");
- if(!accessToken&&!error)return;
- history.replaceState(null,"",window.location.pathname+window.location.search);
- const notice=document.createElement("div");
- notice.setAttribute("role","status");
- notice.style.cssText="position:fixed;z-index:9999;left:50%;top:32px;transform:translateX(-50%);max-width:90vw;padding:18px 24px;background:white;border:1px solid #f2d5b4;border-radius:12px;box-shadow:0 10px 40px #0002;color:#373435;font-weight:700";
- notice.textContent="Signing you in to your Aspectus homepage…";
- document.body.appendChild(notice);
- if(error){notice.textContent=decodeURIComponent(error.replace(/\\+/g," "));return;}
- if(!refreshToken){notice.textContent="Sign-in link is incomplete. Please request a new one.";return;}
- const {error:sessionError}=await supabase.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
- if(sessionError){notice.textContent="Sign-in failed: "+sessionError.message;return;}
- window.location.replace("/aspectus");
+ if(!fragment.has("access_token")&&!fragment.has("error_description")&&!new URLSearchParams(location.search).has("code"))return;
+ // All sessions must be established by the Next.js callback, which stores the
+ // SSR cookies used by /aspectus. The welcome-page Supabase client does not.
+ window.location.replace("/aspectus/auth/callback"+window.location.search+window.location.hash);
 }
 void finishEmailSignIn();
 const modal=document.getElementById("modal");
