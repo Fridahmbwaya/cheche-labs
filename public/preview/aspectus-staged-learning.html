@@ -411,6 +411,12 @@ body:has(.guided-step) .lesson-card .lesson-content b,body:has(.guided-step) .le
 body:has(.guided-step) .guided-controls{box-shadow:0 5px 16px #3734350D}
 body:has(.guided-step) .guided-controls .small{font-weight:800;color:#A55F12}
 @media(max-width:600px){body:has(.guided-step) .lesson-highlights .lesson-content li{font-size:1rem;padding:9px 12px}body:has(.guided-step) .lesson-spotlight .lesson-content h3{font-size:1.85rem}}
+
+/* Calm module identity header: avoid oversized gray block and duplicate navigation. */
+body:has(.guided-step) .modhead{display:flex;flex-direction:column;gap:5px;position:relative;padding:0 0 16px;margin:0 0 6px;border-bottom:1px solid #EADFD3;background:transparent!important;box-shadow:none!important}
+body:has(.guided-step) .modhead .kicker{font-size:.72rem!important;letter-spacing:.13em!important;color:#A55F12!important;font-weight:900!important;margin:0!important}
+body:has(.guided-step) .modhead h1{font-size:clamp(1.5rem,3vw,1.95rem)!important;line-height:1.12!important;letter-spacing:-.04em!important;margin:0!important;color:#373435!important}
+body:has(.guided-step) .modhead .lede{font-size:.87rem!important;margin:0!important;color:#6B6466!important;line-height:1.35!important}
 </style>
 </head>
 <body>
@@ -911,7 +917,6 @@ function moduleView(id){
   const q = quizScore(m); const allAnswered = q.n===q.total; const passed = q.c/q.total >= CONFIG.passMark;
   const idx = MODULES.indexOf(m); const nextM = MODULES[idx+1];
   app.innerHTML = `<div class="wrap" style="${trackStyle(m.track)}">
-    <button class="back" onclick="go('home')">← Home</button>
     <div class="modhead"><p class="kicker">${T.name} · Module ${idx+1} of ${MODULES.length} · ${m.mins} min</p><h1 style="font-size:clamp(1.8rem,6vw,2.5rem)">${m.title}</h1><p class="lede">${m.intro}</p></div>
     <div class="prose">${m.body}</div>
     ${m.scenario?`<div class="stage"><p class="label">What would you do?</p><p class="qt"><b>${m.scenario.q}</b></p>${m.scenario.o.map((o,j)=>{ let cls=""; if(st.scen!=null){ if(o.ok) cls="right"; else if(j===st.scen) cls="wrong"; } return `<button class="opt ${cls}" data-s="${j}" ${st.scen!=null?"disabled":""}>${o.t}</button>`; }).join("")}${st.scen!=null?`<div class="fb">${m.scenario.o[st.scen].fb}${m.scenario.o[st.scen].ok?"":" The highlighted option is the stronger response."}</div>`:""}</div>`:""}
