@@ -32,6 +32,14 @@ useEffect(()=>{
   if(event.origin!==window.location.origin||event.data?.source!=="aspectus-original-quiz"||!user||manager)return;
   const frame=document.getElementById("aspectus-lesson-frame") as HTMLIFrameElement|null;
   if(!frame||event.source!==frame.contentWindow)return;
+  if(event.data.type==="open-assignment"){
+   const order=Number(event.data.moduleOrder);
+   const current=mods.find(m=>m.order_index===order);
+   if(!current||current.id!==nextModule?.id)return;
+   setSelected(current.id);setScreen("learning");setActiveLesson(false);
+   window.setTimeout(()=>document.getElementById("assignment")?.scrollIntoView({behavior:"smooth",block:"start"}),100);
+   return;
+  }
   const payload=event.data,order=Number(payload.moduleOrder),correct=Number(payload.correct),total=Number(payload.total);
   if(!Number.isInteger(order)||!Number.isInteger(correct)||!Number.isInteger(total)||total<1||correct<0||correct>total||typeof payload.answers!=="object"||payload.answers===null)return;
   const mod=mods.find(x=>x.order_index===order);if(!mod)return;
@@ -50,7 +58,7 @@ useEffect(()=>{
   }
  };
  window.addEventListener("message",handle);return()=>window.removeEventListener("message",handle);
-},[user,manager,mods]);
+},[user,manager,mods,nextModule]);
 async function submit(){
  if(!user||!nextModule)return setMsg("Open your current module first.");
  if(!answer.trim()&&!link.trim()&&!uploadFile)return setMsg("Add a response, attach a file, or paste a document link.");
