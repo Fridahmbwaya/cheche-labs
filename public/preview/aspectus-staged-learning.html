@@ -211,6 +211,28 @@ footer .wrap{max-width:1100px}
 @media (prefers-color-scheme:dark){:root:not([data-theme='light']) .hero{background:linear-gradient(115deg,#30271F,#242424 70%,#1D3025)}:root:not([data-theme='light']) .hero .lede{color:#D9D3CD}:root:not([data-theme='light']) nav.tabs{background:#393536}:root:not([data-theme='light']) nav.tabs button[aria-current='page']{background:#51494A}:root:not([data-theme='light']) .hero .hero-eyebrow{background:#373435;color:#FAA954;border-color:#70573A}:root:not([data-theme='light']) .next{border-color:#4C4443}}
 @media print{.hero{background:#fff}.cert{box-shadow:none}}
 
+
+/* Focused learner: one clear, screen-sized stage with fixed controls */
+body:has(.guided-step){background:#FFFBF6}
+body:has(.guided-step) header.top,body:has(.guided-step) footer{display:none!important}
+body:has(.guided-step) main{padding:0!important}
+body:has(.guided-step) #app>.wrap{max-width:920px;min-height:100dvh;margin:auto;padding:18px 24px 18px;display:flex;flex-direction:column;gap:12px}
+body:has(.guided-step) .modhead{padding:0 0 8px;margin:0;border:0}
+body:has(.guided-step) .modhead h1{font-size:clamp(1.3rem,3vw,1.9rem)!important}
+body:has(.guided-step) .modhead .lede{font-size:.92rem;line-height:1.4;margin:4px 0}
+body:has(.guided-step) .modhead .kicker{font-size:.76rem;margin:0}
+body:has(.guided-step) .back{margin:0;font-size:.85rem;align-self:flex-start}
+body:has(.guided-step) .guided-step{margin:0;min-height:0;flex:1;overflow-y:auto;padding:20px 24px;border:1px solid #EADFD3;background:#fff;border-radius:20px;box-shadow:0 8px 30px rgba(55,52,53,.05)}
+body:has(.guided-step) .guided-step .label{color:#A55F12;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin:0 0 10px}
+body:has(.guided-step) .guided-step h3{margin:0 0 12px;font-size:1.28rem;color:#373435}
+body:has(.guided-step) .guided-step p,body:has(.guided-step) .guided-step li{line-height:1.45}
+body:has(.guided-step) .guided-step .q{margin:4px 0}
+body:has(.guided-step) .guided-step .opt{padding:10px 14px;margin:7px 0}
+body:has(.guided-step) .guided-step textarea{min-height:110px}
+body:has(.guided-step) .guided-controls{flex:none;margin:0;padding:12px 18px;background:#fff;border:1px solid #EADFD3;border-radius:14px}
+body:has(.guided-step) .guided-controls .btn{padding:11px 20px}
+body:has(.guided-step) .guided-step .card{margin:8px 0}
+@media(max-width:600px){body:has(.guided-step) #app>.wrap{padding:12px;gap:8px}body:has(.guided-step) .guided-step{padding:16px}body:has(.guided-step) .modhead .lede{display:none}}
 </style>
 </head>
 <body>
@@ -769,8 +791,9 @@ function moduleView(id){
   const blocked=(isQuestion&&st.quiz[questionIndex]==null)||(isScenario&&st.scen==null)||(isTask&&!String(st.task||"").trim());
   controls.innerHTML='<span class="small">Step '+(st.page+1)+' of '+panes.length+'</span><div style="display:flex;gap:10px"><button class="btn ghost" id="prevStep" '+(st.page===0?'disabled':'')+'>Back</button>'+(isComplete?'':'<button class="btn orange" id="forwardStep" '+(blocked?'disabled':'')+'>Continue →</button>')+'</div>';
   const host=app.querySelector(".wrap");host.appendChild(controls);
-  controls.querySelector("#prevStep").onclick=()=>{st.page--;save();moduleView(id);};
-  const forward=controls.querySelector("#forwardStep");if(forward)forward.onclick=()=>{st.page=Math.min(max,st.page+1);save();moduleView(id);};
+  document.body.classList.add("stage-focused");
+  controls.querySelector("#prevStep").onclick=()=>{st.page--;save();moduleView(id);window.scrollTo(0,0);};
+  const forward=controls.querySelector("#forwardStep");if(forward)forward.onclick=()=>{st.page=Math.min(max,st.page+1);save();moduleView(id);window.scrollTo(0,0);};
   app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ st.scen=+b.dataset.s; save(); moduleView(id); });
   app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
   const ta=document.getElementById("task"); let t; ta.oninput=()=>{ st.task=ta.value; const forward=app.querySelector("#forwardStep");if(forward)forward.disabled=!st.task.trim(); clearTimeout(t); t=setTimeout(()=>{ save(); document.getElementById("savedMsg").textContent="Saved on this device"; },400); };
