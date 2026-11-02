@@ -355,6 +355,37 @@ body:has(.guided-step) .lesson-bottomline{font-size:.88rem;color:#6B6466}
 body:has(.guided-step) .guided-controls{border:1.5px solid #FAA954}
 body:has(.guided-step) .guided-controls .btn.orange{font-size:1rem;padding:13px 23px}
 @media(max-width:600px){body:has(.guided-step) .lesson-card{padding:20px!important}body:has(.guided-step) .lesson-content h3{font-size:1.75rem}body:has(.guided-step) .lesson-content p{font-size:1.13rem}body:has(.guided-step) .lesson-content li{font-size:1.05rem}}
+
+/* Gen Z-friendly visual storytelling, rooted in the Aspectus identity */
+.lesson-card{isolation:isolate}
+body:has(.guided-step) .lesson-card .lesson-content{position:relative;z-index:1}
+body:has(.guided-step) .lesson-card .lesson-content h3{font-weight:900;letter-spacing:-.055em;text-wrap:balance}
+body:has(.guided-step) .lesson-card .lesson-content h3::after{content:"";display:block;width:44px;height:6px;border-radius:10px;background:#FAA954;margin-top:13px}
+body:has(.guided-step) .lesson-insight .lesson-content h3::after{background:#00A859}
+body:has(.guided-step) .lesson-card .lesson-content p strong{color:#A55F12;font-weight:900}
+body:has(.guided-step) .lesson-card .lesson-content li b{color:#00753E}
+body:has(.guided-step) .lesson-card .lesson-content .card h4{color:#A55F12;font-size:1.2rem}
+body:has(.guided-step) .lesson-card .lesson-content ul{list-style:none;padding:0}
+body:has(.guided-step) .lesson-card .lesson-content ul li{position:relative;padding-left:19px}
+body:has(.guided-step) .lesson-card .lesson-content ul li::before{content:"✳";position:absolute;left:0;color:#00A859}
+body:has(.guided-step) .lesson-card .lesson-content ol li::marker{font-weight:900;color:#A55F12}
+body:has(.guided-step) .lesson-spotlight::after{content:"✳";position:absolute;top:12%;right:6%;font-size:clamp(5rem,12vw,9rem);line-height:1;color:#FAA954;opacity:.38;z-index:0;pointer-events:none}
+body:has(.guided-step) .lesson-insight::after{content:"✦";position:absolute;top:12%;right:7%;font-size:8rem;line-height:1;color:#00A859;opacity:.12;pointer-events:none}
+body:has(.guided-step) .lesson-story::after{content:"〰";position:absolute;bottom:12%;right:8%;font-size:5rem;color:#FAA954;opacity:.22;pointer-events:none}
+.lesson-big-fact{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin:8px 0 0;color:#373435;position:relative}
+.lesson-big-fact .fact-kicker{font-size:.7rem;letter-spacing:.18em;font-weight:900;color:#A55F12}
+.lesson-big-fact strong{font-size:clamp(4rem,8vw,6.3rem);line-height:.95;font-weight:900;letter-spacing:-.075em;color:#373435}
+.lesson-big-fact small{font-size:.9rem;font-weight:700;color:#A55F12;margin-top:5px}
+.lesson-big-fact .fact-spark{color:#00A859;font-size:.45em;vertical-align:top;margin-left:7px}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content{margin:8px 0}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content h3{font-size:1.35rem;margin-bottom:7px}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content h3::after{display:none}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content p{font-size:1.04rem;line-height:1.48}
+.lesson-playful-tag{font-size:.74rem;font-weight:900;letter-spacing:.11em;color:#373435;align-self:flex-start;background:#FAA954;border-radius:99px;padding:9px 14px;transform:rotate(-2deg)}
+body:has(.guided-step) .lesson-card:has(.lesson-playful-tag) .lesson-content{margin:0}
+body:has(.guided-step) .lesson-principles .lesson-content h3{grid-column:1/-1}
+body:has(.guided-step) .lesson-principles .lesson-content .card{box-shadow:4px 5px 0 #FAA95444}
+@media(max-width:600px){.lesson-big-fact strong{font-size:4.2rem}body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-spotlight::after{font-size:5rem}}
 </style>
 </head>
 <body>
@@ -887,7 +918,18 @@ function moduleView(id){
       pane.className="stage guided-step lesson-card lesson-"+kind;
       pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">✦ DISCOVER</span><span>PART '+String(i+1).padStart(2,"0")+'</span></div>';
       const content=document.createElement("div");content.className="lesson-content";
-      group.forEach(c=>content.appendChild(c));pane.appendChild(content);
+      group.forEach(c=>content.appendChild(c));
+      const topic=(content.querySelector("h3")?.textContent||"").toLowerCase();
+      if(topic.includes("one breath")){
+        const graphic=document.createElement("div");graphic.className="lesson-big-fact";
+        graphic.innerHTML='<span class="fact-kicker">THE ASPECTUS STORY</span><strong>2015<span class="fact-spark">✳</span></strong><small>Rooted in Kenya. Powered by solar.</small>';
+        pane.insertBefore(graphic,content);
+      }else if(topic.includes("values")){
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="WHAT WE STAND FOR ✳";pane.insertBefore(tag,content);
+      }else if(topic.includes("recognition")){
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.insertBefore(tag,content);
+      }
+      pane.appendChild(content);
       const sub=document.createElement("div");sub.className="lesson-bottomline";sub.innerHTML='<span class="lesson-symbol" aria-hidden="true">'+({spotlight:"☀",story:"✦",insight:"↗",principles:"◈",highlights:"✓",people:"◎"}[kind])+'</span><span>Take this idea with you as you continue.</span>';
       pane.appendChild(sub);parent.insertBefore(pane,prose);
     });
