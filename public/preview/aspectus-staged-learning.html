@@ -293,6 +293,41 @@ body:has(.guided-step) .guided-step:has(textarea){background:#FFF8ED}
 body:has(.guided-step) .guided-step:has(.card),body:has(.guided-step) .guided-step:has(.tbl){background:#FFFCF7}
 body:has(.guided-step) .guided-step h3{font-size:1.4rem}
 @media(max-width:600px){.baseline-card{padding:20px 16px}.baseline-question-title{font-size:1.3rem;margin-bottom:14px}.baseline-answers .opt{padding:11px 12px}.baseline-meta{font-size:.67rem}}
+
+/* Designed lesson moments — visual variation while keeping one concept on screen */
+body:has(.guided-step) #app>.wrap{max-width:800px}
+body:has(.guided-step) .modhead{padding:0 4px 8px;border:0}
+body:has(.guided-step) .modhead .lede{color:#6B6466}
+body:has(.guided-step) .lesson-card{display:flex;flex-direction:column;justify-content:space-between;gap:14px;padding:25px 32px!important;position:relative;overflow-y:auto}
+.lesson-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.72rem;letter-spacing:.14em;font-weight:900;color:#A55F12}
+.lesson-chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #FAA954;border-radius:100px;padding:7px 12px}
+body:has(.guided-step) .lesson-content{width:100%;margin:auto 0;max-height:100%;padding:8px 0}
+body:has(.guided-step) .lesson-content h3{font-size:clamp(1.65rem,3.4vw,2.15rem);letter-spacing:-.035em;line-height:1.1;margin:0 0 18px;color:#373435}
+body:has(.guided-step) .lesson-content p{font-size:clamp(1.03rem,1.9vw,1.2rem);line-height:1.55;color:#373435;margin:10px 0}
+body:has(.guided-step) .lesson-bottomline{display:flex;align-items:center;gap:10px;border-top:1px solid #EADFD3;padding-top:12px;font-size:.77rem;color:#6B6466}
+.lesson-symbol{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#FAA954;color:#373435;font-size:.95rem;flex-shrink:0}
+body:has(.guided-step) .lesson-spotlight{background:linear-gradient(145deg,#FFF0DA 0%,#FFF8EF 65%,#fff 100%);border-color:#FAA954}
+body:has(.guided-step) .lesson-spotlight .lesson-content{padding:15px 4px}
+body:has(.guided-step) .lesson-spotlight .lesson-content h3{font-size:clamp(2rem,4vw,2.6rem)}
+body:has(.guided-step) .lesson-story{background:#fff}
+body:has(.guided-step) .lesson-story .lesson-content{border-left:5px solid #FAA954;padding-left:22px}
+body:has(.guided-step) .lesson-insight{background:linear-gradient(130deg,#F2F8F3,#fff);border-color:#B4DFC8}
+body:has(.guided-step) .lesson-insight .lesson-chip{border-color:#00A859;color:#00753E}
+body:has(.guided-step) .lesson-insight .lesson-symbol{background:#00A859;color:#fff}
+body:has(.guided-step) .lesson-principles{background:#FFFBF6}
+body:has(.guided-step) .lesson-principles .lesson-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:11px;align-content:center}
+body:has(.guided-step) .lesson-principles .lesson-content>h3,body:has(.guided-step) .lesson-principles .lesson-content>p{grid-column:1/-1}
+body:has(.guided-step) .lesson-principles .lesson-content .card{margin:0;border:1px solid #F2CB9B;background:#FFF0DA;border-radius:16px;padding:17px}
+body:has(.guided-step) .lesson-principles .lesson-content .card h4{font-size:1.1rem;margin:0 0 6px}
+body:has(.guided-step) .lesson-principles .lesson-content .card p{font-size:1rem}
+body:has(.guided-step) .lesson-highlights{background:#FFFFFF}
+body:has(.guided-step) .lesson-highlights .lesson-content li{background:#FFFBF6;border:1px solid #EADFD3;padding:9px 12px;border-radius:11px;margin:8px 0;font-size:1rem}
+body:has(.guided-step) .lesson-people{background:#FBFCF9}
+body:has(.guided-step) .lesson-people .lesson-content h3{font-size:1.6rem}
+body:has(.guided-step) .lesson-people .lesson-content table{font-size:.83rem;min-width:480px}
+body:has(.guided-step) .lesson-people .lesson-content td,body:has(.guided-step) .lesson-people .lesson-content th{padding:7px 10px}
+body:has(.guided-step) .guided-controls .btn.orange{background:#FAA954;color:#373435;border-color:#FAA954;font-weight:800}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:18px!important}body:has(.guided-step) .lesson-content h3{font-size:1.5rem}body:has(.guided-step) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-story .lesson-content{padding-left:14px}}
 </style>
 </head>
 <body>
@@ -819,7 +854,16 @@ function moduleView(id){
     });
     if(bucket.length)steps.push(bucket);
     const parent=prose.parentElement;
-    steps.forEach((group,i)=>{const pane=document.createElement("section");pane.className="stage guided-step";pane.innerHTML='<p class="label">Learn · Part '+(i+1)+'</p>';group.forEach(c=>pane.appendChild(c));parent.insertBefore(pane,prose);});
+    steps.forEach((group,i)=>{
+      const pane=document.createElement("section");
+      const kind=group.some(c=>c.classList.contains("tbl"))?"people":group.some(c=>c.classList.contains("card"))?"principles":group.some(c=>c.tagName==="UL"||c.tagName==="OL")?"highlights":i%3===0?"spotlight":i%3===1?"story":"insight";
+      pane.className="stage guided-step lesson-card lesson-"+kind;
+      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">✦ DISCOVER</span><span>PART '+String(i+1).padStart(2,"0")+'</span></div>';
+      const content=document.createElement("div");content.className="lesson-content";
+      group.forEach(c=>content.appendChild(c));pane.appendChild(content);
+      const sub=document.createElement("div");sub.className="lesson-bottomline";sub.innerHTML='<span class="lesson-symbol" aria-hidden="true">'+({spotlight:"☀",story:"✦",insight:"↗",principles:"◈",highlights:"✓",people:"◎"}[kind])+'</span><span>Take this idea with you as you continue.</span>';
+      pane.appendChild(sub);parent.insertBefore(pane,prose);
+    });
     prose.remove();
   }
   const scenario=app.querySelector(".stage:not(.guided-step)");
