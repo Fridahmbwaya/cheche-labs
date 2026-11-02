@@ -259,6 +259,40 @@ body:has(.guided-step) #app>.wrap{min-height:100%;padding:12px 20px;gap:8px}
 body:has(.guided-step) .guided-step{padding:14px 20px}
 body:has(.guided-step) .guided-controls{padding:9px 14px}
 @media(max-width:600px){body:has(.baseline-question) #app>.wrap{padding:12px}body:has(.baseline-question) .baseline-question{padding:16px}body:has(.guided-step) #app>.wrap{padding:9px}}
+
+/* Purpose-built learner screens: concise, expressive and within the modal */
+body:has(.baseline-layout) header.top,body:has(.baseline-layout) footer{display:none!important}
+body:has(.baseline-layout) main{padding:0!important}
+body:has(.baseline-layout) #app>.baseline-layout{min-height:100%;max-width:740px;padding:22px 18px;display:flex;align-items:center;justify-content:center}
+.baseline-card{width:100%;padding:26px 30px 22px;background:#fff;border:1px solid #EADFD3;border-radius:24px;box-shadow:0 15px 45px rgba(55,52,53,.065)}
+.baseline-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#A55F12;font-size:.76rem;font-weight:800;letter-spacing:.09em}
+.baseline-meter{height:7px;background:#FEEBD5;border-radius:10px;margin:13px 0 24px;overflow:hidden}
+.baseline-meter span{display:block;height:100%;background:#FAA954;border-radius:10px}
+.baseline-question-title{font-size:clamp(1.35rem,2.6vw,1.8rem);line-height:1.27;color:#373435;letter-spacing:-.025em;margin:0 0 20px}
+.baseline-answers{display:grid;gap:9px}
+.baseline-answers .opt{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:13px 16px;margin:0;background:#FFFBF6;border:1.5px solid #EADFD3;border-radius:12px;line-height:1.35;font-size:.98rem;transition:background .15s,border-color .15s}
+.baseline-answers .opt:hover:not(:disabled){background:#FEEBD5;border-color:#FAA954}
+.baseline-answers .opt.right{background:#D3F2E2;border-color:#00A859;color:#00753E;font-weight:800}
+.baseline-answers .opt.wrong{background:#F7E1E1;border-color:#9B1D20;color:#9B1D20}
+.baseline-answers .opt.muted-option{opacity:.65}
+.answer-check{font-size:1.25rem;padding-left:12px;color:#00753E}
+.baseline-feedback{margin-top:15px;padding:12px 15px;border-radius:12px;font-size:.9rem;line-height:1.4}
+.baseline-feedback p{margin:4px 0 0}
+.baseline-feedback.success{background:#D3F2E2;color:#00753E}
+.baseline-feedback.correction{background:#FFF1E1;color:#373435}
+.baseline-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;padding-top:17px;border-top:1px solid #EADFD3}
+.baseline-actions .btn{padding:11px 18px}
+.baseline-actions .btn.orange{background:#FAA954;color:#373435;font-weight:800}
+body:has(.guided-step) .guided-step{background:#fff;border-radius:20px;border:1px solid #EADFD3;box-shadow:0 12px 30px rgba(55,52,53,.055)}
+body:has(.guided-step) .guided-step:has(.q){background:#FFFDF9}
+body:has(.guided-step) .guided-step:has(.q) .qt{font-size:1.18rem;font-weight:800;line-height:1.3}
+body:has(.guided-step) .guided-step:has(.q) .fb{margin-top:13px;padding:13px 15px;border-radius:12px;background:#FEEBD5}
+body:has(.guided-step) .guided-step .opt.right{background:#D3F2E2;border-color:#00A859;color:#00753E;font-weight:700}
+body:has(.guided-step) .guided-step .opt.wrong{background:#F7E1E1;border-color:#9B1D20;color:#9B1D20}
+body:has(.guided-step) .guided-step:has(textarea){background:#FFF8ED}
+body:has(.guided-step) .guided-step:has(.card),body:has(.guided-step) .guided-step:has(.tbl){background:#FFFCF7}
+body:has(.guided-step) .guided-step h3{font-size:1.4rem}
+@media(max-width:600px){.baseline-card{padding:20px 16px}.baseline-question-title{font-size:1.3rem;margin-bottom:14px}.baseline-answers .opt{padding:11px 12px}.baseline-meta{font-size:.67rem}}
 </style>
 </head>
 <body>
@@ -737,24 +771,21 @@ function quizHTML(list, stateObj, prefix){
 }
 
 function baselineView(){
-  if(S.baseline){go("module",{id:"m1"});return;}
-  const st=S._bl || (S._bl = {});
-  const current=Math.min(Math.max(S._blStep||0,0),BASELINE.length-1);
-  const answer=st[current];
-  app.innerHTML = `<div class="wrap"><button class="back" onclick="go('home')">← Back to learning home</button>
-    <p class="kicker">LET'S BEGIN · QUESTION ${current+1} OF ${BASELINE.length}</p>
-    <h1 class="baseline-title">A quick starting point</h1>
-    <div class="bar" style="margin:16px 0 22px"><span style="width:${(current+1)/BASELINE.length*100}%"></span></div>
-    <div class="baseline-question"><p class="qt">${BASELINE[current].q}</p>${BASELINE[current].o.map((option,j)=>`<button class="opt ${answer===j?"chosen":""}" data-o="${j}" aria-pressed="${answer===j}">${option}</button>`).join("")}</div>
-    <div class="done-bar"><button class="btn ghost" id="blBack" ${current===0?"disabled":""}>← Previous</button><button class="btn orange" id="blNext" ${answer==null?"disabled":""}>${current===BASELINE.length-1?"Begin Module 1 →":"Continue →"}</button></div></div>`;
-  app.querySelectorAll(".baseline-question .opt").forEach(b=>b.onclick=()=>{st[current]=+b.dataset.o;save();baselineView();});
-  document.getElementById("blBack").onclick=()=>{S._blStep=Math.max(0,current-1);save();baselineView();};
-  document.getElementById("blNext").onclick=()=>{
-    if(st[current]==null)return;
-    if(current<BASELINE.length-1){S._blStep=current+1;save();baselineView();return;}
-    let c=0; BASELINE.forEach((q,i)=>{if(st[i]===q.a)c++;});
-    S.baseline={c,total:BASELINE.length};save();go("module",{id:"m1"});
-  };
+ if(S.baseline){go("module",{id:"m1"});return;}
+ const st=S._bl||(S._bl={});
+ const current=Math.min(Math.max(S._blStep||0,0),BASELINE.length-1);
+ const question=BASELINE[current],answer=st[current],answered=answer!=null;
+ app.innerHTML=`<div class="wrap baseline-layout"><section class="baseline-card">
+  <div class="baseline-meta"><span>BEFORE WE BEGIN</span><strong>QUESTION ${current+1} / ${BASELINE.length}</strong></div>
+  <div class="baseline-meter"><span style="width:${(current+1)/BASELINE.length*100}%"></span></div>
+  <h1 class="baseline-question-title">${question.q}</h1>
+  <div class="baseline-answers">${question.o.map((option,j)=>`<button class="opt ${!answered?"":j===question.a?"right":j===answer?"wrong":"muted-option"}" data-o="${j}" ${answered?"disabled":""} aria-pressed="${answer===j}">${option}${answered&&j===question.a?'<span class="answer-check">✓</span>':""}</button>`).join("")}</div>
+  ${answered?`<div class="baseline-feedback ${answer===question.a?"success":"correction"}"><strong>${answer===question.a?"Correct!":"Here's the right answer"}</strong><p>${question.why||"The green answer is the correct choice."}</p></div>`:""}
+  <div class="baseline-actions"><button id="blBack" class="btn ghost" ${current===0?"disabled":""}>← Back</button><button id="blNext" class="btn orange" ${!answered?"disabled":""}>${current===BASELINE.length-1?"Start Module 1 →":"Next question →"}</button></div>
+  </section></div>`;
+ app.querySelectorAll(".baseline-answers .opt").forEach(b=>b.onclick=()=>{st[current]=+b.dataset.o;save();baselineView();});
+ document.getElementById("blBack").onclick=()=>{S._blStep=Math.max(0,current-1);save();baselineView();};
+ document.getElementById("blNext").onclick=()=>{if(st[current]==null)return;if(current<BASELINE.length-1){S._blStep=current+1;save();baselineView();return;}let c=0;BASELINE.forEach((q,i)=>{if(st[i]===q.a)c++;});S.baseline={c,total:BASELINE.length};save();go("module",{id:"m1"});};
 }
 
 function moduleView(id){
