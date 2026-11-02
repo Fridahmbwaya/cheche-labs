@@ -630,7 +630,8 @@ function dayNum(){ const s=new Date(CONFIG.startDate+"T00:00:00"); const d=Math.
 
 /* ================= VIEWS ================= */
 const app = document.getElementById("app");
-let view = {name:"home"};
+const requestedModule = new URLSearchParams(window.location.search).get("module");
+let view = requestedModule && /^m[1-8]$/.test(requestedModule) ? {name:"module",id:requestedModule} : {name:"home"};
 function go(name, extra){ view = Object.assign({name}, extra||{}); render(); window.scrollTo(0,0); }
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 
