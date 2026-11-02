@@ -978,7 +978,7 @@ function moduleView(id){
   if(quizStage){
     const questions=Array.from(quizStage.querySelectorAll(".q"));
     questions.forEach((q,i)=>{const pane=document.createElement("section");pane.className="stage guided-step";pane.innerHTML='<p class="label">Knowledge check · '+(i+1)+' of '+questions.length+'</p>';pane.appendChild(q);quizStage.parentElement.insertBefore(pane,quizStage);});
-    const retry=quizStage.querySelector("#retry");if(retry){const finalQuiz=quizStage.previousElementSibling;finalQuiz.appendChild(retry);}
+    const retry=quizStage.querySelector(".retry-notice");if(retry){const finalQuiz=quizStage.previousElementSibling;finalQuiz.appendChild(retry);}
     quizStage.remove();
   }
   const task=app.querySelector(".stage:not(.guided-step)");
