@@ -689,14 +689,24 @@ function quizHTML(list, stateObj, prefix){
 }
 
 function baselineView(){
-  const st = S._bl || (S._bl = {});
-  const answered = Object.keys(st).length;
-  app.innerHTML = `<div class="wrap"><button class="back" onclick="go('home')">← Home</button>
-    <h2>Baseline check</h2><p class="note">This shows what you already know, so ${CONFIG.manager} can focus your first week. It isn’t graded.</p>
-    ${quizHTML(BASELINE, st, "b")}
-    <div class="done-bar"><span>${answered}/${BASELINE.length} answered</span><button class="btn" id="blDone" ${answered<BASELINE.length?"disabled":""}>Save and continue</button></div></div>`;
-  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ st[+b.dataset.q.slice(1)] = +b.dataset.o; save(); baselineView(); });
-  document.getElementById("blDone").onclick=()=>{ let c=0; BASELINE.forEach((q,i)=>{ if(st[i]===q.a)c++; }); S.baseline={c,total:BASELINE.length}; save(); go("module",{id:"m1"}); };
+  if(S.baseline){go("module",{id:"m1"});return;}
+  const st=S._bl || (S._bl = {});
+  const current=Math.min(Math.max(S._blStep||0,0),BASELINE.length-1);
+  const answer=st[current];
+  app.innerHTML = `<div class="wrap"><button class="back" onclick="go('home')">← Back to learning home</button>
+    <p class="kicker">LET'S BEGIN · QUESTION ${current+1} OF ${BASELINE.length}</p>
+    <h1>What do you already know?</h1><p class="note">Five quick, ungraded questions. We’ll use your answers to understand your starting point.</p>
+    <div class="bar" style="margin:20px 0"><span style="width:${(current+1)/BASELINE.length*100}%"></span></div>
+    ${quizHTML([BASELINE[current]],{0:answer},"b")}
+    <div class="done-bar"><button class="btn ghost" id="blBack" ${current===0?"disabled":""}>← Previous</button><button class="btn orange" id="blNext" ${answer==null?"disabled":""}>${current===BASELINE.length-1?"Begin Module 1 →":"Continue →"}</button></div></div>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{st[current]=+b.dataset.o;save();baselineView();});
+  document.getElementById("blBack").onclick=()=>{S._blStep=Math.max(0,current-1);save();baselineView();};
+  document.getElementById("blNext").onclick=()=>{
+    if(st[current]==null)return;
+    if(current<BASELINE.length-1){S._blStep=current+1;save();baselineView();return;}
+    let c=0; BASELINE.forEach((q,i)=>{if(st[i]===q.a)c++;});
+    S.baseline={c,total:BASELINE.length};save();go("module",{id:"m1"});
+  };
 }
 
 function moduleView(id){
