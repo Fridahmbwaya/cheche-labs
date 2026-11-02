@@ -923,11 +923,11 @@ function moduleView(id){
       if(topic.includes("one breath")){
         const graphic=document.createElement("div");graphic.className="lesson-big-fact";
         graphic.innerHTML='<span class="fact-kicker">THE ASPECTUS STORY</span><strong>2015<span class="fact-spark">✳</span></strong><small>Rooted in Kenya. Powered by solar.</small>';
-        pane.insertBefore(graphic,content);
+        pane.appendChild(graphic);
       }else if(topic.includes("values")){
-        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="WHAT WE STAND FOR ✳";pane.insertBefore(tag,content);
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="WHAT WE STAND FOR ✳";pane.appendChild(tag);
       }else if(topic.includes("recognition")){
-        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.insertBefore(tag,content);
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.appendChild(tag);
       }
       pane.appendChild(content);
       const sub=document.createElement("div");sub.className="lesson-bottomline";sub.innerHTML='<span class="lesson-symbol" aria-hidden="true">'+({spotlight:"☀",story:"✦",insight:"↗",principles:"◈",highlights:"✓",people:"◎"}[kind])+'</span><span>Take this idea with you as you continue.</span>';
