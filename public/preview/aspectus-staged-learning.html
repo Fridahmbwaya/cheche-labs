@@ -252,9 +252,10 @@ function currentModule(){ return MODS.find(m=>status(m)==="prog") || MODS.find(m
 
 /* ---------- routing ---------- */
 const app=document.getElementById("app");
-const params=new URLSearchParams(location.search);
-let view=params.get("module") && /^m[1-8]$/.test(params.get("module"))?{name:"lesson",id:params.get("module")} : (params.get("module")==="baseline"?{name:"baseline"}:{name:"home"});
-function go(name,extra){ view=Object.assign({name},extra||{}); render(); window.scrollTo(0,0); }
+const requested=new URLSearchParams(location.search).get("module");
+const requestedId=requested==="baseline"?"baseline":/^m[1-8]$/.test(requested||"")?requested:null;
+let view=requestedId==="baseline"?{name:"baseline"}:requestedId?{name:"lesson",id:requestedId}:{name:"home"};
+function go(name,extra){ if(requestedId && !(name==="lesson" && extra?.id===requestedId) && !(requestedId==="baseline"&&name==="lesson"&&extra?.id==="m1")) return; view=Object.assign({name},extra||{}); render(); window.scrollTo(0,0); }
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function render(){
   touchDay();
@@ -341,7 +342,7 @@ function baselineView(){
     ${D.BASELINE.map((q,i)=>{ const a=st[i]; return `<div style="margin-top:18px"><p><b>${i+1}. ${esc(q.q)}</b></p>${q.o.map((o,j)=>`<button class="opt ${a!=null?(j===q.a?'right':(j===a?'wrong':'')):''}" data-i="${i}" data-o="${j}" ${a!=null?'disabled':''}>${esc(o)}</button>`).join('')}${a!=null?`<div class="fb"><b>${a===q.a?'Correct.':'Good to know.'}</b> ${esc(q.why)}</div>`:''}</div>`; }).join('')}
     <div class="navrow"><span class="small muted">${answered}/${D.BASELINE.length} answered</span><button class="btn orange" id="bd" ${answered<D.BASELINE.length?'disabled':''}>Save and open Module 1</button></div></div></div>`;
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ st[b.dataset.i]=+b.dataset.o; save(); const y=scrollY; baselineView(); scrollTo(0,y); });
-  document.getElementById("bd").onclick=()=>{ let c=0; D.BASELINE.forEach((q,i)=>{ if(st[i]===q.a) c++; }); S.baseline={c,total:D.BASELINE.length}; save(); go("home"); };
+  document.getElementById("bd").onclick=()=>{ let c=0; D.BASELINE.forEach((q,i)=>{ if(st[i]===q.a) c++; }); S.baseline={c,total:D.BASELINE.length}; save(); window.parent.postMessage({source:"aspectus-original-quiz",type:"baseline-result",correct:c,total:D.BASELINE.length,answers:st},"*"); go("lesson",{id:"m1"}); };
 }
 
 /* ---------- lesson ---------- */
@@ -414,7 +415,12 @@ function lessonView(){
   const ta=document.getElementById("task"), ln=document.getElementById("link");
   if(ta){ let t; const up=()=>{ st.task=ta.value; st.link=ln.value; clearTimeout(t); t=setTimeout(()=>{ save(); document.getElementById("sv").textContent="Saved on this device"; const ok=stepDone(m,st,k); document.getElementById("tg").textContent= ok?'✓ Saved. You can continue.':'🔒 Write at least a few lines, or add a link, to continue.'; const n2=document.getElementById("next"); if(n2) n2.disabled=!ok; },300); }; ta.oninput=up; ln.oninput=up; }
   app.querySelectorAll('input[name="cf"]').forEach(el=>el.onchange=()=>{ st.confidence=el.value; save(); lessonView(); });
-  const cp=document.getElementById("complete"); if(cp) cp.onclick=()=>{ st.done=true; st.submitted=true; st.finished=Date.now(); save(); const correct=m.quiz.filter((q,i)=>st.quiz[i]?.correct).length; window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:n,correct,total:m.quiz.length,answers:st.quiz},"*");window.parent.postMessage({source:"aspectus-original-quiz",type:"practical-task",moduleOrder:n,correct,total:m.quiz.length,answers:st.quiz,task:st.task,link:st.link},"*"); lessonView(); };
+  const cp=document.getElementById("complete"); if(cp) cp.onclick=()=>{ 
+const correct=m.quiz.reduce((count,q,i)=>count+(st.quiz[i]?.correct?1:0),0);
+window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:n,correct,total:m.quiz.length,answers:st.quiz},"*");
+window.parent.postMessage({source:"aspectus-original-quiz",type:"practical-task",moduleOrder:n,correct,total:m.quiz.length,answers:st.quiz,task:st.task||st.link},"*");
+st.done=true;st.submitted=true;st.finished=Date.now();save();lessonView(); 
+};
   const nm=document.getElementById("nextmod"); if(nm) nm.onclick=()=>go("lesson",{id:nextM.id});
 }
 
