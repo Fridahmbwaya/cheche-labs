@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Aspectus Learning Hub — Interactive Offline Copy</title>
+
+
+
+<style>
+:root{
+  --ink:#373435; --orange:#FAA954; --green:#00A859; --red:#9B1D20;
+  --orange-text:#A55F12; --green-text:#00753E;
+  --bg:#FFFBF6; --surface:#FFFFFF; --band:#FDEBDC; --line:#EADFD3; --muted:#6B6466;
+  --t1:#373435; --t2:#FAA954; --t3:#00A859;
+  --t1-soft:#E9E6E6; --t2-soft:#FEEBD5; --t3-soft:#D3F2E2; --red-soft:#F7E1E1;
+  --on-t1:#FFFFFF; --on-t2:#373435; --on-t3:#FFFFFF;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#F2EEEC; --bg:#1E1C1D; --surface:#292627; --band:#33292A; --line:#423C3D; --muted:#B5ACAE;
+    --orange-text:#FAA954; --green-text:#3DD68C;
+    --t1:#CFCACB; --t1-soft:#353132; --t2-soft:#3E3122; --t3-soft:#173A29; --red-soft:#3D1F20; --red:#E26A6D;
+    --on-t1:#1E1C1D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#F2EEEC; --bg:#1E1C1D; --surface:#292627; --band:#33292A; --line:#423C3D; --muted:#B5ACAE;
+  --orange-text:#FAA954; --green-text:#3DD68C;
+  --t1:#CFCACB; --t1-soft:#353132; --t2-soft:#3E3122; --t3-soft:#173A29; --red-soft:#3D1F20; --red:#E26A6D;
+  --on-t1:#1E1C1D; color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.15;margin:0}
+h1{font-size:clamp(2.1rem,7vw,3.2rem);font-weight:800;letter-spacing:-0.02em}
+h2{font-size:1.55rem;font-weight:700;letter-spacing:-0.01em}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:.5em 0}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.1rem;background:none;border:0;color:var(--ink);padding:0}
+.brand svg{width:30px;height:30px}
+nav.tabs{display:flex;gap:4px}
+nav.tabs button{background:none;border:0;color:var(--muted);padding:8px 10px;border-radius:8px;font-size:.95rem}
+nav.tabs button[aria-current="page"]{color:var(--ink);background:var(--band);font-weight:700}
+main{padding:28px 0 64px}
+.hero{background:var(--band);border-radius:0 0 28px 28px;padding:28px 0 32px;margin-top:-28px;margin-bottom:28px}
+.kicker{color:var(--muted);font-size:.95rem;margin:0 0 6px}
+.lede{font-size:1.1rem;max-width:34em}
+.sunpath{display:flex;gap:6px;margin-top:22px}
+.sunpath .seg{flex:1}
+.sunpath .bar{height:12px;border-radius:6px;background:var(--surface);overflow:hidden;border:1px solid var(--line)}
+.sunpath .fill{height:100%}
+.sunpath .lbl{font-size:.8rem;color:var(--muted);margin-top:6px}
+.next{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;font-weight:700;background:var(--ink);color:var(--bg);text-decoration:none;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.green{background:var(--green);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+section.block{margin:36px 0}
+.track-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;transform:translateY(1px)}
+.mods{display:grid;gap:10px}
+.mod{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--ink)}
+.mod:hover{border-color:var(--muted)}
+.ring{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;border:3px solid var(--tc);color:var(--ink)}
+.ring.prog{background:linear-gradient(to top,var(--tc-soft) 50%,transparent 50%)}
+.ring.done{background:var(--tc);color:var(--on-tc)}
+.mod .meta{font-size:.88rem;color:var(--muted)}
+.badge{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.badge.ok{background:var(--t3-soft);color:var(--green-text)}
+.badge.wait{background:var(--band);color:var(--muted)}
+.milestones{display:grid;gap:12px}
+.ms{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.ms h3{display:flex;justify-content:space-between;gap:10px}
+.ms ul{margin:8px 0 0;padding-left:1.2em}
+.ms li{margin:4px 0}
+.note{font-size:.9rem;color:var(--muted)}
+.days{display:grid;gap:8px}
+.day{display:grid;grid-template-columns:86px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.day b{font-family:"Bricolage Grotesque",sans-serif}
+.day.today b{color:var(--orange-text)}
+/* module page */
+.back{background:none;border:0;color:var(--muted);padding:0;margin-bottom:14px}
+.modhead{border-left:6px solid var(--tc);padding-left:16px;margin-bottom:24px}
+.prose h3{margin:28px 0 8px}
+.prose ul,.prose ol{padding-left:1.25em}
+.prose li{margin:5px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0}
+.card h4{margin:0 0 4px;font-size:1.05rem}
+.warn{background:var(--red-soft);border-left:5px solid var(--red);border-radius:10px;padding:14px 16px;margin:16px 0}
+.warn strong:first-child{color:var(--red)}
+.tip{background:var(--t2-soft);border-left:5px solid var(--orange);border-radius:10px;padding:14px 16px;margin:16px 0}
+.tbl{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.93rem}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--band);font-weight:700}
+tr:last-child td{border-bottom:0}
+.stage{margin:40px 0 0;padding-top:24px;border-top:2px dashed var(--line)}
+.stage .label{font-size:.9rem;color:var(--muted)}
+.q{margin:20px 0}
+.q p.qt{font-weight:700}
+.opt{display:block;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--green);background:var(--t3-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+.opt:disabled{cursor:default}
+.fb{font-size:.95rem;padding:8px 2px}
+textarea,input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea{min-height:150px;resize:vertical}
+.saved{font-size:.85rem;color:var(--green-text);min-height:1.2em}
+.done-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:28px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.check input{width:22px;height:22px;accent-color:var(--green);flex:none;margin-top:3px}
+pre.sum{white-space:pre-wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;max-height:340px;overflow:auto}
+.cert{background:#fff;color:#373435;border:2px solid #373435;border-radius:6px;padding:40px 28px;text-align:center;margin-top:20px;position:relative;overflow:hidden}
+.cert::before{content:"";position:absolute;inset:10px;border:1px solid #FAA954;border-radius:4px;pointer-events:none}
+.cert h2{font-size:2rem;margin:10px 0}
+.cert .name{font-family:"Bricolage Grotesque",sans-serif;font-size:2.4rem;font-weight:800;margin:14px 0}
+.cert .stripe{height:8px;display:flex;margin:24px auto 0;max-width:260px}
+.cert .stripe span{flex:1}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:.88rem}
+.hidden{display:none!important}
+@media (max-width:520px){
+  .next{flex-direction:column;align-items:flex-start}
+  nav.tabs button{padding:8px 7px;font-size:.88rem}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .sunpath .fill{transition:width .8s ease}
+}
+@media print{
+  header.top,footer,.no-print{display:none!important}
+  body{background:#fff}
+}
+
+/* ===== Aspectus branded experience • 2026 refresh ===== */
+:root{--bg:#FAFAF7;--surface:#FFFFFF;--band:#FFF2DF;--line:#E9E5DF;--muted:#686767;--shadow:0 8px 30px rgba(55,52,53,.045)}
+body{background:var(--bg);font-size:16px;line-height:1.62}
+.top{box-shadow:0 1px 16px rgba(55,52,53,.035)}
+.top .wrap{max-width:1100px;height:76px}
+.wrap{max-width:860px}
+.brand{gap:12px;min-width:0}
+.brand img{height:47px;max-width:155px;width:auto;object-fit:contain;display:block}
+.brand-logo-fallback{font-size:1.32rem;letter-spacing:-.06em;font-weight:800;line-height:1;color:var(--ink)}
+.brand-logo-fallback::first-letter{color:var(--green)}
+.brand-caption{font-family:'Atkinson Hyperlegible',sans-serif;font-size:.67rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-top:4px}
+nav.tabs{background:#F3F1ED;border-radius:100px;padding:4px;gap:2px}
+nav.tabs button{padding:9px 16px;border-radius:100px;font-weight:700}
+nav.tabs button[aria-current='page']{background:var(--surface);color:var(--ink);box-shadow:0 2px 7px rgba(55,52,53,.1)}
+.hero{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(115deg,#FFF2E0 0%,#FFFAF2 65%,#EDF8EF 100%);border-radius:0 0 36px 36px;border-bottom:1px solid #F0E7DE;padding:57px 0 40px}
+.hero:before{content:'';position:absolute;width:350px;height:350px;border-radius:50%;border:60px solid rgba(0,168,89,.09);right:-150px;top:-130px;z-index:-1}
+.hero:after{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(250,169,84,.14);right:20%;bottom:-220px;z-index:-1}
+.hero .wrap{position:relative}
+.kicker{font-size:.78rem;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:#7B673D}
+.hero h1{max-width:670px;font-size:clamp(2.7rem,7vw,4.45rem);letter-spacing:-.055em}
+.hero .lede{font-size:1.08rem;line-height:1.68;max-width:600px;color:#54514D}
+.hero .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #F5DEC3;border-radius:100px;padding:6px 13px;margin-bottom:18px;color:#795019;font-size:.74rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.hero .hero-eyebrow:before{content:'';height:8px;width:8px;background:var(--green);border-radius:50%}
+.sunpath{gap:12px;margin-top:32px;max-width:660px}
+.sunpath .bar{height:9px;border:0;background:#E9E3D9}
+.sunpath .lbl{font-weight:700;color:#5F5D59}
+.next{margin-top:28px;padding:22px 24px;box-shadow:0 10px 35px rgba(55,52,53,.07);border-color:#E9DDD0}
+.next h3{font-size:1.15rem}
+.btn{transition:transform .18s ease,box-shadow .18s ease;background:var(--ink);color:white}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 16px rgba(55,52,53,.15)}
+.btn.green{background:var(--green);color:#fff}
+section.block{margin:40px 0}
+.track-h{align-items:center;margin-bottom:16px;gap:12px}
+.track-h h2{font-size:1.58rem}
+.dot{height:15px;width:6px;border-radius:8px;transform:none}
+.mods{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.mod{grid-template-columns:47px 1fr;position:relative;min-height:112px;border:1px solid var(--line);box-shadow:var(--shadow);padding:19px;border-radius:19px;gap:15px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.mod:hover{transform:translateY(-2px);border-color:var(--tc);box-shadow:0 11px 25px rgba(55,52,53,.09)}
+.mod .badge{grid-column:2;justify-self:start;margin-top:-4px}
+.mod .meta{display:inline-block;margin-top:5px}
+.ring{width:46px;height:46px}
+.ms,.card{box-shadow:var(--shadow)}
+.ms{border-radius:17px;padding:20px 23px}
+.ms h3{font-size:1.08rem}
+.day{padding:19px 0}
+.day b{color:var(--green-text)}
+.modhead{background:linear-gradient(90deg,var(--tc-soft),transparent);padding:24px 24px 24px 28px;border-radius:0 18px 18px 0}
+.modhead h1{letter-spacing:-.04em}
+.prose{line-height:1.76}
+.prose h3{padding-top:8px}
+.prose .card{padding:21px 23px;border-radius:17px}
+.stage{border-top:1px solid var(--line);margin-top:45px}
+.stage .label{text-transform:uppercase;font-weight:800;letter-spacing:.11em;font-size:.77rem;color:var(--green-text)}
+.opt{transition:border-color .16s ease,background .16s ease}
+.opt:focus-visible,.mod:focus-visible,.btn:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.cert{border-color:#00A859;border-width:3px;box-shadow:0 15px 45px rgba(55,52,53,.08)}
+.cert:before{border-color:#FAA954}
+.cert .logo-on-cert{margin:0 auto 14px;max-height:90px;max-width:220px;object-fit:contain}
+footer{background:#373435;color:#EFEDE7;border-top:0}
+footer .wrap{max-width:1100px}
+@media(max-width:640px){.mods{grid-template-columns:1fr}.hero{padding:34px 0 29px}.hero h1{font-size:2.75rem}.top .wrap{height:65px}.brand img{height:37px;max-width:110px}.brand-logo-fallback{font-size:1.06rem}.brand-caption{font-size:.52rem}.brand span{display:block}nav.tabs{padding:2px}nav.tabs button{font-size:.78rem;padding:7px 9px}.next{padding:18px}.sunpath{gap:7px}.sunpath .lbl{font-size:.7rem}}
+@media (prefers-color-scheme:dark){:root:not([data-theme='light']) .hero{background:linear-gradient(115deg,#30271F,#242424 70%,#1D3025)}:root:not([data-theme='light']) .hero .lede{color:#D9D3CD}:root:not([data-theme='light']) nav.tabs{background:#393536}:root:not([data-theme='light']) nav.tabs button[aria-current='page']{background:#51494A}:root:not([data-theme='light']) .hero .hero-eyebrow{background:#373435;color:#FAA954;border-color:#70573A}:root:not([data-theme='light']) .next{border-color:#4C4443}}
+@media print{.hero{background:#fff}.cert{box-shadow:none}}
+
+
+/* Focused learner: one clear, screen-sized stage with fixed controls */
+body:has(.guided-step){background:#FFFBF6}
+body:has(.guided-step) header.top,body:has(.guided-step) footer{display:none!important}
+body:has(.guided-step) main{padding:0!important}
+body:has(.guided-step) #app>.wrap{max-width:920px;min-height:100dvh;margin:auto;padding:18px 24px 18px;display:flex;flex-direction:column;gap:12px}
+body:has(.guided-step) .modhead{padding:0 0 8px;margin:0;border:0}
+body:has(.guided-step) .modhead h1{font-size:clamp(1.3rem,3vw,1.9rem)!important}
+body:has(.guided-step) .modhead .lede{font-size:.92rem;line-height:1.4;margin:4px 0}
+body:has(.guided-step) .modhead .kicker{font-size:.76rem;margin:0}
+body:has(.guided-step) .back{margin:0;font-size:.85rem;align-self:flex-start}
+body:has(.guided-step) .guided-step{margin:0;min-height:0;flex:1;overflow-y:auto;padding:20px 24px;border:1px solid #EADFD3;background:#fff;border-radius:20px;box-shadow:0 8px 30px rgba(55,52,53,.05)}
+body:has(.guided-step) .guided-step .label{color:#A55F12;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin:0 0 10px}
+body:has(.guided-step) .guided-step h3{margin:0 0 12px;font-size:1.28rem;color:#373435}
+body:has(.guided-step) .guided-step p,body:has(.guided-step) .guided-step li{line-height:1.45}
+body:has(.guided-step) .guided-step .q{margin:4px 0}
+body:has(.guided-step) .guided-step .opt{padding:10px 14px;margin:7px 0}
+body:has(.guided-step) .guided-step textarea{min-height:110px}
+body:has(.guided-step) .guided-controls{flex:none;margin:0;padding:12px 18px;background:#fff;border:1px solid #EADFD3;border-radius:14px}
+body:has(.guided-step) .guided-controls .btn{padding:11px 20px}
+body:has(.guided-step) .guided-step .card{margin:8px 0}
+@media(max-width:600px){body:has(.guided-step) #app>.wrap{padding:12px;gap:8px}body:has(.guided-step) .guided-step{padding:16px}body:has(.guided-step) .modhead .lede{display:none}}
+
+/* Embedded learning: no second app header, no footer, one question per screen. */
+body:has(.baseline-question) header.top,body:has(.baseline-question) footer,body:has(.guided-step) header.top,body:has(.guided-step) footer{display:none!important}
+body:has(.baseline-question) main{padding:0!important}
+body:has(.baseline-question) #app>.wrap{max-width:760px;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding:26px 24px}
+body:has(.baseline-question) .baseline-title{font-size:clamp(1.3rem,3vw,1.85rem);color:#373435;margin:6px 0}
+body:has(.baseline-question) .kicker{color:#A55F12;font-size:.8rem;font-weight:800;letter-spacing:.09em}
+body:has(.baseline-question) .baseline-question{border:1px solid #EADFD3;border-radius:22px;background:#fff;padding:26px;box-shadow:0 8px 25px rgba(55,52,53,.05)}
+body:has(.baseline-question) .baseline-question .qt{font-size:clamp(1.15rem,2.6vw,1.45rem);font-weight:800;line-height:1.35;margin:0 0 18px}
+body:has(.baseline-question) .opt{padding:15px 18px;margin:9px 0}
+body:has(.baseline-question) .opt.chosen{border-color:#FAA954;background:#FEEBD5;box-shadow:inset 0 0 0 1px #FAA954}
+body:has(.baseline-question) .done-bar{margin-top:18px;padding:12px 0;border:0;background:transparent}
+body:has(.baseline-question) .btn.orange{background:#FAA954;color:#373435}
+
+/* Constrain the learner's content to the compact modal viewport. */
+html,body{height:100%}
+body:has(.baseline-question) #app>.wrap{min-height:100%;padding:18px 24px;justify-content:center}
+body:has(.baseline-question) .baseline-question{padding:20px 24px}
+body:has(.baseline-question) .baseline-question .qt{margin-bottom:10px;font-size:1.2rem}
+body:has(.baseline-question) .opt{padding:12px 15px;margin:7px 0}
+body:has(.baseline-question) .done-bar{margin-top:12px}
+body:has(.baseline-question) .back{display:none}
+body:has(.guided-step) #app>.wrap{min-height:100%;padding:12px 20px;gap:8px}
+body:has(.guided-step) .guided-step{padding:14px 20px}
+body:has(.guided-step) .guided-controls{padding:9px 14px}
+@media(max-width:600px){body:has(.baseline-question) #app>.wrap{padding:12px}body:has(.baseline-question) .baseline-question{padding:16px}body:has(.guided-step) #app>.wrap{padding:9px}}
+
+/* Purpose-built learner screens: concise, expressive and within the modal */
+body:has(.baseline-layout) header.top,body:has(.baseline-layout) footer{display:none!important}
+body:has(.baseline-layout) main{padding:0!important}
+body:has(.baseline-layout) #app>.baseline-layout{min-height:100%;max-width:740px;padding:22px 18px;display:flex;align-items:center;justify-content:center}
+.baseline-card{width:100%;padding:26px 30px 22px;background:#fff;border:1px solid #EADFD3;border-radius:24px;box-shadow:0 15px 45px rgba(55,52,53,.065)}
+.baseline-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#A55F12;font-size:.76rem;font-weight:800;letter-spacing:.09em}
+.baseline-meter{height:7px;background:#FEEBD5;border-radius:10px;margin:13px 0 24px;overflow:hidden}
+.baseline-meter span{display:block;height:100%;background:#FAA954;border-radius:10px}
+.baseline-question-title{font-size:clamp(1.35rem,2.6vw,1.8rem);line-height:1.27;color:#373435;letter-spacing:-.025em;margin:0 0 20px}
+.baseline-answers{display:grid;gap:9px}
+.baseline-answers .opt{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:13px 16px;margin:0;background:#FFFBF6;border:1.5px solid #EADFD3;border-radius:12px;line-height:1.35;font-size:.98rem;transition:background .15s,border-color .15s}
+.baseline-answers .opt:hover:not(:disabled){background:#FEEBD5;border-color:#FAA954}
+.baseline-answers .opt.right{background:#D3F2E2;border-color:#00A859;color:#00753E;font-weight:800}
+.baseline-answers .opt.wrong{background:#F7E1E1;border-color:#9B1D20;color:#9B1D20}
+.baseline-answers .opt.muted-option{opacity:.65}
+.answer-check{font-size:1.25rem;padding-left:12px;color:#00753E}
+.baseline-feedback{margin-top:15px;padding:12px 15px;border-radius:12px;font-size:.9rem;line-height:1.4}
+.baseline-feedback p{margin:4px 0 0}
+.baseline-feedback.success{background:#D3F2E2;color:#00753E}
+.baseline-feedback.correction{background:#FFF1E1;color:#373435}
+.baseline-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;padding-top:17px;border-top:1px solid #EADFD3}
+.baseline-actions .btn{padding:11px 18px}
+.baseline-actions .btn.orange{background:#FAA954;color:#373435;font-weight:800}
+body:has(.guided-step) .guided-step{background:#fff;border-radius:20px;border:1px solid #EADFD3;box-shadow:0 12px 30px rgba(55,52,53,.055)}
+body:has(.guided-step) .guided-step:has(.q){background:#FFFDF9}
+body:has(.guided-step) .guided-step:has(.q) .qt{font-size:1.18rem;font-weight:800;line-height:1.3}
+body:has(.guided-step) .guided-step:has(.q) .fb{margin-top:13px;padding:13px 15px;border-radius:12px;background:#FEEBD5}
+body:has(.guided-step) .guided-step .opt.right{background:#D3F2E2;border-color:#00A859;color:#00753E;font-weight:700}
+body:has(.guided-step) .guided-step .opt.wrong{background:#F7E1E1;border-color:#9B1D20;color:#9B1D20}
+body:has(.guided-step) .guided-step:has(textarea){background:#FFF8ED}
+body:has(.guided-step) .guided-step:has(.card),body:has(.guided-step) .guided-step:has(.tbl){background:#FFFCF7}
+body:has(.guided-step) .guided-step h3{font-size:1.4rem}
+@media(max-width:600px){.baseline-card{padding:20px 16px}.baseline-question-title{font-size:1.3rem;margin-bottom:14px}.baseline-answers .opt{padding:11px 12px}.baseline-meta{font-size:.67rem}}
+
+/* Designed lesson moments — visual variation while keeping one concept on screen */
+body:has(.guided-step) #app>.wrap{max-width:800px}
+body:has(.guided-step) .modhead{padding:0 4px 8px;border:0}
+body:has(.guided-step) .modhead .lede{color:#6B6466}
+body:has(.guided-step) .lesson-card{display:flex;flex-direction:column;justify-content:space-between;gap:14px;padding:25px 32px!important;position:relative;overflow-y:auto}
+.lesson-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.72rem;letter-spacing:.14em;font-weight:900;color:#A55F12}
+.lesson-chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #FAA954;border-radius:100px;padding:7px 12px}
+body:has(.guided-step) .lesson-content{width:100%;margin:auto 0;max-height:100%;padding:8px 0}
+body:has(.guided-step) .lesson-content h3{font-size:clamp(1.65rem,3.4vw,2.15rem);letter-spacing:-.035em;line-height:1.1;margin:0 0 18px;color:#373435}
+body:has(.guided-step) .lesson-content p{font-size:clamp(1.03rem,1.9vw,1.2rem);line-height:1.55;color:#373435;margin:10px 0}
+body:has(.guided-step) .lesson-bottomline{display:flex;align-items:center;gap:10px;border-top:1px solid #EADFD3;padding-top:12px;font-size:.77rem;color:#6B6466}
+.lesson-symbol{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#FAA954;color:#373435;font-size:.95rem;flex-shrink:0}
+body:has(.guided-step) .lesson-spotlight{background:linear-gradient(145deg,#FFF0DA 0%,#FFF8EF 65%,#fff 100%);border-color:#FAA954}
+body:has(.guided-step) .lesson-spotlight .lesson-content{padding:15px 4px}
+body:has(.guided-step) .lesson-spotlight .lesson-content h3{font-size:clamp(2rem,4vw,2.6rem)}
+body:has(.guided-step) .lesson-story{background:#fff}
+body:has(.guided-step) .lesson-story .lesson-content{border-left:5px solid #FAA954;padding-left:22px}
+body:has(.guided-step) .lesson-insight{background:linear-gradient(130deg,#F2F8F3,#fff);border-color:#B4DFC8}
+body:has(.guided-step) .lesson-insight .lesson-chip{border-color:#00A859;color:#00753E}
+body:has(.guided-step) .lesson-insight .lesson-symbol{background:#00A859;color:#fff}
+body:has(.guided-step) .lesson-principles{background:#FFFBF6}
+body:has(.guided-step) .lesson-principles .lesson-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:11px;align-content:center}
+body:has(.guided-step) .lesson-principles .lesson-content>h3,body:has(.guided-step) .lesson-principles .lesson-content>p{grid-column:1/-1}
+body:has(.guided-step) .lesson-principles .lesson-content .card{margin:0;border:1px solid #F2CB9B;background:#FFF0DA;border-radius:16px;padding:17px}
+body:has(.guided-step) .lesson-principles .lesson-content .card h4{font-size:1.1rem;margin:0 0 6px}
+body:has(.guided-step) .lesson-principles .lesson-content .card p{font-size:1rem}
+body:has(.guided-step) .lesson-highlights{background:#FFFFFF}
+body:has(.guided-step) .lesson-highlights .lesson-content li{background:#FFFBF6;border:1px solid #EADFD3;padding:9px 12px;border-radius:11px;margin:8px 0;font-size:1rem}
+body:has(.guided-step) .lesson-people{background:#FBFCF9}
+body:has(.guided-step) .lesson-people .lesson-content h3{font-size:1.6rem}
+body:has(.guided-step) .lesson-people .lesson-content table{font-size:.83rem;min-width:480px}
+body:has(.guided-step) .lesson-people .lesson-content td,body:has(.guided-step) .lesson-people .lesson-content th{padding:7px 10px}
+body:has(.guided-step) .guided-controls .btn.orange{background:#FAA954;color:#373435;border-color:#FAA954;font-weight:800}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:18px!important}body:has(.guided-step) .lesson-content h3{font-size:1.5rem}body:has(.guided-step) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-story .lesson-content{padding-left:14px}}
+
+
+/* Expanded visual learning theme */
+body:has(.guided-step) #app>.wrap{max-width:100%;width:100%}
+body:has(.guided-step) .lesson-card{padding:26px 34px!important}
+body:has(.guided-step) .lesson-content .card{position:relative;border:1px solid #EADFD3;background:#FFFFFF;border-radius:18px;padding:19px 22px;box-shadow:0 3px 14px #3734350a}
+body:has(.guided-step) .lesson-content .card:before{content:none!important}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2){background:#FFFBF6;border-color:#F1D6B7}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n){background:#FFFFFF;border-color:#EADFD3}
+body:has(.guided-step) .lesson-content .card h4{font-size:1.14rem;line-height:1.3;margin-bottom:8px}
+body:has(.guided-step) .lesson-content table th{background:#FEEBD5;color:#373435}
+body:has(.guided-step) .lesson-content table tr:nth-child(even) td{background:#FFFBF6}
+body:has(.guided-step) .lesson-content .tbl{border-radius:17px}
+body:has(.guided-step) .lesson-content figure,body:has(.guided-step) .lesson-content img{display:block;max-width:100%;height:auto;margin:16px auto;text-align:center}
+body:has(.guided-step) .lesson-content li{line-height:1.6;margin-bottom:10px}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:17px!important}body:has(.guided-step) .lesson-content .card{padding:15px 16px}}
+/* Aspectus color and legibility refinement */
+body:has(.guided-step) .modhead .kicker{color:#A55F12;font-size:.87rem;font-weight:900;letter-spacing:.09em}
+body:has(.guided-step) .modhead h1{color:#373435;font-size:clamp(1.65rem,3vw,2.2rem)!important;line-height:1.15}
+body:has(.guided-step) .modhead .lede{font-size:1.06rem;color:#6B6466}
+body:has(.guided-step) .lesson-card{border:2px solid #FAA954;box-shadow:0 14px 34px rgba(55,52,53,.09);padding:28px 34px!important}
+body:has(.guided-step) .lesson-eyebrow{color:#A55F12;font-size:.83rem}
+body:has(.guided-step) .lesson-chip{background:#FAA954;color:#373435;border-color:#FAA954;padding:9px 15px}
+body:has(.guided-step) .lesson-content h3{font-size:clamp(1.9rem,3.7vw,2.45rem);line-height:1.13}
+body:has(.guided-step) .lesson-content p{font-size:clamp(1.17rem,2.05vw,1.32rem);line-height:1.58}
+body:has(.guided-step) .lesson-content li{font-size:1.1rem;line-height:1.48}
+body:has(.guided-step) .lesson-spotlight{background:linear-gradient(135deg,#FAA954 0%,#FEEBD5 56%,#FFFBF6 100%)}
+body:has(.guided-step) .lesson-spotlight .lesson-chip{background:#373435;color:#fff;border-color:#373435}
+body:has(.guided-step) .lesson-story{background:linear-gradient(115deg,#FFF6EB 0%,#fff 75%)}
+body:has(.guided-step) .lesson-story .lesson-content{border-left:7px solid #FAA954}
+body:has(.guided-step) .lesson-insight{background:linear-gradient(125deg,#D3F2E2 0%,#FFFFFF 75%);border-color:#00A859}
+body:has(.guided-step) .lesson-insight .lesson-chip{background:#00A859;border-color:#00A859;color:#fff}
+body:has(.guided-step) .lesson-principles{background:#FFF0DC}
+body:has(.guided-step) .lesson-principles .lesson-content .card{background:#fff;border:2px solid #FAA954}
+body:has(.guided-step) .lesson-highlights{background:linear-gradient(125deg,#FFF0DC,#fff)}
+body:has(.guided-step) .lesson-highlights .lesson-content li{font-size:1.1rem;border-left:5px solid #FAA954;background:#fff;padding:12px 16px}
+body:has(.guided-step) .lesson-people{background:#FFFBF6}
+body:has(.guided-step) .lesson-people .lesson-content table{font-size:.96rem}
+body:has(.guided-step) .lesson-bottomline{font-size:.88rem;color:#6B6466}
+body:has(.guided-step) .guided-controls{border:1.5px solid #FAA954}
+body:has(.guided-step) .guided-controls .btn.orange{font-size:1rem;padding:13px 23px}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:20px!important}body:has(.guided-step) .lesson-content h3{font-size:1.75rem}body:has(.guided-step) .lesson-content p{font-size:1.13rem}body:has(.guided-step) .lesson-content li{font-size:1.05rem}}
+
+/* Gen Z-friendly visual storytelling, rooted in the Aspectus identity */
+.lesson-card{isolation:isolate}
+body:has(.guided-step) .lesson-card .lesson-content{position:relative;z-index:1}
+body:has(.guided-step) .lesson-card .lesson-content h3{font-weight:900;letter-spacing:-.055em;text-wrap:balance}
+body:has(.guided-step) .lesson-card .lesson-content h3::after{content:"";display:block;width:44px;height:6px;border-radius:10px;background:#FAA954;margin-top:13px}
+body:has(.guided-step) .lesson-insight .lesson-content h3::after{background:#00A859}
+body:has(.guided-step) .lesson-card .lesson-content p strong{color:#A55F12;font-weight:900}
+body:has(.guided-step) .lesson-card .lesson-content li b{color:#00753E}
+body:has(.guided-step) .lesson-card .lesson-content .card h4{color:#A55F12;font-size:1.2rem}
+body:has(.guided-step) .lesson-card .lesson-content ul{list-style:none;padding:0}
+body:has(.guided-step) .lesson-card .lesson-content ul li{position:relative;padding-left:19px}
+body:has(.guided-step) .lesson-card .lesson-content ul li::before{content:"✳";position:absolute;left:0;color:#00A859}
+body:has(.guided-step) .lesson-card .lesson-content ol li::marker{font-weight:900;color:#A55F12}
+body:has(.guided-step) .lesson-spotlight::after{content:"✳";position:absolute;top:12%;right:6%;font-size:clamp(5rem,12vw,9rem);line-height:1;color:#FAA954;opacity:.38;z-index:0;pointer-events:none}
+body:has(.guided-step) .lesson-insight::after{content:"✦";position:absolute;top:12%;right:7%;font-size:8rem;line-height:1;color:#00A859;opacity:.12;pointer-events:none}
+body:has(.guided-step) .lesson-story::after{content:"〰";position:absolute;bottom:12%;right:8%;font-size:5rem;color:#FAA954;opacity:.22;pointer-events:none}
+.lesson-big-fact{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin:8px 0 0;color:#373435;position:relative}
+.lesson-big-fact .fact-kicker{font-size:.7rem;letter-spacing:.18em;font-weight:900;color:#A55F12}
+.lesson-big-fact strong{font-size:clamp(4rem,8vw,6.3rem);line-height:.95;font-weight:900;letter-spacing:-.075em;color:#373435}
+.lesson-big-fact small{font-size:.9rem;font-weight:700;color:#A55F12;margin-top:5px}
+.lesson-big-fact .fact-spark{color:#00A859;font-size:.45em;vertical-align:top;margin-left:7px}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content{margin:8px 0}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content h3{font-size:1.35rem;margin-bottom:7px}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content h3::after{display:none}
+body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content p{font-size:1.04rem;line-height:1.48}
+.lesson-playful-tag{font-size:.74rem;font-weight:900;letter-spacing:.11em;color:#373435;align-self:flex-start;background:#FAA954;border-radius:99px;padding:9px 14px;transform:rotate(-2deg)}
+body:has(.guided-step) .lesson-card:has(.lesson-playful-tag) .lesson-content{margin:0}
+body:has(.guided-step) .lesson-principles .lesson-content h3{grid-column:1/-1}
+body:has(.guided-step) .lesson-principles .lesson-content .card{box-shadow:4px 5px 0 #FAA95444}
+@media(max-width:600px){.lesson-big-fact strong{font-size:4.2rem}body:has(.guided-step) .lesson-card:has(.lesson-big-fact) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-spotlight::after{font-size:5rem}}
+
+/* Visual storytelling pass: changes in rhythm, emphasis and shape without extra copy */
+body:has(.guided-step) .lesson-card{gap:12px}
+body:has(.guided-step) .lesson-card .lesson-eyebrow{position:relative;z-index:2}
+body:has(.guided-step) .lesson-card .lesson-content{z-index:2}
+body:has(.guided-step) .lesson-spotlight{background:linear-gradient(148deg,#FAA954 0%,#FEEBD5 62%,#fff 100%)}
+body:has(.guided-step) .lesson-spotlight::after{content:"";width:170px;height:170px;position:absolute;right:-35px;bottom:-55px;border:24px solid #00A859;border-radius:50%;opacity:.15;pointer-events:none}
+body:has(.guided-step) .lesson-spotlight .lesson-content h3{max-width:16ch;font-size:clamp(2.15rem,4.2vw,3rem);line-height:1.07}
+body:has(.guided-step) .lesson-story .lesson-content{border-left:0;padding-left:0}
+body:has(.guided-step) .lesson-story .lesson-content h3{display:inline-block;max-width:95%;background:linear-gradient(transparent 67%,#FAA95488 67%);padding-right:8px}
+body:has(.guided-step) .lesson-story .lesson-lead{font-weight:750;font-size:clamp(1.2rem,2.3vw,1.42rem);line-height:1.4}
+body:has(.guided-step) .lesson-insight{background:radial-gradient(circle at 90% 15%,#D3F2E2 0 22%,transparent 22%),#fff}
+body:has(.guided-step) .lesson-insight .lesson-content h3{color:#00753E}
+body:has(.guided-step) .lesson-highlights .lesson-content ul,body:has(.guided-step) .lesson-highlights .lesson-content ol{display:grid;gap:9px;margin:10px 0}
+body:has(.guided-step) .lesson-highlights .lesson-content li{margin:0;border:1px solid #EADFD3;border-left:6px solid #FAA954;border-radius:13px;padding:12px 16px;background:#fff;font-size:1.08rem;box-shadow:0 3px 0 #FEEBD5}
+body:has(.guided-step) .lesson-highlights .lesson-content li::before{display:none}
+body:has(.guided-step) .lesson-principles .lesson-content .card:nth-of-type(even){background:#D3F2E2;border-color:#00A859;box-shadow:5px 5px 0 #00A85922}
+body:has(.guided-step) .lesson-principles .lesson-content .card:nth-of-type(odd){background:#fff;border-color:#FAA954;box-shadow:5px 5px 0 #FAA95433}
+body:has(.guided-step) .lesson-people .lesson-content .tbl{border-radius:15px;border-color:#EADFD3}
+body:has(.guided-step) .lesson-people .lesson-content th{background:#FAA954;color:#373435}
+body:has(.guided-step) .lesson-people .lesson-content tr:nth-child(even) td{background:#FFF4E7}
+body:has(.guided-step) .lesson-card .lesson-content b,body:has(.guided-step) .lesson-card .lesson-content strong{font-weight:850}
+body:has(.guided-step) .guided-controls{box-shadow:0 5px 16px #3734350D}
+body:has(.guided-step) .guided-controls .small{font-weight:800;color:#A55F12}
+@media(max-width:600px){body:has(.guided-step) .lesson-highlights .lesson-content li{font-size:1rem;padding:9px 12px}body:has(.guided-step) .lesson-spotlight .lesson-content h3{font-size:1.85rem}}
+
+/* Calm module identity header: avoid oversized gray block and duplicate navigation. */
+body:has(.guided-step) .modhead{display:flex;flex-direction:column;gap:5px;position:relative;padding:0 0 16px;margin:0 0 6px;border-bottom:1px solid #EADFD3;background:transparent!important;box-shadow:none!important}
+body:has(.guided-step) .modhead .kicker{font-size:.72rem!important;letter-spacing:.13em!important;color:#A55F12!important;font-weight:900!important;margin:0!important}
+body:has(.guided-step) .modhead h1{font-size:clamp(1.5rem,3vw,1.95rem)!important;line-height:1.12!important;letter-spacing:-.04em!important;margin:0!important;color:#373435!important}
+body:has(.guided-step) .modhead .lede{font-size:.87rem!important;margin:0!important;color:#6B6466!important;line-height:1.35!important}
+
+.retry-notice{margin-top:16px;padding:16px 18px;border:1px solid #FAA954;background:#FFF0D9;border-radius:14px}
+.retry-notice strong{display:block;color:#A55F12;font-size:1rem}
+.retry-notice p{margin:5px 0 12px;color:#6B6466}
+.retry-quiz-action{cursor:pointer!important;background:#FAA954!important;color:#373435!important;border-color:#FAA954!important;opacity:1!important;pointer-events:auto!important}
+
+/* The learning window should use the whole available iframe, not a narrow card column. */
+body:has(.guided-step) #app>.wrap{width:100%!important;max-width:none!important;padding:12px 24px!important;box-sizing:border-box}
+body:has(.guided-step) .lesson-card{width:100%;min-height:0;padding:22px 30px!important;box-sizing:border-box}
+body:has(.guided-step) .lesson-content{max-width:none!important;width:100%!important}
+body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:start!important}
+body:has(.guided-step) .lesson-principles .lesson-content>.card{width:auto;min-width:0}
+body:has(.guided-step) .lesson-content .card{min-width:0}
+@media(max-width:650px){body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:1fr!important}body:has(.guided-step) #app>.wrap{padding:10px!important}}
+
+/* Consistent chip icon baseline and centered labels */
+body:has(.guided-step) .lesson-chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.2;vertical-align:middle;text-align:center;white-space:normal}
+body:has(.guided-step) .lesson-eyebrow{align-items:center}
+
+/* A balanced, chronological story layout with no floating decorative marks. */
+body:has(.guided-step) .lesson-content .aspectus-timeline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:1/-1;align-items:stretch}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card{min-width:0;width:auto;background:#FFFFFF!important;border:1px solid #F0C58C!important;padding:16px 18px!important;margin:0!important;box-shadow:none}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card h4{font-size:1.07rem}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card p{font-size:.98rem;line-height:1.5}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:before{content:none!important}
+body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:1/-1}
+@media(max-width:620px){body:has(.guided-step) .lesson-content .aspectus-timeline{grid-template-columns:1fr}body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:auto}}
+
+/* Brand lesson: tangible swatches and a clear visual system */
+body:has(.guided-step) .lesson-content .brand-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:16px 0 20px}
+body:has(.guided-step) .lesson-content .brand-swatch{background:#fff;border:1px solid #EADFD3;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 3px 10px #37343509}
+body:has(.guided-step) .lesson-content .swatch-color{display:block;height:76px;width:100%}
+body:has(.guided-step) .lesson-content .swatch-details{display:flex;flex-direction:column;gap:3px;padding:13px 15px}
+body:has(.guided-step) .lesson-content .swatch-details strong{font-size:1.02rem;color:#373435}
+body:has(.guided-step) .lesson-content .swatch-details small{font-size:.88rem;color:#6B6466}
+body:has(.guided-step) .lesson-content .brand-rule{display:flex;align-items:flex-start;gap:15px;border:1px solid #F0CB99;border-radius:16px;background:#FFFBF6;padding:18px 20px;margin:16px 0}
+body:has(.guided-step) .lesson-content .brand-rule-icon{width:38px;height:38px;flex:none;display:grid;place-items:center;background:#FAA954;border-radius:12px;color:#373435;font-size:1.25rem}
+body:has(.guided-step) .lesson-content .brand-rule h4{font-size:1.12rem;margin:0 0 5px;color:#373435}
+body:has(.guided-step) .lesson-content .brand-rule p{font-size:1rem;margin:0}
+@media(max-width:540px){body:has(.guided-step) .lesson-content .brand-palette{grid-template-columns:1fr 1fr;gap:9px}body:has(.guided-step) .lesson-content .swatch-color{height:52px}body:has(.guided-step) .lesson-content .swatch-details{padding:10px}body:has(.guided-step) .lesson-content .swatch-details small{font-size:.76rem}}
+
+/* Consistent brand-green inner learning rows across all guided modules. */
+body:has(.guided-step) .lesson-content :is(ul,ol)>li{
+  background:#FFFFFF!important;
+  border:1px solid #EADFD3!important;
+  border-left:5px solid #00A859!important;
+  border-radius:12px!important;
+  padding:11px 15px!important;
+  margin:7px 0!important;
+  box-shadow:0 2px 0 #D3F2E2!important;
+}
+body:has(.guided-step) .lesson-content ol>li::marker{color:#00753E!important;font-weight:800}
+body:has(.guided-step) .lesson-content ul>li::marker{color:#00A859!important}
+body:has(.guided-step) .lesson-content li>b:first-child,
+body:has(.guided-step) .lesson-content li>strong:first-child{color:#00753E!important}
+body:has(.guided-step) .lesson-highlights .lesson-content li{border-left-color:#00A859!important;background:#FFFFFF!important}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <button class="brand" data-go="home" aria-label="Aspectus onboarding home">
+      <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%2270%22 viewBox=%220 0 260 70%22%3E%3Crect width=%22260%22 height=%2270%22 fill=%22%23FFFBF6%22/%3E%3Ctext x=%2210%22 y=%2250%22 font-family=%22Arial,sans-serif%22 font-size=%2242%22 font-weight=%22700%22 fill=%22%23373435%22%3Easpectus%3C/text%3E%3Ccircle cx=%22235%22 cy=%2222%22 r=%2210%22 fill=%22%23FAA954%22/%3E%3C/svg%3E" alt="Aspectus logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span class="brand-logo-fallback" style="display:none">aspectus</span>
+      <span class="brand-caption">Learning hub</span>
+    </button>
+    <nav class="tabs" aria-label="Main">
+      <button data-go="home">Home</button>
+      <button data-go="toolkit">Toolkit</button>
+      <button data-go="brenda">For Brenda</button>
+    </nav>
+  </div>
+</header>
+<main id="app"></main>
+<footer><div class="wrap">Aspectus Limited internal onboarding. Please don’t share this link outside the company. Powered by Cheche Labs.</div></footer>
+
+<script>
+/* ============ CONFIG: swap this block for the next client ============ */
+const CONFIG = {
+  company: "Aspectus",
+  learner: "Ian",
+  role: "Social Media Marketing Intern",
+  manager: "Brenda",
+  startDate: "2026-11-03",
+  passMark: 0.8,
+  storageKey: "aspectus-ceo-offline-preview-v1"
+};
+const TRACKS = {
+  know:   {name:"Know Aspectus",   c:"var(--t1)", soft:"var(--t1-soft)", on:"var(--on-t1)"},
+  market: {name:"Market Aspectus", c:"var(--t2)", soft:"var(--t2-soft)", on:"var(--on-t2)"},
+  sell:   {name:"Sell Aspectus",   c:"var(--t3)", soft:"var(--t3-soft)", on:"var(--on-t3)"}
+};
+
+const BASELINE = [
+  {q:"What does “kWp” on a solar system describe?", o:["How much electricity a home uses per month","The peak power the panels can produce","The size of the battery","The price per panel"], a:1, why:"kWp (kilowatt peak) is the maximum output of the panels in full sun. A “20 kWp system” is a way of saying how big it is."},
+  {q:"What is the main difference between an on-grid and an off-grid system?", o:["Off-grid systems don’t use panels","On-grid systems stay connected to KPLC power; off-grid systems run independently, usually with batteries","On-grid systems are only for factories","There is no difference"], a:1, why:"On-grid (grid-tied) systems work alongside KPLC. Off-grid systems stand alone, which is why they matter for camps, farms and rural sites. Hybrid systems do both."},
+  {q:"What is a tender?", o:["A formal invitation from an organisation for companies to bid for a job","A discount for loyal customers","A type of solar battery","A marketing campaign"], a:0, why:"A tender (or RFQ, RFP) is a formal process where an organisation asks suppliers to submit bids. Aspectus does several every quarter."},
+  {q:"Which body licenses solar installers in Kenya?", o:["KEBS","EPRA, the Energy and Petroleum Regulatory Authority","KRA","NEMA"], a:1, why:"EPRA licenses solar PV and solar water heating technicians and companies. Aspectus is EPRA licensed."},
+  {q:"A property developer wants to see proof that we can deliver large projects. Which channel suits them best?", o:["TikTok","WhatsApp Status","LinkedIn","X / Twitter"], a:2, why:"Aspectus uses LinkedIn for case studies aimed at developers, institutions and commercial clients."}
+];
+
+const MODULES = [
+/* ---------------- TRACK 1: KNOW ---------------- */
+{id:"m1", track:"know", title:"Who we are in 2026", mins:8,
+ intro:"The company, its purpose, its people and where it’s heading this year.",
+ body:`
+<h3>The big idea: know who we are</h3><p>Aspectus is more than a collection of solar products. Behind each installation is a team, a purpose and a customer whose life or business we hope to improve.</p><div class="card"><h4>What you will take away</h4><p>You will be able to explain Aspectus in one clear sentence, recognize our values and know whom to approach for information.</p></div><div class="card"><h4>Picture yourself at work</h4><p>Imagine a customer asks you at an event, “What exactly does Aspectus do?” You should be able to answer without reaching for a company brochure.</p></div>
+<h3>In one breath</h3>
+<p>Aspectus Limited is a Kenyan solar energy company, founded in 2015 by Eng. Sarah Mbwaya. We design, install and maintain solar systems for homes, property developers, businesses, institutions and farms. We are licensed by EPRA for solar PV and solar water heating, and registered with the National Construction Authority (NCA), with a contractor registration category of NCA 4. The NCA is Kenya's construction-sector regulator, and contractor categories indicate the class of construction work a registered contractor may undertake. Always check the current certificate before quoting a category.</p>
+<h3>Vision and mission</h3>
+<div class="card"><h4>Vision</h4><p>To become the sustainable energy solutions company of choice in Africa by 2040.</p></div>
+<div class="card"><h4>Mission</h4><p>To improve lives through quality, sustainable and innovative energy solutions.</p></div>
+<p>Taglines you can use: <b>“Simply Stellar, Simply Solar”</b> and <b>“Empowering a sustainable future.”</b></p>
+<h3>Our values</h3>
+<p>Integrity, Innovation, Passion, Collaboration and Sustainability. The team holds weekly core values sessions, and you’re part of them now.</p>
+<h3>Who’s who</h3>
+<div class="tbl"><table><tr><th>Person</th><th>Role</th><th>Go to them for</th></tr>
+<tr><td>Sarah</td><td>Founder and CEO</td><td>Company direction, partnerships, final say on big claims</td></tr>
+<tr><td>Brenda</td><td>Sales and Marketing (your manager)</td><td>Approving every post, your priorities, check-ins</td></tr>
+<tr><td>Tracy</td><td>Sales and Marketing</td><td>Leads, quotations, campaigns, what clients are asking</td></tr>
+<tr><td>Nereah</td><td>Finance and HR</td><td>HR questions, leave, paperwork</td></tr>
+<tr><td>Javis</td><td>Technical Manager</td><td>Checking any technical claim, project details and photos</td></tr>
+<tr><td>Julius</td><td>Technician</td><td>Site visits, installation footage, how things work</td></tr>
+</table></div>
+<p>We also have sales agents and technical agents in the regions (Homa Bay and the Coast). They share our WhatsApp posters with their own networks, so they’re part of your audience too.</p>
+<h3>Where we work</h3>
+<p>Most projects are in Kenya: Nairobi and its suburbs, Rongai, Nanyuki, Diani, Kisii, Malindi and more. Outside Kenya, our largest system is a 265 kWp off-grid plant for a factory in Mogadishu, Somalia.</p>
+<h3>Recognition</h3>
+<ul><li>Real Estate 100 Awards, Best Solar Solutions Provider: 2022, 2023, 2024 and 2025</li><li>African Excellence Award, 2023</li><li>Top Star Brands Award, 2024</li></ul>
+<h3>What we’re focused on this year</h3>
+<p>Sarah has set three priorities for 2026 and 2027:</p>
+<ol><li><b>Grow sales.</b> More agents, more partners, a weekly pipeline review.</li><li><b>Grow servicing and maintenance.</b> Most clients only call us once. Regular servicing and remote monitoring keep them with us.</li><li><b>Build the people and systems to match the growth.</b> You’re part of this one.</li></ol>
+<div class="tip"><strong>Your piece of it:</strong> the marketing goal for the year is to grow to 10,000 followers across all platforms and generate 1,000 leads. TikTok was planned but nobody had time to run it. That’s a big part of why you were hired.</div>
+`,
+ quiz:[
+  {q:"What is Aspectus’s current vision?", o:["To improve people’s lives and create a safer habitable environment","To become the sustainable energy solutions company of choice in Africa by 2040","To be Kenya’s cheapest solar installer","To install solar in every school"], a:1, why:"This is the 2026 vision. The first option is the old 2024 wording, which is retired."},
+  {q:"You want to post that a project produces a certain amount of power. Who checks it first?", o:["Nereah","Javis or Julius on the technical team","Nobody, if it’s from the profile","The client"], a:1, why:"Technical claims are checked with the technical team before Brenda approves the post."},
+  {q:"Which of these is one of Sarah’s three priorities?", o:["Opening an office in Uganda","Growing servicing and maintenance","Stopping solar water heaters","Reducing the number of agents"], a:1, why:"Servicing and maintenance is one of the three bets. It’s a strong theme for your content."}
+ ],
+ task:{prompt:"Revisit the social media graphic you submitted during your application. Refine it into an Instagram post that reintroduces Aspectus using the brand colors and accurate company information. Submit the improved graphic, a caption of no more than 100 words, and one sentence explaining what you changed. Draft only; Brenda approves anything published."}
+},
+
+{id:"m2", track:"know", title:"Aspectus Over the Years", mins:10,
+ intro:"How our story evolved — and how to find and maintain reliable facts for every post.",
+ body:`
+<h3>The big idea: our story changes, so our facts need checking</h3><p>Aspectus has evolved since 2015. The latest approved information guides what we say today, while older documents help us understand our journey.</p><div class="card"><h4>What you will take away</h4><p>You will be able to trace a claim to its source, decide whether it is current and approved, and keep a simple fact-checking tracker for your posts.</p></div><div class="card"><h4>Picture yourself at work</h4><p>You find three versions of the company story: a 2024 deck, a saved caption and a current company profile. They disagree. Your job is not to guess — it is to verify.</p></div>
+<h3>How the Aspectus story has evolved</h3>
+<p>Aspectus was founded in 2015, but the company you are joining today is not identical to the one described in older files. Here are four chapters to help you understand the journey. The chapter labels are a helpful learning framework; they are not a verified year-by-year corporate history.</p>
+<div class="aspectus-timeline"><div class="card timeline-card"><h4>2015–2019 · Starting out and winning trust</h4><p>Aspectus began in 2015. The early story is about introducing solar solutions, demonstrating technical credibility and earning clients' trust. The 2024 profile shows the breadth of that work: solar power, water heating, pumping, lighting and agricultural applications.</p></div>
+<div class="card timeline-card"><h4>2020–2021 · Working through a changed world</h4><p>COVID-19 changed the wider business environment. Use this chapter to remember that old business plans were written for their own circumstances. The supplied company profiles do <b>not</b> document precisely how the pandemic affected Aspectus, so do not invent a company-specific impact.</p></div>
+<div class="card timeline-card"><h4>2022–2024 · Reflecting and repositioning</h4><p>The 2024 company profile presents Aspectus through sustainability, its range of solutions, its people and its installation portfolio. It also documents Real Estate 100 recognition in 2022 and 2023. “Restructuring” can be a useful working label, but neither profile establishes a formal restructuring or its dates — Brenda should confirm that separately.</p></div>
+<div class="card timeline-card"><h4>2024–2026 · Evidence-led growth and clearer positioning</h4><p>The 2026 profile places more emphasis on specific customer outcomes, case studies, a concise product portfolio, partnerships and a stated vision to become the sustainable energy solutions company of choice in Africa by 2040. It lists Real Estate 100 awards through 2025. That is an evolution in how the company tells its story; the profiles alone cannot prove exactly when each operational change happened.</p></div>
+</div>
+<h3>Same company, different ways of telling its story</h3>
+<div class="tbl"><table><tr><th>Look for</th><th>2024 company profile</th><th>2026 company profile</th></tr>
+<tr><td>First impression</td><td>“Shine brightest with Solar Power”; a broad sustainability story</td><td>“Simply Stellar, Simply Solar”; clean-energy solutions supported by customer examples</td></tr>
+<tr><td>Products</td><td>Solar PV, lighting, water heating, irrigation and agri-energy in a detailed catalogue</td><td>Four clearer focus areas: solar PV, water heating and pumping, lighting, agri-solar technologies</td></tr>
+<tr><td>Proof of work</td><td>Project photo galleries, client list and a wide portfolio</td><td>Named case studies with capacities and stated customer outcomes</td></tr>
+<tr><td>Recognition</td><td>Images of 2022 and 2023 Real Estate 100 awards</td><td>Lists Real Estate 100 awards for 2022–2025 alongside other recognition</td></tr>
+<tr><td>Long-term direction</td><td>Emphasis on access, sustainability and improving lives</td><td>Explicit vision: company of choice for sustainable energy solutions in Africa by 2040</td></tr>
+</table></div>
+<div class="card"><h4>Your real-world example</h4><p>You're drafting an Instagram caption about a solar installation. The 2024 profile has several photographs and a system size; the 2026 profile includes a customer-result claim. <b>Don't combine them blindly.</b> First confirm that both refer to the same installation, ask the technical team to check specifications, and confirm that the customer has approved public use.</p></div>
+<div class="card"><h4>What you should remember</h4><p>Old documents aren't necessarily wrong. They may simply describe a different moment in the company's history. The job is to preserve the history while checking the current message, evidence and permission before publishing.</p></div>
+<h3>Why one source of truth matters</h3>
+<p>Information can conflict because teams update decks, documents get reused and facts change. A <b>single source of truth</b> is the agreed, maintained reference for a particular kind of information. There is not necessarily one file for everything: the company profile explains current positioning; project records and the technical team confirm specifications; Brenda approves what goes public.</p>
+<div class="card"><h4>Newest is a starting point, not a guarantee</h4><p>A recent draft may not be approved. An old completion certificate may still be the correct evidence of a historic project. Always check who owns the information, the date, the context and whether the content is approved for external use.</p></div>
+<h3>How to verify before you publish</h3>
+<ol><li><b>State the exact claim.</b> Write out the number, title, promise or description you want to use.</li><li><b>Trace it back.</b> Find the underlying document, source date and responsible person — not just an old caption or screenshot.</li><li><b>Cross-check with today.</b> Compare it with the latest approved material and ask Brenda or another knowledgeable colleague when sources disagree. Confirm technical claims with the technical team and publishing permission with Brenda.</li><li><b>Check confidentiality and consent.</b> A number from an internal board deck, a customer’s photo or a WhatsApp review is not automatically public.</li><li><b>Record the outcome.</b> Mark it verified, needs confirmation or do not publish. Save the evidence and next action.</li></ol>
+<h3>Build your personal source tracker</h3>
+<p>Keep a small research sheet with <b>Claim · Source and date · Owner · Status · Last checked · Approved use</b>. Your sheet helps you work efficiently; it does not replace the official company source or Brenda’s approval.</p>
+<div class="tbl"><table><tr><th>Claim</th><th>Source / owner</th><th>Decision</th></tr><tr><td>Current company vision</td><td>Latest approved company profile · Brenda</td><td>Use approved 2026 wording</td></tr><tr><td>Installation capacity</td><td>Project record · Javis or Julius</td><td>Confirm number before post</td></tr><tr><td>Happy customer quote</td><td>Customer message · customer and Brenda</td><td>Seek permission first</td></tr></table></div>
+<h3>Which document wins</h3>
+<p>If two documents disagree, use this order:</p>
+<ol><li>The September 2026 board presentation</li><li>The October 2026 company profile</li><li>Anything older (2024 profile, 2017 training deck, 2022 policies) only if nothing newer covers it</li></ol>
+<p>Still unsure? Ask Brenda or another knowledgeable colleague. Someone on the team can help — asking questions early and communicating clearly goes a long way. Obtain the right approval before publishing.</p>
+<h3>What changed</h3>
+<div class="tbl"><table><tr><th>Topic</th><th>Then (2024 and earlier)</th><th>Now (2026)</th></tr>
+<tr><td>Vision</td><td>Improve people’s lives; a safer habitable environment</td><td>Company of choice in Africa by 2040</td></tr>
+<tr><td>Story</td><td>Led with climate and the UN goals</td><td>Leads with results: real projects and outcomes</td></tr>
+<tr><td>Team</td><td>Profile listed a different sales director and team</td><td>Sarah, Brenda, Tracy, Nereah, Javis, Julius, plus regional agents</td></tr>
+<tr><td>Awards</td><td>Real Estate 100, 2022 to 2023</td><td>Real Estate 100, 2022 to 2025, plus African Excellence and Top Star Brands</td></tr>
+<tr><td>Licences</td><td>EPRA</td><td>EPRA and NCA 4</td></tr>
+<tr><td>Biggest product</td><td>Solar water heating</td><td>Solar PV is now the largest line</td></tr>
+<tr><td>Taglines</td><td>“Shine brightest with Solar Power”, “Solar You Can Trust”</td><td>“Simply Stellar, Simply Solar”, “Empowering a sustainable future”</td></tr>
+</table></div>
+<h3>Claims that need a current source</h3>
+<p>Some information changes quarterly or annually. Other claims require project evidence or permission. Rather than memorizing old numbers, learn which source to check and whom to ask.</p>
+<div class="tbl"><table><tr><th>Information</th><th>Where to check</th><th>Before publishing</th></tr>
+<tr><td><b>Internal financial and commercial information</b><br>Budgets, pricing strategy, contract values and internal performance reports</td><td>Current finance report; Finance or leadership</td><td>Keep internal unless leadership explicitly approves public disclosure.</td></tr>
+<tr><td><b>Business metrics</b><br>Projects, client retention, sales or performance statistics</td><td>Dated performance report; relevant team owner</td><td>Check date, definition and public approval.</td></tr>
+<tr><td><b>Licences and registrations</b><br>EPRA, NCA category, awards, professional credentials</td><td>Current regulator record, certificate or award document</td><td>Verify current status; never present an application or future goal as achieved.</td></tr>
+<tr><td><b>People and company identity</b><br>Job titles, experience, ownership descriptions, branding</td><td>Current approved company profile; HR or leadership</td><td>Check wording and whether it remains accurate.</td></tr>
+<tr><td><b>Projects and clients</b><br>System sizes, savings, names, photographs, testimonials</td><td>Project file, technical team, customer permission</td><td>Verify the exact claim and obtain consent.</td></tr>
+<tr><td><b>Products and partnerships</b><br>Financing partners, supplier names, available services</td><td>Current sales/product records; partnerships owner</td><td>Check that the offering or relationship is active and public.</td></tr></table></div>
+<div class="card"><h4>What does NCA mean?</h4><p><b>NCA</b> stands for <b>National Construction Authority</b>, Kenya's regulator of the construction sector. A contractor's <b>NCA category</b> is part of its registration classification. Aspectus materials currently describe the company as <b>NCA 4</b>; that is not the same as NCA 3. For any public statement, use the current registration certificate or regulator record and confirm with the responsible colleague.</p></div>
+<div class="warn"><strong>Can't trace a claim? Don't publish it yet.</strong><p>Note the claim, source, date, responsible person and approval status. Ask a colleague who knows the subject and communicate clearly with Brenda before anything goes live.</p></div>
+`,
+ quiz:[
+  {q:"You find a 2024 project slide and a 2026 company profile with different details. What should you do before posting?", o:["Copy the 2024 slide because it includes a project photo","Identify the exact claim, check the latest approved source and confirm project details with the owner","Use whichever description sounds more impressive","Avoid all historical information, even if verified"], a:1, why:"Newer is not automatically approved, and older evidence can still be valid. Trace the claim, confirm it with the right owner and obtain publishing approval."},
+  {q:"Can you post “We are NCA 3 certified”?", o:["Yes","No. We are NCA 4; NCA 3 is a goal","Only on LinkedIn","Only in tenders"], a:1, why:"Claiming a rating we don’t hold yet could hurt us, especially in tenders."},
+  {q:"You find an internal report with an impressive business figure. Can you include it in a public post?", o:["Yes, because it appears in an official company report","Yes, if the figure makes the caption more persuasive","Not without explicit approval; use verified public project evidence instead","Yes, if the report is recent"], a:2, why:"An internal source confirms a fact for internal use, not permission to publish it. Ask the responsible colleague and Brenda before sharing sensitive company information."}
+ ],
+ task:{prompt:"Review Aspectus Instagram, Facebook and LinkedIn profiles. Capture screenshots of three specific improvements you recommend. Submit each screenshot with its platform, what should change, and a proposed fix."}
+},
+
+{id:"m3", track:"know", title:"What we sell and who buys it", mins:10,
+ intro:"You don’t need to be an engineer. You need to explain each product clearly in language your customer understands — English, Kiswahili, Sheng or a natural mix — and know what to ask.",
+ body:`
+<h3>The big idea: explain a solution before trying to sell it</h3><p>Customers care about their problems first: unreliable power, hot water, operating costs or continuity. A good communicator connects those needs to the right solar solution.</p><div class="card"><h4>What you will take away</h4><p>You will be able to describe our major solutions in everyday language, identify likely customers and ask useful first questions.</p></div><div class="card"><h4>Picture yourself at work</h4><p>A school asks if solar will help keep its computer lab running during outages. Before promising anything, understand what needs power and introduce the right specialist.</p></div>
+<h3>Start with a customer, not a product list</h3><p>Picture two enquiries. A property developer wants reliable hot water for multiple apartments. A school wants to keep computers running during power cuts. They are both interested in solar, but they are not asking for the same solution.</p><div class="card"><h4>First, understand the job to be done</h4><p>Ask what the customer needs powered or heated, when they need it, where they are and what is currently going wrong. Only then decide which Aspectus product family is relevant. This is an initial conversation, not system design.</p></div><div class="card"><h4>A real project makes this clearer</h4><p>The 2024 company profile documents solar water heating for the Kings Developers Eden Gardens project (72 units) and an 80 kWp ground-mounted grid-tied system in Timau. One responds to hot-water demand at a residential development; the other demonstrates a different electricity application. Confirm current details before sharing publicly.</p></div><h3>Now meet the solutions</h3>
+<div class="card"><h4>Solar PV systems (on-grid, off-grid, hybrid)</h4>
+<p><b>What it is:</b> Panels that make electricity. On-grid works with KPLC, off-grid stands alone with batteries, hybrid does both and keeps the lights on in a blackout.</p>
+<p><b>Who buys:</b> Homeowners, businesses, schools, farms, lodges.</p>
+<p><b>Customer-friendly benefit:</b> Potential electricity cost savings or improved resilience, depending on system design, usage and storage.</p>
+<p><b>What sales needs to know:</b> What appliances they run and how many. For bigger systems, 3 to 6 months of power bills.</p></div>
+<div class="card"><h4>Solar water heating</h4>
+<p><b>What it is:</b> Uses the sun to heat water instead of an electric geyser. Comes as tube or flat plate, pressurised or split systems (common sizes 200L and 300L).</p>
+<p><b>Who buys:</b> Homeowners, property developers (Kings Developers fitted 258 units with us), hotels.</p>
+<p><b>Customer-friendly benefit:</b> Solar-heated water that can reduce reliance on electric heating, depending on design and usage.</p>
+<p><b>What sales needs to know:</b> Location, number of bedrooms, whether there’s an overhead tank, water type, any booster pump, and tube or flat plate preference.</p></div>
+<div class="card"><h4>Solar water pumping and irrigation</h4>
+<p><b>Who buys:</b> Farms, boreholes, estates, resorts. <b>Benefit:</b> Pump water without diesel or KPLC.</p></div>
+<div class="card"><h4>Solar outdoor lights (street, security, garden)</h4>
+<p><b>Who buys:</b> Estates, homes, schools, hotels. <b>Benefit:</b> Security lighting with no wiring and no bills; switches on at dusk by itself.</p>
+<p><b>What sales needs to know:</b> The area to light, the type of light, and how many.</p></div>
+<div class="card"><h4>Servicing, maintenance and remote monitoring</h4>
+<p><b>What it is:</b> Servicing and maintenance work helps clients keep their systems functioning. Inspection timing and any monitoring capability depend on the specific system and service arrangement; confirm with the technical team.</p>
+<p><b>Who buys:</b> Existing clients, and anyone with a solar system someone else installed.</p>
+<p><b>Why it matters:</b> It’s a company priority. Most clients never book a service. Content that explains why servicing matters helps directly.</p></div>
+<div class="card"><h4>Agri-solar and innovations</h4>
+<p>Solar dryers, egg incubators, solar refrigeration, e-cookers and mobile clinics. Good for educational content; check details with the technical team.</p></div>
+<h3>Who buys from us</h3>
+<div class="tbl"><table><tr><th>Segment</th><th>What we know</th><th>What they care about</th></tr>
+<tr><td>Homeowners</td><td>Our best converters: when they enquire, they often buy</td><td>Bills, blackouts, hot water, security</td></tr>
+<tr><td>Property developers</td><td>Now our biggest source of business</td><td>Track record, reliability, delivering on schedule across many units</td></tr>
+<tr><td>Commercial and institutions</td><td>Big tickets but harder to close this year</td><td>Cost savings, proof, tenders</td></tr>
+<tr><td>Schools and colleges</td><td>Many enquiries, few closes</td><td>Budget, reliability for labs and night classes</td></tr>
+<tr><td>Hotels, lodges, camps</td><td>Especially off-grid sites</td><td>Replacing diesel, guest comfort, eco credentials</td></tr>
+</table></div>
+<h3>How long installs take</h3>
+<p>Small homes (1 to 10 kW): 2 to 3 days. Medium systems (12 to 30 kW): about a week. Large projects (50 kW and up): 4 to 6 weeks. Projects tied to construction can run up to 2 years.</p>
+<div class="warn"><strong>Never promise</strong> a specific saving, payback time or system size. Those come from a site visit and the technical team’s sizing.</div>
+`,
+ scenario:{q:"A hotel messages on Instagram: “We spend a lot heating water. Can you help?” What’s the best reply?",
+  o:[{t:"“Yes! Our heaters cut bills by 40%. A system for you will cost about Ksh 500,000.”", ok:false, fb:"Never quote savings or prices in a DM. Both depend on a site visit."},
+     {t:"“Yes, we’ve done this for hotels like Castel Mara. Could you share your location, number of rooms and a phone number? Our team will call to arrange a site visit.”", ok:true, fb:"Right. A relevant example, the details sales needs, and a handover. Then log it in the pipeline sheet."},
+     {t:"“Please call our office.”", ok:false, fb:"Too cold. Collect their details so the lead isn’t lost."}]},
+ quiz:[
+  {q:"Which segment is now Aspectus’s biggest source of business?", o:["Schools","Property developers","Quarries","Hotels"], a:1, why:"Developers now account for more than half of closed business."},
+  {q:"Which segment converts best once they enquire?", o:["Homeowners","Schools","Managed estates","Commercial"], a:0, why:"Homeowners have the highest closing rate. Facebook and Instagram ads aimed at them pay off."},
+  {q:"For a large solar PV quote, what does sales usually need from the client?", o:["Their favourite colour","3 to 6 months of power bills","Their KRA PIN","Nothing"], a:1, why:"Bills show how much power they really use, which drives the system size."}
+ ],
+ task:{prompt:"Choose one Aspectus solar product. Create one educational post concept with a simple graphic or photo and a caption of up to 100 words explaining one customer benefit. Add two technical claims to check with Javis before publishing."}
+},
+
+{id:"m4", track:"know", title:"How Aspectus runs", mins:7,
+ intro:"Where things live, how we treat customers, and the house rules.",
+ body:`
+<h3>The big idea: good service is a team sport</h3><p>A social media message is not just a comment. It may become a lead, a technical question or a complaint, each requiring a different handoff.</p><div class="card"><h4>What you will take away</h4><p>You will be able to respond professionally, protect customer information, use the correct internal tools and escalate concerns promptly.</p></div><div class="card"><h4>Picture yourself at work</h4><p>A frustrated customer leaves a public comment on Friday afternoon. You can acknowledge it and make sure it reaches the right person, even if you cannot solve the installation problem yourself.</p></div>
+<h3>Follow one message through the company</h3><p>Imagine someone comments, “We need a solar solution for our school, but we don’t know what size.” Ian can respond quickly and respectfully — but he cannot responsibly price or size the system himself. Someone must capture the enquiry, find the right colleague and make sure the customer receives a response.</p><div class="card"><h4>Three different responsibilities</h4><p><b>Ian:</b> acknowledge the enquiry and record the relevant details. <b>Sales:</b> qualify it and coordinate next steps. <b>Technical team:</b> verify system requirements and specifications. Brenda helps manage priorities and escalation.</p></div><p>That is why shared records, handoffs and service expectations matter: without them, an enquiry can get lost between people who thought someone else was responding.</p><h3>Where the work is recorded</h3>
+<ul>
+<li><b>Email:</b> Google Workspace (Gmail).</li>
+<li><b>Sales pipeline:</b> a shared Google Sheet. Every new enquiry from social media gets logged there. Brenda will show you which tab.</li>
+<li><b>Weekly pipeline brief:</b> an internal email that goes out on Thursday mornings.</li>
+<li><b>Quotations and tenders:</b> handled by sales using standard templates. You support, you don’t price.</li>
+</ul>
+<h3>Customer service standards</h3>
+<div class="tbl"><table><tr><th>Channel</th><th>Standard</th></tr>
+<tr><td>Phone</td><td>Answer within 3 to 4 rings and say “Aspectus Limited”. If the person they want isn’t in, take a message and pass it on the same day.</td></tr>
+<tr><td>Returning calls</td><td>Within one business day, and within two hours where possible.</td></tr>
+<tr><td>Website and social enquiries</td><td>Reply within 24 hours, accurately. Faster is better: a slow reply loses leads.</td></tr>
+<tr><td>Written complaints</td><td>Acknowledge within 24 to 48 hours. Try to resolve; if you can’t, escalate to Brenda.</td></tr>
+</table></div>
+<p>Always: speak respectfully, listen fully before responding, communicate honestly in language the customer understands (English, Kiswahili, Sheng or a natural mix as appropriate), and keep customer details private (Kenya’s Data Protection Act 2019 applies).</p>
+<h3>House rules</h3>
+<ul>
+<li><b>Hours:</b> 8:00am to 5:00pm. Be on time.</li>
+<li><b>Dress:</b> business or smart casual. Dress-down Fridays allow jeans, but not when you’re meeting clients or partners.</li>
+<li><b>Confidentiality:</b> client and company information stays inside the company. That includes pricing, deal values and internal documents.</li>
+<li><b>Gifts:</b> we discourage accepting gifts from clients or partners, and bribery is never allowed.</li>
+<li><b>Deadlines:</b> if you can’t meet one, tell Brenda before the due date, not after.</li>
+<li><b>Open door:</b> questions and ideas are welcome. Speak up.</li>
+</ul>
+`,
+ scenario:{q:"Someone comments on a Facebook post: “Two weeks and my installation still isn’t done. Terrible service.” What do you do?",
+  o:[{t:"Delete the comment.", ok:false, fb:"Deleting looks like hiding. Others may have seen it already."},
+     {t:"Reply publicly to explain whose fault the delay was.", ok:false, fb:"Never argue in public, and you don’t know the full story yet."},
+     {t:"Reply publicly with a short, polite acknowledgement and invite them to DM or call; then tell Brenda straight away so the right person follows up.", ok:true, fb:"Right. Acknowledge, take it private, escalate. Log it so it’s followed through."}]},
+ quiz:[
+  {q:"How quickly should a social media enquiry get a reply?", o:["Within a week","Within 24 hours, faster if possible","Only on Mondays","When sales has time"], a:1, why:"Our standard is 24 hours. Speed wins leads."},
+  {q:"A client’s phone number came through a DM. Can you share it in a public reply?", o:["Yes","No, customer details stay private","Only with their name","Only on WhatsApp"], a:1, why:"Customer privacy is part of our policy and Kenyan law."},
+  {q:"A task is due Friday, but on Wednesday you realise you cannot finish it on time. When should you let Brenda know about the delay?", o:["On Monday","Before Friday","Never","Only if she asks"], a:1, why:"Tell Brenda as soon as you realise the deadline is at risk, before Friday. Explain what is blocking you and propose a realistic new completion date."}
+ ],
+ task:{prompt:"Respond to three realistic social interactions: a new product enquiry, a price question and a customer concerned about an installation delay. Submit three replies (40 words maximum each), plus one sentence identifying anything to escalate to Brenda."}
+},
+
+/* ---------------- TRACK 2: MARKET ---------------- */
+{id:"m5", track:"market", title:"Our voice and what we can claim", mins:8,
+ intro:"How we sound, what we can prove, and how a post gets approved.",
+ body:`
+<h3>The big idea: trust matters more than a flashy caption</h3><p>Every public claim represents the company. Clear writing, accurate facts and permission to share real client stories build the brand better than big promises.</p><div class="card"><h4>What you will take away</h4><p>You will be able to write in Aspectus’s voice, spot risky claims, check approval requirements and prepare a post for Brenda’s review.</p></div><div class="card"><h4>Picture yourself at work</h4><p>You find a glowing WhatsApp message from a customer and a photo of their house. They could make a great post — but first you need permission and a verified story.</p></div>
+<h3>Why would a customer believe us?</h3><p>Suppose you have a photograph of an installation and an old caption claiming it “eliminated electricity bills.” The photo may be genuine, but the claim is not necessarily accurate. The more impressive a promise sounds, the more important it is to verify.</p><div class="card"><h4>Build a story from evidence</h4><p>Start with the customer's need, explain what Aspectus installed, identify what the record actually proves and describe the outcome without exaggeration. The 2024 company profile contains installation photos and project names; they are useful leads for research, not automatic permission to publish.</p></div><div class="card"><h4>See the difference</h4><p><b>Weak:</b> “We guarantee no more bills!” <b>Stronger:</b> “Aspectus designed an installation for this customer's energy needs. Ask our team to assess which solution may suit your site.” Use a specific capacity or savings claim only when verified and approved.</p></div><h3>Now find the right voice</h3>
+<ul><li><b>Speak your audience's language.</b> Use clear, natural wording that fits the customer and platform — English, Kiswahili, Sheng or a blend where appropriate. Avoid jargon unless you explain it.</li><li><b>Lead with the customer need.</b> Explain how backup power could help during an outage before introducing a technical specification.</li><li><b>Specific beats vague.</b> Real projects, real places, real system sizes.</li><li><b>Honest.</b> We never exaggerate. Our reputation is our marketing.</li></ul>
+<h3>The Aspectus visual identity</h3>
+<p>Think of our palette as a visual toolkit. Orange brings energy, green marks progress, charcoal keeps writing readable, and red is reserved for warnings — not ordinary decorative cards.</p>
+<div class="brand-palette" aria-label="Aspectus brand colour palette">
+<div class="brand-swatch"><span class="swatch-color" style="background:#FAA954"></span><span class="swatch-details"><strong>Solar orange</strong><small>#FAA954 · Main accent</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#00A859"></span><span class="swatch-details"><strong>Aspectus green</strong><small>#00A859 · Success and approval</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#373435"></span><span class="swatch-details"><strong>Charcoal</strong><small>#373435 · Text and contrast</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#9B1D20"></span><span class="swatch-details"><strong>Alert red</strong><small>#9B1D20 · Warnings only</small></span></div>
+</div>
+<div class="brand-rule"><span class="brand-rule-icon">✦</span><div><h4>Use the logo as supplied</h4><p>Use only approved logo files. Keep the proportions, spacing and colors intact — no stretching, recoloring or squeezing into a graphic.</p></div></div>
+<h3>Proof points you can use</h3>
+<ul>
+<li>EPRA licensed for solar PV and solar water heating; NCA 4 registered</li>
+<li>Real Estate 100 Awards, Best Solar Solutions Provider, 2022 to 2025</li>
+<li>Kings Developers: solar water heaters for Eden Gardens (72 units), Vintage (120) and Apollo (66)</li>
+<li>265 kWp off-grid system for a factory in Mogadishu, replacing diesel</li>
+<li>80 kWp grid-tied system on a farm in Timau</li>
+<li>Kamburaini School, Naro Moru: a hybrid system powering computer labs</li>
+<li>Design and supervision of a 4.3 MW hybrid system for the Baricho Water Works in Malindi</li>
+<li>2026 completions such as Mwitu (16.4 kW, Karen), a 20 kW system in Kiambu, 6 kW for pool heating in Lavington</li>
+</ul>
+<h3>The claim rules</h3>
+<ol>
+<li>Savings are never promised. Say what a specific client experienced, and name the source.</li>
+<li>Every technical number is checked with Javis or Julius.</li>
+<li>Client names, homes and photos need the client’s permission. Homeowners especially: never show a house number or exact location.</li>
+<li>A nice WhatsApp message is not a testimonial until the client agrees it can be published.</li>
+</ol>
+<h3>How a post gets approved</h3>
+<ol><li>You draft the post (visual, caption, call to action).</li><li>If it has a technical claim, the technical team checks it.</li><li>Brenda approves it.</li><li>You publish, then log any enquiries it brings in.</li></ol>
+`,
+ scenario:{q:"A prospect asks: “Will you guarantee my bill drops by 50%?” Best response?",
+  o:[{t:"“Yes, guaranteed.”", ok:false, fb:"We can’t guarantee that, and it creates a complaint later."},
+     {t:"“Savings depend on how you use power. Our team sizes every system after a site visit, so you’ll get a figure based on your actual usage. Can I arrange that?”", ok:true, fb:"Honest, helpful, and it moves them to the next step."},
+     {t:"“No.”", ok:false, fb:"True but unhelpful. Explain why and offer the next step."}]},
+ quiz:[
+  {q:"A client sends a glowing WhatsApp review. Can you post it as a testimonial today?", o:["Yes","Only after the client agrees it can be published","Only without their name","Only on TikTok"], a:1, why:"Permission first, always."},
+  {q:"Who gives final approval for your posts?", o:["You","Brenda","Javis","Any agent"], a:1, why:"Brenda approves every post. Technical claims get checked by the technical team first."},
+  {q:"Which caption follows our voice best?", o:["“Leveraging cutting-edge photovoltaic synergies.”","“No more blackouts in Kitengela: a 12 kW system, installed in a week.”","“BEST SOLAR EVER!!!”","“Solar is good.”"], a:1, why:"Lead with the customer benefit, be specific, and use clear, audience-appropriate language."}
+ ],
+ task:{prompt:"Choose one verified Aspectus installation. Create a three-slide social carousel storyboard showing the customer need, the solution and the outcome, plus a short caption. Flag facts, photos or client details that need approval."}
+},
+
+{id:"m6", track:"market", title:"The social media playbook", mins:10,
+ intro:"Each platform has a job. This is the strategy the team presented to the board in September 2026.",
+ body:`
+<h3>The big idea: each channel has a job</h3><p>Posting everywhere is not the same as having a strategy. Different audiences need different examples, formats and reasons to respond.</p><div class="card"><h4>What you will take away</h4><p>You will be able to match content to the right platform, plan a balanced week and choose measures that show whether your posts are working.</p></div><div class="card"><h4>Picture yourself at work</h4><p>You have a new commercial PV case study, a homeowner FAQ and an installation photo. Where should each go, and what should success look like?</p></div>
+<h3>A post needs a person and a purpose</h3><p>Imagine you have photos of a solar water heater on an apartment roof and a technical case study from a commercial site. Posting both identically everywhere might generate views, but may miss the people who would find them most useful.</p><div class="card"><h4>Decide who the story is for</h4><p>A homeowner may want a simple explanation and reassurance about everyday use. A developer might care more about suitability for multiple units and how installation planning works. The underlying project can be the same, but the angle and level of detail should change.</p></div><div class="card"><h4>Then choose the channel and measure</h4><p>Match the audience to a platform, give the post one clear action and record what happened next. A post that brings three serious enquiries may be more useful for a lead-generation goal than one that earns many likes but no conversations.</p></div><h3>The platform playbook</h3>
+<div class="tbl"><table><tr><th>Platform</th><th>Audience</th><th>Content</th><th>We measure</th></tr>
+<tr><td>Facebook and Instagram</td><td>Homeowners and small businesses</td><td>Project completions with specs, educational posts (myths, “did you know”), seasonal product posts, newsletters. Paid ads that open WhatsApp or Messenger.</td><td>Enquiries from ads, cost per lead</td></tr>
+<tr><td>LinkedIn</td><td>Developers, institutions, commercial clients</td><td>Medium and large project case studies, technical completions, newsletters, milestones and awards</td><td>Profile views, follower growth</td></tr>
+<tr><td>WhatsApp Status</td><td>Warm leads and past customers</td><td>Product posters, seasonal promotions, project highlights. Agents reshare these to their contacts.</td><td>Messages received per post</td></tr>
+<tr><td>TikTok</td><td>18 and over, broad awareness</td><td>Installation slideshows, before and after, product spotlights</td><td>Views and watch time</td></tr>
+<tr><td>X / Twitter</td><td>General</td><td>Mirror of Facebook and Instagram, nothing extra</td><td>Low priority</td></tr>
+</table></div>
+<h3>What we’ve learned so far</h3>
+<ul><li>Follower growth spikes when we run paid ads. Organic months are flat, so consistency matters.</li><li>LinkedIn grows slowly but steadily.</li><li>Awareness posts alone don’t bring leads. Product-specific posts with a clear “message us on WhatsApp” do.</li></ul>
+<h3>Your targets for the year</h3>
+<p>Older marketing materials included targets such as 10,000 followers and 1,000 leads. Ask Brenda to confirm the current targets and reporting cadence before treating those numbers as active goals.</p>
+<h3>The Tuesday Energy Tip</h3>
+<p>A weekly post that informs and educates. Rotate the theme: a practical tip, a “did you know?”, something funny, a new technology, or a new energy law. Every tip with a technical claim gets checked first.</p>
+<h3>Turning happy customers into content</h3>
+<p>After every installation, sales follows up with a feedback form. It asks what the customer liked and whether they have referrals. Positive answers become testimonials (with permission), and referrals go straight into the pipeline.</p>
+<h3>When a message comes in</h3>
+<ol><li><b>Enquiry:</b> reply within 24 hours, collect name, phone, location and what they need, log it in the pipeline sheet, and hand it to sales.</li><li><b>Complaint:</b> acknowledge politely, move it to DM or phone, tell Brenda the same day.</li><li><b>Question you can’t answer:</b> say you’ll find out, then check with the right person. Never guess.</li></ol>
+`,
+ scenario:{q:"Javis sends you a spec sheet for a new inverter, and you don’t fully understand it. What happens before it’s posted?",
+  o:[{t:"Copy the spec sheet into a caption.", ok:false, fb:"Customers won’t understand it either, and you could misstate something."},
+     {t:"Ask Javis to explain the key benefit in plain words, draft the post, have him check it, then send it to Brenda.", ok:true, fb:"Right. Understand it, translate it, verify it, get approval."},
+     {t:"Skip it.", ok:false, fb:"New products are good content. Just check them first."}]},
+ quiz:[
+  {q:"Where should a case study about a 60 kW commercial project go first?", o:["TikTok","LinkedIn","X","Nowhere"], a:1, why:"LinkedIn reaches developers, institutions and commercial buyers."},
+  {q:"What do we measure for WhatsApp Status posts?", o:["Likes","Messages received per post","Shares on X","Nothing"], a:1, why:"WhatsApp Status is about direct conversations with warm leads."},
+  {q:"A new enquiry comes in by DM. After replying, what’s the next step?", o:["Nothing","Log it in the pipeline sheet and hand it to sales","Post about it","Wait for them to call"], a:1, why:"A lead that isn’t logged gets lost."}
+ ],
+ task:{prompt:"Build a one-week content calendar with five posts: education, product, project proof, engagement and enquiry generation. For each include platform, format, hook, call to action and needed asset. Design only one example post."}
+},
+
+/* ---------------- TRACK 3: SELL ---------------- */
+{id:"m7", track:"sell", title:"The sales journey and your part in it", mins:8,
+ intro:"How a stranger becomes a client, and where marketing makes the difference.",
+ body:`
+<h3>The big idea: a conversation becomes valuable when it is handed over well</h3><p>Marketing opens the door, but the whole team helps a prospect move from enquiry to installation and follow-up.</p><div class="card"><h4>What you will take away</h4><p>You will be able to capture the essential lead details, pass a useful handoff to sales and follow up without overpromising.</p></div><div class="card"><h4>Picture yourself at work</h4><p>A school bursar messages Aspectus after a Facebook post and asks for a price. A guessed quote could lose trust; a clear, timely handoff can create a genuine opportunity.</p></div>
+<h3>One real-world journey: from message to relationship</h3><p>A school bursar sees an Aspectus post and asks for a quotation. Ian's job starts before there is a sale: listen, capture enough information to help and make sure someone follows up. The sales team then investigates the opportunity rather than guessing a price.</p><div class="card"><h4>Why these steps exist</h4><p>The Aspectus Sales Process starts with <b>lead generation</b>, then <b>qualify/research</b> and <b>contact</b>. It moves to <b>pitch/send proposal/negotiations</b>, <b>overcome objections</b>, <b>close the deal</b> and <b>follow up</b>. Each step answers a question: Is this a potential customer? What do they need? Can we propose a fit? What is stopping a decision? How do we keep the relationship?</p></div><div class="card"><h4>And the story doesn't end at closing</h4><p>The sales-process document explicitly includes getting feedback, nurturing the relationship, considering cross-selling and asking for referrals. Marketing can help make those follow-ups useful rather than treating customers as finished transactions.</p></div><h3>The official sales journey</h3>
+<ol>
+<li><b>Lead generation:</b> referrals, social media, events, site visits. <i>This is mostly you.</i></li>
+<li><b>Qualify:</b> is this a good fit? What do they need?</li>
+<li><b>Contact:</b> a call, email or meeting.</li>
+<li><b>Site visit and sizing:</b> the team collects details and sizes the system.</li>
+<li><b>Proposal and quotation.</b></li>
+<li><b>Objections and negotiation:</b> the quote may be revised.</li>
+<li><b>Close:</b> award letter, proforma invoice, deposit.</li>
+<li><b>Delivery:</b> sourcing, installation, testing, training the client, completion certificate.</li>
+<li><b>Follow-up:</b> feedback, referrals, maintenance schedule. <i>You help here too.</i></li>
+</ol>
+<p>If a deal is lost, the team looks at why. Lost clients are worth reaching back out to later.</p>
+<h3>Where your job ends and sales begins</h3>
+<p>You own the lead until it’s logged in the pipeline sheet with the right details and handed to sales. Sales owns it from the first call. Collect:</p>
+<ul><li>Name and phone number</li><li>Location (area, not exact address)</li><li>What they’re interested in</li><li>Type of client (home, developer, business, school, hotel, farm)</li><li>Where they found us (which post, ad or platform)</li></ul>
+<p>That last one matters. It’s how we know which content brings business.</p>
+<h3>Keeping clients</h3>
+<p>Our retention approach: reply fast, deliver within one or two days where possible, follow up after installation (a few days later, a week later, then regularly), run satisfaction checks, and handle complaints properly. Content that keeps past clients engaged, like servicing reminders and energy tips, supports this.</p>
+<h3>Ways we make buying easier</h3>
+<p>We work with financing partners so some clients can pay over time. Check with Brenda before naming any partner publicly.</p>
+`,
+ scenario:{q:"A school bursar asks for a quotation through Facebook. What do you collect, and where does it go?",
+  o:[{t:"Send them a price list.", ok:false, fb:"Prices depend on sizing, and price lists are internal."},
+     {t:"Collect the contact person, phone, school name and location, what they want powered, and how they found us; log it in the pipeline sheet and hand it to sales.", ok:true, fb:"Right. Sales will arrange the visit and quotation."},
+     {t:"Tell them to email info@.", ok:false, fb:"You risk losing the lead. Capture it yourself."}]},
+ quiz:[
+  {q:"Why record where a lead found us?", o:["It’s not needed","It shows which content and platforms bring business","For the client’s records","For KRA"], a:1, why:"It’s how marketing proves its value and learns what works."},
+  {q:"Who prepares quotations?", o:["You","Sales, after sizing","The client","Nobody"], a:1, why:"Quotes come after a site visit and sizing by the team."},
+  {q:"At which two stages does marketing contribute most?", o:["Lead generation and follow-up","Installation and testing","Invoicing and payment","Sourcing materials"], a:0, why:"You bring leads in and help keep clients engaged afterwards."}
+ ],
+ task:{prompt:"A follower sends a direct message asking for a solar solution. Draft a friendly opening reply, a simple five-field lead capture checklist, and a concise handoff message to sales. Include a short follow-up when the customer has not replied."}
+},
+
+{id:"m8", track:"market", title:"Planning a social media campaign", mins:10,
+ intro:"Put everything together: audience, message, content plan, creative and measurement.",
+ body:`
+<h3>The big idea: turn everything you have learned into a campaign</h3><p>A strong campaign links an audience, one goal, relevant messages, approved creative and a way to learn from the results.</p><div class="card"><h4>What you will take away</h4><p>You will be able to create a simple one-week campaign brief, plan three connected posts, produce a sample and identify two meaningful metrics.</p></div><div class="card"><h4>Picture yourself at work</h4><p>Brenda wants more qualified enquiries for one Aspectus solution next week. Instead of posting at random, you will build a small campaign with a purpose.</p></div>
+<h3>From scattered posts to one connected story</h3><p>Imagine Brenda asks Ian to promote solar water heating. He could post a product photo on Monday, an award on Wednesday and a random energy tip on Friday. That is activity — but it may not tell one audience why they should care or what to do.</p><div class="card"><h4>Build the campaign backwards</h4><p>Start with the change you want: for example, relevant homeowners or developers asking for more information. Then decide what the audience must understand before taking action. A connected sequence can introduce the problem, explain a verified solution and invite a conversation.</p></div><div class="card"><h4>Use a consistent example</h4><p>The 2024 company profile includes solar water heating at Eden Gardens (72 units). That may be a useful starting point for a developer-focused content concept, but check technical facts, photos and permission before treating it as an approved case study.</p></div><h3>Choose one campaign objective</h3>
+<p>A campaign is a group of posts working toward one outcome. For Aspectus, choose an objective such as awareness of solar water heating, more qualified enquiries, or education about solar PV. Avoid trying to achieve everything at once.</p>
+<div class="card"><h4>Campaign brief</h4><p>Record four things: the audience, the goal, the one key message and the action you want them to take.</p></div>
+<h3>Choose the audience</h3>
+<p>A homeowner looking at monthly energy bills and a developer specifying systems for new apartments need different messages. Choose one audience and write for their concerns.</p>
+<h3>Build a three-post sequence</h3>
+<ol><li><b>Get attention.</b> Introduce a customer problem or surprising insight.</li><li><b>Build confidence.</b> Explain how an Aspectus solution works or show a verified installation.</li><li><b>Invite action.</b> Make the next step simple: send an enquiry, ask for advice or request a consultation.</li></ol>
+<h3>The content calendar</h3>
+<p>For each post, capture: day, platform, format (photo, carousel or graphic), opening hook, visual asset, caption angle and call to action. Three clear rows are enough for this mini-campaign.</p>
+<div class="card"><h4>Keep production manageable</h4><p>Plan all three posts, but fully design only one creative. Reuse approved Aspectus photos and your existing templates where possible.</p></div>
+<h3>Measure what matters</h3>
+<p>Match metrics to your goal. Reach and saves can help assess awareness or education; relevant direct messages and qualified enquiries are more useful when the objective is lead generation.</p>
+<h3>Before anything goes live</h3>
+<ul><li>Check technical claims with Javis or Julius.</li><li>Confirm photo and client permissions.</li><li>Use Aspectus colors and approved branding.</li><li>Send every post to Brenda for approval before publishing.</li></ul>
+`,
+ scenario:{q:"The objective is to generate enquiries from homeowners about solar water heating. Which call to action fits best?",
+  o:[{t:"Send us a DM with your household's hot-water needs.",ok:true,fb:"Right. A specific next step can start a useful sales conversation."},{t:"Like this post if you love sunshine.",ok:false,fb:"Likes are engagement, not necessarily customer enquiries."},{t:"Follow for more inspiration.",ok:false,fb:"Following may build an audience but does not directly qualify a lead."}]},
+ quiz:[
+  {q:"What should a campaign brief clarify first?",o:["Every hashtag","One objective and target audience","The final photo filter","The number of likes to promise"],a:1,why:"Start with a clear goal and the people you want to reach."},
+  {q:"Which content calendar entry is most useful?",o:["Tuesday: post something","Tuesday: carousel, homeowner audience, hook, visual, CTA","Three emojis","Post whenever free"],a:1,why:"A usable plan identifies the message, format, asset and next step."},
+  {q:"Which metric best supports a lead-generation campaign?",o:["Any impression","Qualified product enquiries","Logo size","Number of words"],a:1,why:"Meaningful enquiries reflect the campaign objective."},
+  {q:"What must happen before publishing a project photo?",o:["Nothing if it looks professional","Only add a hashtag","Confirm permissions, verify claims and get Brenda's approval","Let the app approve automatically"],a:2,why:"Company and client approval rules still apply."}
+ ],
+ task:{prompt:"Plan a three-post, one-week social campaign for one Aspectus solution. Submit a short campaign brief (audience, objective, key message), a three-row content calendar (format, hook and CTA), one sample graphic or carousel slide with a caption, and two success metrics. Submit for Brenda review; do not publish."}
+}
+];
+
+const TOOLKIT = `
+<h2>Toolkit</h2>
+<p class="note">Quick references you’ll come back to. Everything here is also in the modules.</p>
+<section class="block"><h3>Who to ask</h3><div class="tbl"><table>
+<tr><th>Need</th><th>Ask</th></tr>
+<tr><td>Post approval, priorities</td><td>Brenda</td></tr>
+<tr><td>Leads, quotes, campaign ideas</td><td>Brenda or Tracy</td></tr>
+<tr><td>Technical claims, specs, project details</td><td>Javis or Julius</td></tr>
+<tr><td>HR, leave, paperwork</td><td>Nereah</td></tr>
+<tr><td>Company direction, partnerships</td><td>Sarah, through Brenda</td></tr></table></div></section>
+<section class="block"><h3>Before you publish</h3><div class="card"><ul>
+<li>Is every fact from a 2026 source?</li><li>Has any technical number been checked by Javis or Julius?</li><li>Do I have permission for client names, photos and quotes?</li><li>No unapproved pricing, financial details, performance claims or savings promises?</li><li>Clear, audience-appropriate language, a relevant benefit and a clear call to action?</li><li>Has Brenda approved it?</li></ul></div></section>
+<section class="block"><h3>New enquiry: collect these</h3><div class="card"><ol>
+<li>Name and phone</li><li>Location (area)</li><li>What they’re interested in</li><li>Type of client</li><li>Where they found us</li></ol><p>Then log it in the pipeline sheet and hand it to sales.</p></div></section>
+<section class="block"><h3>Response times</h3><div class="card"><ul>
+<li>Social and website enquiries: within 24 hours</li><li>Calls: within one business day, two hours if possible</li><li>Written complaints: acknowledge within 24 to 48 hours, escalate if unresolved</li></ul></div></section>
+<section class="block"><h3>Monthly report for Brenda</h3><div class="card"><ul>
+<li>Followers per platform, and total against 10,000</li><li>Leads from social, and from which platform or post</li><li>Cost per lead on paid ads</li><li>Top three posts and why they worked</li><li>One thing to try next month</li></ul></div></section>
+`;
+
+const MILESTONES = [
+ {id:"w1", t:"Week 1: Understand", when:"by 9 Nov", items:["Completes all eight modules with quiz scores of 80% or more","Lists outdated content on current social pages","Knows who to ask for what"]},
+ {id:"w2", t:"Week 2: Apply", when:"by 16 Nov", items:["Three Tuesday Energy Tips drafted, claims checked, one published","First posts approved by Brenda and published","Every social enquiry logged in the pipeline sheet","First TikTok from a completed project"]},
+ {id:"d30", t:"Day 30: Own", when:"by 3 Dec", items:["Runs a weekly content calendar across all platforms, with Brenda approving","Posts on TikTok every week","Sends the first monthly report: followers, leads, cost per lead","Keeps the tender document pack current for one live tender"]}
+];
+
+const WEEK = [
+ {d:"2026-11-03", lbl:"Tue 3 Nov", t:"Orientation with Brenda. Meet the team. Baseline check. Modules 1 and 2."},
+ {d:"2026-11-04", lbl:"Wed 4 Nov", t:"Modules 3 and 4. Ask Javis or Julius to walk you through one product."},
+ {d:"2026-11-05", lbl:"Thu 5 Nov", t:"Modules 5 and 6. Draft your three Energy Tips."},
+ {d:"2026-11-06", lbl:"Fri 6 Nov", t:"Modules 7 and 8. Look at one past tender with Brenda."},
+ {d:"2026-11-09", lbl:"Mon 9 Nov", t:"Send your summary to Brenda. Week 1 check-in and plan for week 2."}
+];
+
+/* ================= STATE ================= */
+let S = load();
+function load(){ try{ return JSON.parse(localStorage.getItem(CONFIG.storageKey)) || fresh(); }catch(e){ return fresh(); } }
+function fresh(){ return {baseline:null, mods:{}, signoff:{}, questions:""}; }
+function save(){ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(S)); }catch(e){} }
+function ms(id){ return S.mods[id] || (S.mods[id] = {quiz:{}, scen:null, task:"", done:false}); }
+function quizScore(m){ const st=ms(m.id); let c=0,n=0; m.quiz.forEach((q,i)=>{ if(st.quiz[i]!=null){n++; if(st.quiz[i]===q.a)c++;} }); return {c,n,total:m.quiz.length}; }
+function modState(m){ const st=S.mods[m.id]; if(!st) return "new"; if(st.done) return "done"; return (Object.keys(st.quiz).length||st.task||st.scen!=null)?"prog":"new"; }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function dayNum(){ const s=new Date(CONFIG.startDate+"T00:00:00"); const d=Math.floor((new Date()-s)/864e5)+1; return d; }
+
+/* ================= VIEWS ================= */
+const app = document.getElementById("app");
+const requestedModule = new URLSearchParams(window.location.search).get("module");
+let view = requestedModule==="baseline" ? {name:"baseline"} : requestedModule && /^m[1-8]$/.test(requestedModule) ? {name:"module",id:requestedModule} : {name:"home"};
+function go(name, extra){ if(new URLSearchParams(window.location.search).get("locked")==="1" && (name!=="module" || (extra && extra.id!==requestedModule))) return; view = Object.assign({name}, extra||{}); render(); window.scrollTo(0,0); }
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current", b.dataset.go===view.name?"page":"false"));
+  if(view.name==="home") homeView();
+  else if(view.name==="baseline") baselineView();
+  else if(view.name==="module") moduleView(view.id);
+  else if(view.name==="toolkit") app.innerHTML = `<div class="wrap prose">${TOOLKIT}</div>`;
+  else if(view.name==="brenda") brendaView();
+  else if(view.name==="cert") certView();
+}
+
+function trackStyle(t){ const T=TRACKS[t]; return `--tc:${T.c};--tc-soft:${T.soft};--on-tc:${T.on}`; }
+
+function homeView(){
+  const dn = dayNum();
+  const dayTxt = dn<1 ? `You start on Tuesday 3 November` : dn<=30 ? `Day ${dn} of 30` : `Onboarding complete window`;
+  const next = !S.baseline ? {t:"Start with a quick baseline check", s:"5 questions, about 3 minutes. It isn’t graded.", act:()=>go("baseline")}
+    : (()=>{ const m = MODULES.find(m=>!ms(m.id).done); return m ? {t:`Next: ${m.title}`, s:`${TRACKS[m.track].name}, about ${m.mins} minutes`, act:()=>go("module",{id:m.id})} : {t:"All modules complete", s:"Send your summary to Brenda and view your learning record.", act:()=>go("brenda")}; })();
+  const segs = Object.keys(TRACKS).map(t=>{ const ms_=MODULES.filter(m=>m.track===t); const d=ms_.filter(m=>ms(m.id).done).length; return `<div class="seg"><div class="bar"><div class="fill" style="width:${Math.round(d/ms_.length*100)}%;background:${TRACKS[t].c}"></div></div><div class="lbl">${TRACKS[t].name} ${d}/${ms_.length}</div></div>`; }).join("");
+  const today = new Date().toISOString().slice(0,10);
+  app.innerHTML = `
+  <div class="hero"><div class="wrap">
+    <div class="hero-eyebrow">Your Aspectus learning journey</div><p class="kicker">${dayTxt}</p>
+    <h1>Karibu, ${CONFIG.learner}<span style="color:#00A859">.</span></h1>
+    <p class="lede">This is your guide to Aspectus and to your role as ${CONFIG.role}. Work through it at your own pace. ${CONFIG.manager} will check in with you along the way.</p>
+    <div class="sunpath">${segs}</div>
+    <div class="next"><div><h3>${next.t}</h3><div class="note">${next.s}</div></div><button class="btn" id="nextBtn">Continue</button></div>
+  </div></div>
+  <div class="wrap">
+    ${Object.keys(TRACKS).map(t=>`
+    <section class="block"><div class="track-h"><span class="dot" style="background:${TRACKS[t].c}"></span><h2>${TRACKS[t].name}</h2></div>
+      <div class="mods">${MODULES.filter(m=>m.track===t).map(m=>{ const st=modState(m); const n=MODULES.indexOf(m)+1; const q=quizScore(m); return `
+        <button class="mod" data-mod="${m.id}" style="${trackStyle(t)}">
+          <span class="ring ${st}">${st==="done"?"✓":n}</span>
+          <span><b>${m.title}</b><br><span class="meta">${m.mins} min${q.n?` · quiz ${q.c}/${q.total}`:""}</span></span>
+          ${st==="done"?`<span class="badge wait">Ready for review</span>`:""}
+        </button>`; }).join("")}</div>
+    </section>`).join("")}
+    <section class="block"><h2>Your first week</h2>
+      <div class="days" style="margin-top:12px">${WEEK.map(w=>`<div class="day ${w.d===today?"today":""}"><b>${w.lbl}</b><span>${w.t}</span></div>`).join("")}</div>
+    </section>
+    <section class="block"><h2>What success looks like</h2>
+      <p class="note">Draft milestones for ${CONFIG.manager} to confirm with you.</p>
+      <div class="milestones">${MILESTONES.map(m=>`<div class="ms"><h3><span>${m.t}</span><span class="note">${m.when}</span></h3><ul>${m.items.map((it,i)=>`<li>${it}</li>`).join("")}</ul></div>`).join("")}</div>
+    </section>
+  </div>`;
+  document.getElementById("nextBtn").onclick = next.act;
+  app.querySelectorAll("[data-mod]").forEach(b=>b.onclick=()=>go("module",{id:b.dataset.mod}));
+}
+
+function quizHTML(list, stateObj, prefix){
+  return list.map((q,i)=>{ const ans=stateObj[i]; return `<div class="q"><p class="qt">${i+1}. ${q.q}</p>${q.o.map((o,j)=>{ let cls=""; if(ans!=null){ if(j===q.a) cls="right"; else if(j===ans) cls="wrong"; } return `<button class="opt ${cls}" data-q="${prefix}${i}" data-o="${j}" ${ans!=null?"disabled":""}>${o}</button>`; }).join("")}${ans!=null?`<div class="fb"><b>${ans===q.a?"Correct.":"Not quite."}</b> ${q.why}</div>`:""}</div>`; }).join("");
+}
+
+function baselineView(){
+ if(S.baseline){go("module",{id:"m1"});return;}
+ const st=S._bl||(S._bl={});
+ const current=Math.min(Math.max(S._blStep||0,0),BASELINE.length-1);
+ const question=BASELINE[current],answer=st[current],answered=answer!=null;
+ app.innerHTML=`<div class="wrap baseline-layout"><section class="baseline-card">
+  <div class="baseline-meta"><span>BEFORE WE BEGIN</span><strong>QUESTION ${current+1} / ${BASELINE.length}</strong></div>
+  <div class="baseline-meter"><span style="width:${(current+1)/BASELINE.length*100}%"></span></div>
+  <h1 class="baseline-question-title">${question.q}</h1>
+  <div class="baseline-answers">${question.o.map((option,j)=>`<button class="opt ${!answered?"":j===question.a?"right":j===answer?"wrong":"muted-option"}" data-o="${j}" ${answered?"disabled":""} aria-pressed="${answer===j}">${option}${answered&&j===question.a?'<span class="answer-check">✓</span>':""}</button>`).join("")}</div>
+  ${answered?`<div class="baseline-feedback ${answer===question.a?"success":"correction"}"><strong>${answer===question.a?"Correct!":"Here's the right answer"}</strong><p>${question.why||"The green answer is the correct choice."}</p></div>`:""}
+  <div class="baseline-actions"><button id="blBack" class="btn ghost" ${current===0?"disabled":""}>← Back</button><button id="blNext" class="btn orange" ${!answered?"disabled":""}>${current===BASELINE.length-1?"Start Module 1 →":"Next question →"}</button></div>
+  </section></div>`;
+ app.querySelectorAll(".baseline-answers .opt").forEach(b=>b.onclick=()=>{st[current]=+b.dataset.o;save();baselineView();});
+ document.getElementById("blBack").onclick=()=>{S._blStep=Math.max(0,current-1);save();baselineView();};
+ document.getElementById("blNext").onclick=()=>{if(st[current]==null)return;if(current<BASELINE.length-1){S._blStep=current+1;save();baselineView();return;}let c=0;BASELINE.forEach((q,i)=>{if(st[i]===q.a)c++;});S.baseline={c,total:BASELINE.length};save();go("module",{id:"m1"});};
+}
+
+function moduleView(id){
+  const m = MODULES.find(x=>x.id===id); const st = ms(id); const T=TRACKS[m.track];
+  const q = quizScore(m); const allAnswered = q.n===q.total; const passed = q.c/q.total >= CONFIG.passMark;
+  const idx = MODULES.indexOf(m); const nextM = MODULES[idx+1];
+  app.innerHTML = `<div class="wrap" style="${trackStyle(m.track)}">
+    <div class="modhead"><p class="kicker">${T.name} · Module ${idx+1} of ${MODULES.length} · ${m.mins} min</p><h1 style="font-size:clamp(1.8rem,6vw,2.5rem)">${m.title}</h1><p class="lede">${m.intro}</p></div>
+    <div class="prose">${m.body}</div>
+    ${m.scenario?`<div class="stage"><p class="label">What would you do?</p><p class="qt"><b>${m.scenario.q}</b></p>${m.scenario.o.map((o,j)=>{ let cls=""; if(st.scen!=null){ if(o.ok) cls="right"; else if(j===st.scen) cls="wrong"; } return `<button class="opt ${cls}" data-s="${j}" ${st.scen!=null?"disabled":""}>${o.t}</button>`; }).join("")}${st.scen!=null?`<div class="fb">${m.scenario.o[st.scen].fb}${m.scenario.o[st.scen].ok?"":" The highlighted option is the stronger response."}</div>`:""}</div>`:""}
+    <div class="stage"><p class="label">Quick check · you need ${Math.round(CONFIG.passMark*100)}% to complete the module</p>${quizHTML(m.quiz, st.quiz, "q")}
+      ${allAnswered && !passed?`<div class="retry-notice"><strong>Retry the quiz to unlock your assignment.</strong><p>Review the explanations above, then try again.</p><button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button></div>`:""}</div>
+    <div class="done-bar"><div><p class="label">STEP 2 · APPLY YOUR LEARNING</p><h3 style="margin:5px 0 7px">Ready to put it into practice?</h3><p style="margin:0">Your quiz score: ${q.c}/${q.total}. ${passed?"Next, share your practical assignment with Brenda.":"Retry the quiz to unlock your assignment."}</p><p style="margin:9px 0 0;font-size:.9rem;color:#6B6466">${m.task.prompt}</p></div>${allAnswered&&!passed?`<button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button>`:`<button class="btn green" id="complete" ${allAnswered&&passed?"":"disabled"}>Continue to assignment →</button>`}
+    </div></div>`;
+  // Present one small learning step at a time, preserving the original content and quizzes.
+  const steps=[];
+  const prose=app.querySelector(".prose");
+  if(prose){
+    const children=Array.from(prose.children);
+    let bucket=[];
+    children.forEach((child,i)=>{
+      if(child.tagName==="H3"&&bucket.length){steps.push(bucket);bucket=[];}
+      bucket.push(child);
+      if(bucket.length>=3){steps.push(bucket);bucket=[];}
+    });
+    if(bucket.length)steps.push(bucket);
+    const parent=prose.parentElement;
+    steps.forEach((group,i)=>{
+      const pane=document.createElement("section");
+      const kind=group.some(c=>c.classList.contains("tbl"))?"people":group.some(c=>c.classList.contains("card"))?"principles":group.some(c=>c.tagName==="UL"||c.tagName==="OL")?"highlights":i%3===0?"spotlight":i%3===1?"story":"insight";
+      pane.className="stage guided-step lesson-card lesson-"+kind;
+      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">'+({spotlight:"☀ THE BIG PICTURE",story:"✦ THE STORY",insight:"↗ WHY IT MATTERS",principles:"● OUR FOUNDATIONS",highlights:"✓ KEY TAKEAWAYS",people:"◎ MEET THE TEAM"}[kind])+'</span><span>'+String(i+1).padStart(2,"0")+' / '+String(steps.length).padStart(2,"0")+'</span></div>';
+      const content=document.createElement("div");content.className="lesson-content";
+      group.forEach(c=>content.appendChild(c));
+      const topic=(content.querySelector("h3")?.textContent||"").toLowerCase();
+      if(topic.includes("one breath")){
+        const graphic=document.createElement("div");graphic.className="lesson-big-fact";
+        graphic.innerHTML='<span class="fact-kicker">THE ASPECTUS STORY</span><strong>2015<span class="fact-spark">✳</span></strong><small>Rooted in Kenya. Powered by solar.</small>';
+        pane.appendChild(graphic);
+      }else if(topic.includes("values")){
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="WHAT WE STAND FOR ✳";pane.appendChild(tag);
+      }else if(topic.includes("recognition")){
+        const tag=document.createElement("div");tag.className="lesson-playful-tag";tag.textContent="A LITTLE BRAG MOMENT ✦";pane.appendChild(tag);
+      }
+      // Larger ideas and shorter facts deserve different visual rhythms.
+      if(kind==="highlights"){
+        content.querySelectorAll("li").forEach((li,j)=>{li.style.setProperty("--item-index",String(j+1));});
+      }
+      if(kind==="story"||kind==="insight"){
+        const paragraphs=content.querySelectorAll(":scope > p");
+        if(paragraphs.length>1)paragraphs[0].classList.add("lesson-lead");
+      }
+      pane.appendChild(content);
+      parent.insertBefore(pane,prose);
+    });
+    prose.remove();
+  }
+  const scenario=app.querySelector(".stage:not(.guided-step)");
+  if(scenario&&m.scenario)scenario.classList.add("guided-step");
+  const quizStage=app.querySelector(".stage:not(.guided-step)");
+  if(quizStage){
+    const questions=Array.from(quizStage.querySelectorAll(".q"));
+    questions.forEach((q,i)=>{const pane=document.createElement("section");pane.className="stage guided-step";pane.innerHTML='<p class="label">Knowledge check · '+(i+1)+' of '+questions.length+'</p>';pane.appendChild(q);quizStage.parentElement.insertBefore(pane,quizStage);});
+    const retry=quizStage.querySelector(".retry-notice");if(retry){const finalQuiz=quizStage.previousElementSibling;finalQuiz.appendChild(retry);}
+    quizStage.remove();
+  }
+  const task=app.querySelector(".stage:not(.guided-step)");
+  if(task)task.classList.add("guided-step");
+  const doneBar=app.querySelector(".done-bar");
+  if(doneBar)doneBar.classList.add("guided-step");
+  const panes=Array.from(app.querySelectorAll(".guided-step"));
+  const max=panes.length-1;st.page=Math.max(0,Math.min(st.page||0,max));
+  const active=panes[st.page];
+  panes.forEach((p,i)=>p.style.display=i===st.page?"":"none");
+  const controls=document.createElement("div");controls.className="done-bar guided-controls";
+  const isQuestion=!!active?.querySelector(".q");
+  const isScenario=!!active?.querySelector("[data-s]");
+  const isTask=!!active?.querySelector("#task");
+  const isComplete=active===doneBar;
+  const questionIndex=isQuestion?Number(active.querySelector(".q .opt")?.dataset.q?.slice(1)):null;
+  const blocked=(isQuestion&&st.quiz[questionIndex]==null)||(isScenario&&st.scen==null)||(isTask&&!String(st.task||"").trim());
+  controls.innerHTML='<span class="small">Step '+(st.page+1)+' of '+panes.length+'</span><div style="display:flex;gap:10px"><button class="btn ghost" id="prevStep" '+(st.page===0?'disabled':'')+'>Back</button>'+(isComplete?'':'<button class="btn orange" id="forwardStep" '+(blocked?'disabled':'')+'>Continue →</button>')+'</div>';
+  const host=app.querySelector(".wrap");host.appendChild(controls);
+  document.body.classList.add("stage-focused");
+  controls.querySelector("#prevStep").onclick=()=>{st.page--;save();moduleView(id);window.scrollTo(0,0);};
+  const forward=controls.querySelector("#forwardStep");if(forward)forward.onclick=()=>{st.page=Math.min(max,st.page+1);save();moduleView(id);window.scrollTo(0,0);};
+  app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ st.scen=+b.dataset.s; save(); moduleView(id); });
+  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
+  // The practical assignment is managed by the parent learner page, not this lesson.
+  // Both the final knowledge-check screen and the completion screen restart at question one.
+  app.querySelectorAll(".retry-quiz-action").forEach(button=>button.addEventListener("click",event=>{
+    event.preventDefault();
+    st.quiz={};
+    const firstQuestion=panes.findIndex(p=>p.querySelector(".q"));
+    st.page=firstQuestion<0?0:firstQuestion;
+    save();
+    moduleView(id);
+    window.scrollTo(0,0);
+  }));
+  const c=document.getElementById("complete"); if(c) c.onclick=()=>{if(!allAnswered||!passed)return;offlineAssignmentView(id);};
+  const n=document.getElementById("nextMod"); if(n) n.onclick=()=>go("module",{id:nextM.id});
+}
+
+
+// Standalone assignment screen: this is the original lesson experience with local-only submissions.
+// Nothing here is sent to the live Aspectus system.
+function offlineAssignmentView(id){
+ const m=MODULES.find(x=>x.id===id);const st=ms(id);const idx=MODULES.indexOf(m);
+ app.innerHTML='<div class="wrap" style="'+trackStyle(m.track)+'"><button class="back" id="offlineBack">← Back to lesson</button><section class="stage" style="max-width:860px;margin:20px auto;padding:28px"><p class="label">MODULE '+(idx+1)+' · PRACTICAL ASSIGNMENT</p><h2>'+m.title+'</h2><p style="font-size:1.1rem;line-height:1.65">'+m.task.prompt+'</p><div class="card" style="border-left:5px solid #00A859;background:#fff"><h3>What would you submit?</h3><p>This is a standalone preview. You can draft a response and explore the completion flow, but it does not submit to Brenda or update the live learning hub.</p><textarea id="offlineResponse" style="width:100%;min-height:140px" placeholder="Write your draft or notes here...">'+esc(st.task||'')+'</textarea></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px"><button class="btn green" id="offlineSave">Save draft and complete preview ✓</button><button class="btn ghost" id="offlineNext">Explore next module →</button></div><p class="note" id="offlineSavedNote"></p></section></div>';
+ document.getElementById("offlineBack").onclick=()=>go("module",{id});
+ document.getElementById("offlineSave").onclick=()=>{st.task=document.getElementById("offlineResponse").value;st.done=true;save();document.getElementById("offlineSavedNote").textContent="Saved on this device only. This is not a manager-approved submission.";};
+ document.getElementById("offlineNext").onclick=()=>{const next=MODULES[idx+1];if(next)go("module",{id:next.id});else go("home");};
+}
+
+function summaryText(){
+  const lines=[]; const done=MODULES.filter(m=>ms(m.id).done).length;
+  lines.push(`${CONFIG.company} onboarding summary: ${CONFIG.learner}`);
+  lines.push(`Date: ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})} (day ${Math.max(dayNum(),1)})`);
+  lines.push(`Baseline check: ${S.baseline?`${S.baseline.c}/${S.baseline.total}`:"not taken"}`);
+  lines.push(`Modules complete: ${done}/${MODULES.length}`,"");
+  MODULES.forEach((m,i)=>{ const q=quizScore(m); const st=ms(m.id);
+    lines.push(`${i+1}. ${m.title}: ${st.done?"complete":"in progress"}, quiz ${q.c}/${q.total}${m.scenario&&st.scen!=null?`, scenario ${m.scenario.o[st.scen].ok?"handled well":"needs discussion"}`:""}`);
+    if(st.task) lines.push(`   Task: ${st.task.replace(/\n+/g," / ")}`); });
+  lines.push("", `Questions for ${CONFIG.manager}: ${S.questions||"none yet"}`);
+  return lines.join("\n");
+}
+
+function brendaView(){
+  const allDone = MODULES.every(m=>ms(m.id).done);
+  app.innerHTML = `<div class="wrap">
+    <h2>For ${CONFIG.manager}</h2>
+    <p>${CONFIG.learner}: add any questions below, then copy your summary and send it to ${CONFIG.manager} by email or WhatsApp.</p>
+    <label for="qs"><b>Questions or anything unclear</b></label>
+    <textarea id="qs" style="min-height:100px" placeholder="E.g. Which tab of the pipeline sheet do I use?">${esc(S.questions)}</textarea>
+    <h3 style="margin-top:24px">Your summary</h3>
+    <pre class="sum" id="sum">${esc(summaryText())}</pre>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="copy">Copy summary</button><a class="btn ghost" id="mail" href="#">Open in email</a><span class="saved" id="copied"></span></div>
+
+    <section class="block"><h2>${CONFIG.manager}’s sign-off</h2>
+      <p class="note">Manager review happens directly with ${CONFIG.manager}. This learner copy does not record or certify manager approval. Use the summary below during your check-in.</p>
+      <div class="card"><strong>Review checklist</strong><p>Ask ${CONFIG.manager} to review your practical tasks, discuss any questions, and confirm your progress outside this page.</p></div>
+    </section>
+    <section class="block"><h2>Learning record</h2>
+      <p>${allDone?"All modules are complete.":"Unlocks when all eight modules are complete."}</p>
+      <button class="btn green" ${allDone?"":"disabled"} onclick="go('cert')">View learning record</button>
+    </section>
+    <section class="block"><button class="btn ghost" id="reset">Reset all progress on this device</button></section>
+  </div>`;
+  const qs=document.getElementById("qs"); qs.oninput=()=>{ S.questions=qs.value; save(); document.getElementById("sum").textContent=summaryText(); };
+  document.getElementById("copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(summaryText()); document.getElementById("copied").textContent="Copied"; }catch(e){ const r=document.createRange(); r.selectNodeContents(document.getElementById("sum")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); document.getElementById("copied").textContent="Selected. Press copy."; } };
+  document.getElementById("mail").onclick=(e)=>{ e.preventDefault(); location.href=`mailto:?subject=${encodeURIComponent(CONFIG.company+" onboarding summary: "+CONFIG.learner)}&body=${encodeURIComponent(summaryText().slice(0,1800))}`; };
+
+  document.getElementById("reset").onclick=()=>{ if(confirm("Reset all progress on this device? This can’t be undone.")){ S=fresh(); save(); go("home"); } };
+}
+
+function certView(){
+  const scores = MODULES.map(m=>quizScore(m)); const c=scores.reduce((a,s)=>a+s.c,0), t=scores.reduce((a,s)=>a+s.total,0);
+  app.innerHTML = `<div class="wrap"><button class="back no-print" onclick="go('brenda')">← Back</button>
+    <div class="cert">
+      <img class="logo-on-cert" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%2270%22 viewBox=%220 0 260 70%22%3E%3Crect width=%22260%22 height=%2270%22 fill=%22%23FFFBF6%22/%3E%3Ctext x=%2210%22 y=%2250%22 font-family=%22Arial,sans-serif%22 font-size=%2242%22 font-weight=%22700%22 fill=%22%23373435%22%3Easpectus%3C/text%3E%3Ccircle cx=%22235%22 cy=%2222%22 r=%2210%22 fill=%22%23FAA954%22/%3E%3C/svg%3E" alt="Aspectus logo" onerror="this.style.display='none'">
+      <p>Aspectus Limited</p>
+      <h2>Learning completion record</h2>
+      <p>This certifies that</p>
+      <div class="name">${CONFIG.learner}</div>
+      <p>has completed the Aspectus onboarding programme for the role of ${CONFIG.role}, covering all eight modules with a quiz score of ${c}/${t}.</p>
+      <p>${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</p>
+      <p style="margin-top:28px">Practical task review is completed separately with ${CONFIG.manager}.</p>
+      <div class="stripe"><span style="background:#373435"></span><span style="background:#FAA954"></span><span style="background:#00A859"></span></div>
+      <p style="font-size:.8rem;margin-top:14px;color:#6B6466">An internal learner-generated progress record, not manager approval. Powered by Cheche Labs.</p>
+    </div>
+    <p class="no-print" style="margin-top:16px"><button class="btn" onclick="window.print()">Print or save as PDF</button></p></div>`;
+}
+
+render();
+</script>
+</body>
+</html>
