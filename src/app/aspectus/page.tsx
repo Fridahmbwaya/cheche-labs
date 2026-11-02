@@ -13,11 +13,11 @@ const [screen,setScreen]=useState<"home"|"learning"|"activity">("home");
 const [quizAttempts,setQuizAttempts]=useState<{id:string;learner_id:string;module_id:string;score:number;correct_count:number;question_count:number;passed:boolean;submitted_at:string}[]>([]);
 const [teamNames,setTeamNames]=useState<Record<string,string>>({});
 const [activeLesson,setActiveLesson]=useState(false);
-const nextModule=mods.find(m=>!quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user?.id&&q.passed)||!myItems.some(x=>x.module_id===m.id&&x.status==="approved"));
 function openModule(moduleId:string){if(moduleId!==nextModule?.id)return;setSelected(moduleId);setActiveLesson(true);setTimeout(()=>document.getElementById("lesson-panel")?.scrollIntoView({behavior:"smooth",block:"start"}),80)}
 const [selected,setSelected]=useState(""),[answer,setAnswer]=useState(""),[link,setLink]=useState(""),[notes,setNotes]=useState<Record<string,string>>({}),[msg,setMsg]=useState("");
 const manager=!!user&&["manager","hr_manager","admin","org_admin"].includes(user.role);
 const myItems=items.filter(x=>x.learner_id===user?.id);
+const nextModule=mods.find(m=>!quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user?.id&&q.passed)||!myItems.some(x=>x.module_id===m.id&&x.status==="approved"));
 const completedModules=mods.filter(m=>quizAttempts.some(a=>a.module_id===m.id&&a.learner_id===user?.id&&a.passed)&&myItems.some(x=>x.module_id===m.id&&x.status==="approved")).length;
 const awaitingReview=myItems.filter(x=>x.status==="submitted").length;
 const revisionsNeeded=myItems.filter(x=>x.status==="revision_requested").length;
