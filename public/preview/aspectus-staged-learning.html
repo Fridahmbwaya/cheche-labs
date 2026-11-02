@@ -448,6 +448,10 @@ body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:
 body:has(.guided-step) .lesson-principles .lesson-content>.card{width:auto;min-width:0}
 body:has(.guided-step) .lesson-content .card{min-width:0}
 @media(max-width:650px){body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:1fr!important}body:has(.guided-step) #app>.wrap{padding:10px!important}}
+
+/* Consistent chip icon baseline and centered labels */
+body:has(.guided-step) .lesson-chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.2;vertical-align:middle;text-align:center;white-space:normal}
+body:has(.guided-step) .lesson-eyebrow{align-items:center}
 </style>
 </head>
 <body>
@@ -589,7 +593,7 @@ const MODULES = [
 </ul></div>
 `,
  quiz:[
-  {q:"The 2024 profile and the 2026 profile say different things. Which do you use?", o:["2024, it’s been around longer","2026, and ask Brenda if it’s still unclear","Whichever sounds better","Neither, make your own"], a:1, why:"Newest wins. If it’s still unclear, ask Brenda."},
+  {q:"You find a 2024 project slide and a 2026 company profile with different details. What should you do before posting?", o:["Copy the 2024 slide because it includes a project photo","Identify the exact claim, check the latest approved source and confirm project details with the owner","Use whichever description sounds more impressive","Avoid all historical information, even if verified"], a:1, why:"Newer is not automatically approved, and older evidence can still be valid. Trace the claim, confirm it with the right owner and obtain publishing approval."},
   {q:"Can you post “We are NCA 3 certified”?", o:["Yes","No. We are NCA 4; NCA 3 is a goal","Only on LinkedIn","Only in tenders"], a:1, why:"Claiming a rating we don’t hold yet could hurt us, especially in tenders."},
   {q:"A follower asks how much revenue Aspectus made last year. What do you do?", o:["Share the board figure","Share the company profile figure","Don’t share financials; thank them and redirect to what we do","Guess"], a:2, why:"Financials are internal. Keep the reply friendly and point to our projects instead."}
  ],
@@ -986,7 +990,7 @@ function moduleView(id){
       const pane=document.createElement("section");
       const kind=group.some(c=>c.classList.contains("tbl"))?"people":group.some(c=>c.classList.contains("card"))?"principles":group.some(c=>c.tagName==="UL"||c.tagName==="OL")?"highlights":i%3===0?"spotlight":i%3===1?"story":"insight";
       pane.className="stage guided-step lesson-card lesson-"+kind;
-      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">'+({spotlight:"☀ THE BIG PICTURE",story:"✦ THE STORY",insight:"↗ WHY IT MATTERS",principles:"◈ OUR FOUNDATIONS",highlights:"✓ KEY TAKEAWAYS",people:"◎ MEET THE TEAM"}[kind])+'</span><span>'+String(i+1).padStart(2,"0")+' / '+String(steps.length).padStart(2,"0")+'</span></div>';
+      pane.innerHTML='<div class="lesson-eyebrow"><span class="lesson-chip">'+({spotlight:"☀ THE BIG PICTURE",story:"✦ THE STORY",insight:"↗ WHY IT MATTERS",principles:"● OUR FOUNDATIONS",highlights:"✓ KEY TAKEAWAYS",people:"◎ MEET THE TEAM"}[kind])+'</span><span>'+String(i+1).padStart(2,"0")+' / '+String(steps.length).padStart(2,"0")+'</span></div>';
       const content=document.createElement("div");content.className="lesson-content";
       group.forEach(c=>content.appendChild(c));
       const topic=(content.querySelector("h3")?.textContent||"").toLowerCase();
