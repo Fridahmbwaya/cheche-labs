@@ -329,6 +329,23 @@ body:has(.guided-step) .lesson-people .lesson-content td,body:has(.guided-step) 
 body:has(.guided-step) .guided-controls .btn.orange{background:#FAA954;color:#373435;border-color:#FAA954;font-weight:800}
 @media(max-width:600px){body:has(.guided-step) .lesson-card{padding:18px!important}body:has(.guided-step) .lesson-content h3{font-size:1.5rem}body:has(.guided-step) .lesson-content p{font-size:1rem}body:has(.guided-step) .lesson-story .lesson-content{padding-left:14px}}
 
+
+/* Expanded visual learning theme */
+body:has(.guided-step) #app>.wrap{max-width:1060px}
+body:has(.guided-step) .lesson-card{padding:26px 34px!important}
+body:has(.guided-step) .lesson-content .card{position:relative;border-radius:18px;padding:19px 22px 19px 51px;box-shadow:0 3px 14px #3734350a}
+body:has(.guided-step) .lesson-content .card:before{content:"✦";position:absolute;left:17px;top:19px;color:#A55F12;font-size:20px}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2){background:#D3F2E2;border-color:#00A859}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n+2):before{content:"✓";color:#00753E}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n){background:#FFFBF6;border-color:#EADFD3}
+body:has(.guided-step) .lesson-content .card:nth-of-type(3n):before{content:"☀"}
+body:has(.guided-step) .lesson-content .card h4{font-size:1.14rem;line-height:1.3;margin-bottom:8px}
+body:has(.guided-step) .lesson-content table th{background:#FEEBD5;color:#373435}
+body:has(.guided-step) .lesson-content table tr:nth-child(even) td{background:#FFFBF6}
+body:has(.guided-step) .lesson-content .tbl{border-radius:17px}
+body:has(.guided-step) .lesson-content figure,body:has(.guided-step) .lesson-content img{display:block;max-width:100%;height:auto;margin:16px auto;text-align:center}
+body:has(.guided-step) .lesson-content li{line-height:1.6;margin-bottom:10px}
+@media(max-width:600px){body:has(.guided-step) .lesson-card{padding:17px!important}body:has(.guided-step) .lesson-content .card{padding:15px 14px 15px 42px}body:has(.guided-step) .lesson-content .card:before{left:12px;top:15px}}
 /* Aspectus color and legibility refinement */
 body:has(.guided-step) .modhead .kicker{color:#A55F12;font-size:.87rem;font-weight:900;letter-spacing:.09em}
 body:has(.guided-step) .modhead h1{color:#373435;font-size:clamp(1.65rem,3vw,2.2rem)!important;line-height:1.15}
