@@ -246,6 +246,19 @@ body:has(.baseline-question) .opt{padding:15px 18px;margin:9px 0}
 body:has(.baseline-question) .opt.chosen{border-color:#FAA954;background:#FEEBD5;box-shadow:inset 0 0 0 1px #FAA954}
 body:has(.baseline-question) .done-bar{margin-top:18px;padding:12px 0;border:0;background:transparent}
 body:has(.baseline-question) .btn.orange{background:#FAA954;color:#373435}
+
+/* Constrain the learner's content to the compact modal viewport. */
+html,body{height:100%}
+body:has(.baseline-question) #app>.wrap{min-height:100%;padding:18px 24px;justify-content:center}
+body:has(.baseline-question) .baseline-question{padding:20px 24px}
+body:has(.baseline-question) .baseline-question .qt{margin-bottom:10px;font-size:1.2rem}
+body:has(.baseline-question) .opt{padding:12px 15px;margin:7px 0}
+body:has(.baseline-question) .done-bar{margin-top:12px}
+body:has(.baseline-question) .back{display:none}
+body:has(.guided-step) #app>.wrap{min-height:100%;padding:12px 20px;gap:8px}
+body:has(.guided-step) .guided-step{padding:14px 20px}
+body:has(.guided-step) .guided-controls{padding:9px 14px}
+@media(max-width:600px){body:has(.baseline-question) #app>.wrap{padding:12px}body:has(.baseline-question) .baseline-question{padding:16px}body:has(.guided-step) #app>.wrap{padding:9px}}
 </style>
 </head>
 <body>
