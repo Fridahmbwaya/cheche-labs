@@ -331,7 +331,7 @@ body:has(.guided-step) .guided-controls .btn.orange{background:#FAA954;color:#37
 
 
 /* Expanded visual learning theme */
-body:has(.guided-step) #app>.wrap{max-width:1060px}
+body:has(.guided-step) #app>.wrap{max-width:100%;width:100%}
 body:has(.guided-step) .lesson-card{padding:26px 34px!important}
 body:has(.guided-step) .lesson-content .card{position:relative;border-radius:18px;padding:19px 22px 19px 51px;box-shadow:0 3px 14px #3734350a}
 body:has(.guided-step) .lesson-content .card:before{content:"✦";position:absolute;left:17px;top:19px;color:#A55F12;font-size:20px}
@@ -439,6 +439,15 @@ body:has(.guided-step) .modhead .lede{font-size:.87rem!important;margin:0!import
 .retry-notice strong{display:block;color:#A55F12;font-size:1rem}
 .retry-notice p{margin:5px 0 12px;color:#6B6466}
 .retry-quiz-action{cursor:pointer!important;background:#FAA954!important;color:#373435!important;border-color:#FAA954!important;opacity:1!important;pointer-events:auto!important}
+
+/* The learning window should use the whole available iframe, not a narrow card column. */
+body:has(.guided-step) #app>.wrap{width:100%!important;max-width:none!important;padding:12px 24px!important;box-sizing:border-box}
+body:has(.guided-step) .lesson-card{width:100%;min-height:0;padding:22px 30px!important;box-sizing:border-box}
+body:has(.guided-step) .lesson-content{max-width:none!important;width:100%!important}
+body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:start!important}
+body:has(.guided-step) .lesson-principles .lesson-content>.card{width:auto;min-width:0}
+body:has(.guided-step) .lesson-content .card{min-width:0}
+@media(max-width:650px){body:has(.guided-step) .lesson-principles .lesson-content{grid-template-columns:1fr!important}body:has(.guided-step) #app>.wrap{padding:10px!important}}
 </style>
 </head>
 <body>
