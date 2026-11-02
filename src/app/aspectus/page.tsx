@@ -62,7 +62,6 @@ useEffect(()=>{
   const payload=event.data,order=Number(payload.moduleOrder),correct=Number(payload.correct),total=Number(payload.total);
   if(!Number.isInteger(order)||!Number.isInteger(correct)||!Number.isInteger(total)||total<1||correct<0||correct>total||typeof payload.answers!=="object"||payload.answers===null)return;
   const mod=mods.find(x=>x.order_index===order);if(!mod)return;
-  const score=Math.round(correct/total*100),passed=score>=80;
   if(payload.type==="quiz-result"){
    const {data,error}=await db.rpc("aspectus_submit_quiz",{p_module_id:mod.id,p_answers:payload.answers});const result=Array.isArray(data)?data[0]:data;
    setMsg(error?("Quiz result could not be saved: "+error.message):("Module "+order+" quiz saved: "+result.score+"%. Brenda can see your result."));
