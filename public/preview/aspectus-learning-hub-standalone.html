@@ -500,7 +500,7 @@ body:has(.guided-step) .lesson-highlights .lesson-content li{border-left-color:#
     </button>
     <nav class="tabs" aria-label="Main">
       <button data-go="home">Home</button>
-      <button data-go="toolkit">Toolkit</button>
+      
       <button data-go="brenda">For Brenda</button>
     </nav>
   </div>
@@ -939,7 +939,7 @@ function render(){
   if(view.name==="home") homeView();
   else if(view.name==="baseline") baselineView();
   else if(view.name==="module") moduleView(view.id);
-  else if(view.name==="toolkit") app.innerHTML = `<div class="wrap prose">${TOOLKIT}</div>`;
+  
   else if(view.name==="brenda") brendaView();
   else if(view.name==="cert") certView();
 }
