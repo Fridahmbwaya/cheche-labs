@@ -459,6 +459,19 @@ body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card p{font-
 body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:before{content:none!important}
 body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:1/-1}
 @media(max-width:620px){body:has(.guided-step) .lesson-content .aspectus-timeline{grid-template-columns:1fr}body:has(.guided-step) .lesson-content .aspectus-timeline .timeline-card:last-child:nth-child(odd){grid-column:auto}}
+
+/* Brand lesson: tangible swatches and a clear visual system */
+body:has(.guided-step) .lesson-content .brand-palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:16px 0 20px}
+body:has(.guided-step) .lesson-content .brand-swatch{background:#fff;border:1px solid #EADFD3;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 3px 10px #37343509}
+body:has(.guided-step) .lesson-content .swatch-color{display:block;height:76px;width:100%}
+body:has(.guided-step) .lesson-content .swatch-details{display:flex;flex-direction:column;gap:3px;padding:13px 15px}
+body:has(.guided-step) .lesson-content .swatch-details strong{font-size:1.02rem;color:#373435}
+body:has(.guided-step) .lesson-content .swatch-details small{font-size:.88rem;color:#6B6466}
+body:has(.guided-step) .lesson-content .brand-rule{display:flex;align-items:flex-start;gap:15px;border:1px solid #F0CB99;border-radius:16px;background:#FFFBF6;padding:18px 20px;margin:16px 0}
+body:has(.guided-step) .lesson-content .brand-rule-icon{width:38px;height:38px;flex:none;display:grid;place-items:center;background:#FAA954;border-radius:12px;color:#373435;font-size:1.25rem}
+body:has(.guided-step) .lesson-content .brand-rule h4{font-size:1.12rem;margin:0 0 5px;color:#373435}
+body:has(.guided-step) .lesson-content .brand-rule p{font-size:1rem;margin:0}
+@media(max-width:540px){body:has(.guided-step) .lesson-content .brand-palette{grid-template-columns:1fr 1fr;gap:9px}body:has(.guided-step) .lesson-content .swatch-color{height:52px}body:has(.guided-step) .lesson-content .swatch-details{padding:10px}body:has(.guided-step) .lesson-content .swatch-details small{font-size:.76rem}}
 </style>
 </head>
 <body>
@@ -609,19 +622,19 @@ const MODULES = [
 },
 
 {id:"m3", track:"know", title:"What we sell and who buys it", mins:10,
- intro:"You don’t need to be an engineer. You need to explain each product in plain English and know what to ask.",
+ intro:"You don’t need to be an engineer. You need to explain each product clearly in language your customer understands — English, Kiswahili, Sheng or a natural mix — and know what to ask.",
  body:`
 <h3>The big idea: explain a solution before trying to sell it</h3><p>Customers care about their problems first: unreliable power, hot water, operating costs or continuity. A good communicator connects those needs to the right solar solution.</p><div class="card"><h4>What you will take away</h4><p>You will be able to describe our major solutions in everyday language, identify likely customers and ask useful first questions.</p></div><div class="card"><h4>Picture yourself at work</h4><p>A school asks if solar will help keep its computer lab running during outages. Before promising anything, understand what needs power and introduce the right specialist.</p></div>
 <h3>Start with a customer, not a product list</h3><p>Picture two enquiries. A property developer wants reliable hot water for multiple apartments. A school wants to keep computers running during power cuts. They are both interested in solar, but they are not asking for the same solution.</p><div class="card"><h4>First, understand the job to be done</h4><p>Ask what the customer needs powered or heated, when they need it, where they are and what is currently going wrong. Only then decide which Aspectus product family is relevant. This is an initial conversation, not system design.</p></div><div class="card"><h4>A real project makes this clearer</h4><p>The 2024 company profile documents solar water heating for the Kings Developers Eden Gardens project (72 units) and an 80 kWp ground-mounted grid-tied system in Timau. One responds to hot-water demand at a residential development; the other demonstrates a different electricity application. Confirm current details before sharing publicly.</p></div><h3>Now meet the solutions</h3>
 <div class="card"><h4>Solar PV systems (on-grid, off-grid, hybrid)</h4>
 <p><b>What it is:</b> Panels that make electricity. On-grid works with KPLC, off-grid stands alone with batteries, hybrid does both and keeps the lights on in a blackout.</p>
 <p><b>Who buys:</b> Homeowners, businesses, schools, farms, lodges.</p>
-<p><b>Plain-English benefit:</b> Potential electricity cost savings or improved resilience, depending on system design, usage and storage.</p>
+<p><b>Customer-friendly benefit:</b> Potential electricity cost savings or improved resilience, depending on system design, usage and storage.</p>
 <p><b>What sales needs to know:</b> What appliances they run and how many. For bigger systems, 3 to 6 months of power bills.</p></div>
 <div class="card"><h4>Solar water heating</h4>
 <p><b>What it is:</b> Uses the sun to heat water instead of an electric geyser. Comes as tube or flat plate, pressurised or split systems (common sizes 200L and 300L).</p>
 <p><b>Who buys:</b> Homeowners, property developers (Kings Developers fitted 258 units with us), hotels.</p>
-<p><b>Plain-English benefit:</b> Solar-heated water that can reduce reliance on electric heating, depending on design and usage.</p>
+<p><b>Customer-friendly benefit:</b> Solar-heated water that can reduce reliance on electric heating, depending on design and usage.</p>
 <p><b>What sales needs to know:</b> Location, number of bedrooms, whether there’s an overhead tank, water type, any booster pump, and tube or flat plate preference.</p></div>
 <div class="card"><h4>Solar water pumping and irrigation</h4>
 <p><b>Who buys:</b> Farms, boreholes, estates, resorts. <b>Benefit:</b> Pump water without diesel or KPLC.</p></div>
@@ -676,7 +689,7 @@ const MODULES = [
 <tr><td>Website and social enquiries</td><td>Reply within 24 hours, accurately. Faster is better: a slow reply loses leads.</td></tr>
 <tr><td>Written complaints</td><td>Acknowledge within 24 to 48 hours. Try to resolve; if you can’t, escalate to Brenda.</td></tr>
 </table></div>
-<p>Always: speak respectfully, listen fully before responding, communicate honestly and in plain English, and keep customer details private (Kenya’s Data Protection Act 2019 applies).</p>
+<p>Always: speak respectfully, listen fully before responding, communicate honestly in language the customer understands (English, Kiswahili, Sheng or a natural mix as appropriate), and keep customer details private (Kenya’s Data Protection Act 2019 applies).</p>
 <h3>House rules</h3>
 <ul>
 <li><b>Hours:</b> 8:00am to 5:00pm. Be on time.</li>
@@ -705,9 +718,16 @@ const MODULES = [
  body:`
 <h3>The big idea: trust matters more than a flashy caption</h3><p>Every public claim represents the company. Clear writing, accurate facts and permission to share real client stories build the brand better than big promises.</p><div class="card"><h4>What you will take away</h4><p>You will be able to write in Aspectus’s voice, spot risky claims, check approval requirements and prepare a post for Brenda’s review.</p></div><div class="card"><h4>Picture yourself at work</h4><p>You find a glowing WhatsApp message from a customer and a photo of their house. They could make a great post — but first you need permission and a verified story.</p></div>
 <h3>Why would a customer believe us?</h3><p>Suppose you have a photograph of an installation and an old caption claiming it “eliminated electricity bills.” The photo may be genuine, but the claim is not necessarily accurate. The more impressive a promise sounds, the more important it is to verify.</p><div class="card"><h4>Build a story from evidence</h4><p>Start with the customer's need, explain what Aspectus installed, identify what the record actually proves and describe the outcome without exaggeration. The 2024 company profile contains installation photos and project names; they are useful leads for research, not automatic permission to publish.</p></div><div class="card"><h4>See the difference</h4><p><b>Weak:</b> “We guarantee no more bills!” <b>Stronger:</b> “Aspectus designed an installation for this customer's energy needs. Ask our team to assess which solution may suit your site.” Use a specific capacity or savings claim only when verified and approved.</p></div><h3>Now find the right voice</h3>
-<ul><li><b>Plain English.</b> Write for a homeowner, not an engineer.</li><li><b>Lead with the outcome.</b> “No more blackouts” before “12 kWp hybrid”.</li><li><b>Specific beats vague.</b> Real projects, real places, real system sizes.</li><li><b>Honest.</b> We never exaggerate. Our reputation is our marketing.</li></ul>
-<h3>Brand basics</h3>
-<p>Colours: orange #FAA954, green #00A859, red #9B1D20, black #373435. Use the official logo files only; never stretch or recolour the logo.</p>
+<ul><li><b>Speak your audience's language.</b> Use clear, natural wording that fits the customer and platform — English, Kiswahili, Sheng or a blend where appropriate. Avoid jargon unless you explain it.</li><li><b>Lead with the customer need.</b> Explain how backup power could help during an outage before introducing a technical specification.</li><li><b>Specific beats vague.</b> Real projects, real places, real system sizes.</li><li><b>Honest.</b> We never exaggerate. Our reputation is our marketing.</li></ul>
+<h3>The Aspectus visual identity</h3>
+<p>Think of our palette as a visual toolkit. Orange brings energy, green marks progress, charcoal keeps writing readable, and red is reserved for warnings — not ordinary decorative cards.</p>
+<div class="brand-palette" aria-label="Aspectus brand colour palette">
+<div class="brand-swatch"><span class="swatch-color" style="background:#FAA954"></span><span class="swatch-details"><strong>Solar orange</strong><small>#FAA954 · Main accent</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#00A859"></span><span class="swatch-details"><strong>Aspectus green</strong><small>#00A859 · Success and approval</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#373435"></span><span class="swatch-details"><strong>Charcoal</strong><small>#373435 · Text and contrast</small></span></div>
+<div class="brand-swatch"><span class="swatch-color" style="background:#9B1D20"></span><span class="swatch-details"><strong>Alert red</strong><small>#9B1D20 · Warnings only</small></span></div>
+</div>
+<div class="brand-rule"><span class="brand-rule-icon">✦</span><div><h4>Use the logo as supplied</h4><p>Use only approved logo files. Keep the proportions, spacing and colors intact — no stretching, recoloring or squeezing into a graphic.</p></div></div>
 <h3>Proof points you can use</h3>
 <ul>
 <li>EPRA licensed for solar PV and solar water heating; NCA 4 registered</li>
@@ -736,7 +756,7 @@ const MODULES = [
  quiz:[
   {q:"A client sends a glowing WhatsApp review. Can you post it as a testimonial today?", o:["Yes","Only after the client agrees it can be published","Only without their name","Only on TikTok"], a:1, why:"Permission first, always."},
   {q:"Who gives final approval for your posts?", o:["You","Brenda","Javis","Any agent"], a:1, why:"Brenda approves every post. Technical claims get checked by the technical team first."},
-  {q:"Which caption follows our voice best?", o:["“Leveraging cutting-edge photovoltaic synergies.”","“No more blackouts in Kitengela: a 12 kW system, installed in a week.”","“BEST SOLAR EVER!!!”","“Solar is good.”"], a:1, why:"Outcome first, specific, plain English."}
+  {q:"Which caption follows our voice best?", o:["“Leveraging cutting-edge photovoltaic synergies.”","“No more blackouts in Kitengela: a 12 kW system, installed in a week.”","“BEST SOLAR EVER!!!”","“Solar is good.”"], a:1, why:"Lead with the customer benefit, be specific, and use clear, audience-appropriate language."}
  ],
  task:{prompt:"Choose one verified Aspectus installation. Create a three-slide social carousel storyboard showing the customer need, the solution and the outcome, plus a short caption. Flag facts, photos or client details that need approval."}
 },
@@ -857,7 +877,7 @@ const TOOLKIT = `
 <tr><td>HR, leave, paperwork</td><td>Nereah</td></tr>
 <tr><td>Company direction, partnerships</td><td>Sarah, through Brenda</td></tr></table></div></section>
 <section class="block"><h3>Before you publish</h3><div class="card"><ul>
-<li>Is every fact from a 2026 source?</li><li>Has any technical number been checked by Javis or Julius?</li><li>Do I have permission for client names, photos and quotes?</li><li>No unapproved pricing, financial details, performance claims or savings promises?</li><li>Plain English, outcome first, clear call to action?</li><li>Has Brenda approved it?</li></ul></div></section>
+<li>Is every fact from a 2026 source?</li><li>Has any technical number been checked by Javis or Julius?</li><li>Do I have permission for client names, photos and quotes?</li><li>No unapproved pricing, financial details, performance claims or savings promises?</li><li>Clear, audience-appropriate language, a relevant benefit and a clear call to action?</li><li>Has Brenda approved it?</li></ul></div></section>
 <section class="block"><h3>New enquiry: collect these</h3><div class="card"><ol>
 <li>Name and phone</li><li>Location (area)</li><li>What they’re interested in</li><li>Type of client</li><li>Where they found us</li></ol><p>Then log it in the pipeline sheet and hand it to sales.</p></div></section>
 <section class="block"><h3>Response times</h3><div class="card"><ul>
