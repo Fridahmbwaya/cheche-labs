@@ -66,7 +66,7 @@ async function resetTestProgress(moduleId:string|null=null){
  const targetModule=moduleId?mods.find(m=>m.id===moduleId):null;
  if(moduleId&&!targetModule)return;
  const scope=targetModule?"Module "+targetModule.order_index+" — "+targetModule.title:"ALL eight modules";
- if(!window.confirm("Reset "+scope+" for the test Ian account?\\n\\nThis deletes the selected test quiz results, assignment submissions and any associated reviews. This cannot be undone.\\n\\nThe real Ian account and Brenda's workspace are unaffected."))return;
+ if(!window.confirm("Reset "+scope+" for the test Ian account?\n\nThis deletes the selected test quiz results, assignment submissions and any associated reviews. This cannot be undone.\n\nThe real Ian account and Brenda's workspace are unaffected."))return;
  setTestResetBusy(true);
  try{
   const {error}=await db.rpc("aspectus_reset_test_progress",{p_module_id:moduleId});
