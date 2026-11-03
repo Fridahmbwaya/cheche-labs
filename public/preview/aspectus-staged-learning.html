@@ -519,10 +519,7 @@ const CONFIG = {
   passMark: 0.8,
   storageKey: "cheche-onboarding-aspectus-ian-v1"
 };
-// Keep the test learner’s new quiz cycle isolated from existing browser-saved answers.
-if (new URLSearchParams(window.location.search).get("testCycle") === "20261103") {
-  CONFIG.storageKey += "-fridahmunji-20261103";
-}
+
 const TRACKS = {
   know:   {name:"Know Aspectus",   c:"var(--t1)", soft:"var(--t1-soft)", on:"var(--on-t1)"},
   market: {name:"Market Aspectus", c:"var(--t2)", soft:"var(--t2-soft)", on:"var(--on-t2)"},
@@ -935,6 +932,8 @@ function dayNum(){ const s=new Date(CONFIG.startDate+"T00:00:00"); const d=Math.
 const app = document.getElementById("app");
 const requestedModule = new URLSearchParams(window.location.search).get("module");
 let view = requestedModule==="baseline" ? {name:"baseline"} : requestedModule && /^m[1-8]$/.test(requestedModule) ? {name:"module",id:requestedModule} : {name:"home"};
+// Revisiting a passed lesson always starts at step one, without clearing quiz answers, scores, or assignments.
+if(new URLSearchParams(window.location.search).get("revisit")==="1" && requestedModule && /^m[1-8]$/.test(requestedModule)) { ms(requestedModule).page=0; save(); }
 function go(name, extra){ if(new URLSearchParams(window.location.search).get("locked")==="1" && (name!=="module" || (extra && extra.id!==requestedModule))) return; view = Object.assign({name}, extra||{}); render(); window.scrollTo(0,0); }
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 
