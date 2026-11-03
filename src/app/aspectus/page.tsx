@@ -170,7 +170,7 @@ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-5 py-9"><div
 {!manager&&mods.some(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user.id&&q.passed))&&<section className="rounded-[28px] border border-[#BEE9D0] bg-[#F8FFFB] p-6 sm:p-8">
  <p className="text-sm font-extrabold tracking-[.16em] text-[#00753E]">YOUR LEARNING LIBRARY</p>
  <h3 className="text-2xl sm:text-3xl font-black text-[#373435] mt-2">Your lessons are always here.</h3>
- <p className="text-base text-[#6B6466] mt-2">Reopen any lesson you have passed to refresh your knowledge. Your recorded quiz scores, projects and Brenda's feedback stay unchanged.</p>
+ <p className="text-base text-[#6B6466] mt-2">Reopen any lesson you have passed to refresh your knowledge. Your recorded quiz scores, projects and Brenda&apos;s feedback stay unchanged.</p>
  <div className="grid sm:grid-cols-2 gap-3 mt-5">{mods.filter(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user.id&&q.passed)).map(m=><button key={m.id} type="button" onClick={()=>{setScreen("learning");openModule(m.id)}} className="flex flex-col items-start text-left gap-2 rounded-2xl bg-white border border-[#D3F2E2] p-4 hover:border-[#00A859] focus-visible:ring-2 focus-visible:ring-[#00A859]">
  <span className="text-xs font-extrabold uppercase tracking-widest text-[#00753E]">MODULE {String(m.order_index).padStart(2,"0")}</span>
  <span className="text-base font-extrabold text-[#373435]">{m.title}</span>
@@ -203,9 +203,9 @@ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-5 py-9"><div
 {screen!=="home"&&<div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white border border-orange-100 p-4"><button className="font-semibold underline" onClick={()=>go("home")}>← My learning home</button><div className="flex gap-2"><button onClick={()=>go("learning")} className={screen==="learning"?btn:"rounded-xl border px-4 py-2"}>Learning modules</button><button onClick={()=>go("activity")} className={screen==="activity"?btn:"rounded-xl border px-4 py-2"}>{manager?"Reviews":"My feedback"}</button></div></div>}
 {screen==="learning"&&<><section id="modules" className="space-y-7">
 {isTestLearner&&<div className="rounded-[26px] border-2 border-dashed border-[#00A859] bg-[#F8FFFB] p-5 sm:p-6 flex flex-wrap items-center justify-between gap-5">
- <div className="max-w-2xl"><p className="text-sm font-extrabold uppercase tracking-[.15em] text-[#00753E]">Test learner controls · Fridahmunji only</p><h3 className="text-xl font-extrabold text-[#373435] mt-2">Restart modules as many times as you need.</h3><p className="text-base text-[#6B6466] mt-2">Reset a specific module using its card, or restart all eight here. Only this test account's saved quizzes, submissions and review history are cleared; real accounts never see these controls.</p></div>
+ <div className="max-w-2xl"><p className="text-sm font-extrabold uppercase tracking-[.15em] text-[#00753E]">Test learner controls · Fridahmunji only</p><h3 className="text-xl font-extrabold text-[#373435] mt-2">Restart modules as many times as you need.</h3><p className="text-base text-[#6B6466] mt-2">Reset a specific module using its card, or restart all eight here. Only this test account&apos;s saved quizzes, submissions and review history are cleared; real accounts never see these controls.</p></div>
  <button type="button" disabled={testResetBusy} onClick={()=>void resetTestProgress()} className="rounded-xl bg-[#373435] px-5 py-3.5 text-white font-extrabold disabled:opacity-50 hover:bg-[#544E50]">{testResetBusy?"Resetting…":"↻ Reset all test modules"}</button>
-</div>
+</div>}
 {!manager&&nextModule&&<div className="overflow-hidden rounded-[30px] border border-[#EADFD3] bg-white shadow-sm">
  <div className="bg-[#FAA954] text-[#373435] p-7 sm:p-10 relative overflow-hidden">
  <div className="absolute -right-10 -top-16 h-64 w-64 bg-white/40 rounded-full blur-3xl pointer-events-none"/>
