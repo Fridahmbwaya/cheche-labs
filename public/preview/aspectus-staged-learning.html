@@ -520,6 +520,11 @@ const CONFIG = {
   storageKey: "cheche-onboarding-aspectus-ian-v1"
 };
 
+// Browser-only lesson progress is scoped to the authenticated learner ID supplied by the host application.
+const learnerId = new URLSearchParams(window.location.search).get("learner");
+if (learnerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(learnerId)) {
+  CONFIG.storageKey += "-profile-" + learnerId.toLowerCase();
+}
 const TRACKS = {
   know:   {name:"Know Aspectus",   c:"var(--t1)", soft:"var(--t1-soft)", on:"var(--on-t1)"},
   market: {name:"Market Aspectus", c:"var(--t2)", soft:"var(--t2-soft)", on:"var(--on-t2)"},
@@ -1093,7 +1098,7 @@ function moduleView(id){
   controls.querySelector("#prevStep").onclick=()=>{st.page--;save();moduleView(id);window.scrollTo(0,0);};
   const forward=controls.querySelector("#forwardStep");if(forward)forward.onclick=()=>{st.page=Math.min(max,st.page+1);save();moduleView(id);window.scrollTo(0,0);};
   app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ st.scen=+b.dataset.s; save(); moduleView(id); });
-  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
+  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total && new URLSearchParams(window.location.search).get("revisit")!=="1"){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
   // The practical assignment is managed by the parent learner page, not this lesson.
   // Both the final knowledge-check screen and the completion screen restart at question one.
   app.querySelectorAll(".retry-quiz-action").forEach(button=>button.addEventListener("click",event=>{
