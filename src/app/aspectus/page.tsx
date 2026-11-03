@@ -63,9 +63,9 @@ const focusId=manager&&managerLearningMode==="learner"?learnerFocus?.[0]:user?.i
 const focusProgress=mods.filter(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===focusId&&q.passed)&&items.some(t=>t.module_id===m.id&&t.learner_id===focusId)).length;
 async function resetTestProgress(moduleId:string|null=null){
  if(!isTestLearner||!user||testResetBusy)return;
- const module=moduleId?mods.find(m=>m.id===moduleId):null;
- if(moduleId&&!module)return;
- const scope=module?"Module "+module.order_index+" — "+module.title:"ALL eight modules";
+ const targetModule=moduleId?mods.find(m=>m.id===moduleId):null;
+ if(moduleId&&!targetModule)return;
+ const scope=targetModule?"Module "+targetModule.order_index+" — "+targetModule.title:"ALL eight modules";
  if(!window.confirm("Reset "+scope+" for the test Ian account?\\n\\nThis deletes the selected test quiz results, assignment submissions and any associated reviews. This cannot be undone.\\n\\nThe real Ian account and Brenda's workspace are unaffected."))return;
  setTestResetBusy(true);
  try{
@@ -80,8 +80,8 @@ async function resetTestProgress(moduleId:string|null=null){
     if(raw){
      const state=JSON.parse(raw);
      if(state&&typeof state==="object"){
-      if(state.mods&&typeof state.mods==="object")delete state.mods["m"+module?.order_index];
-      if(module?.order_index===1){state.baseline=null;delete state._bl;state._blStep=0;}
+      if(state.mods&&typeof state.mods==="object")delete state.mods["m"+targetModule?.order_index];
+      if(targetModule?.order_index===1){state.baseline=null;delete state._bl;state._blStep=0;}
       window.localStorage.setItem(key,JSON.stringify(state));
      }
     }
@@ -91,7 +91,7 @@ async function resetTestProgress(moduleId:string|null=null){
   setSelected("");
   await refresh();
   setScreen("learning");
-  setMsg(module?"Test Module "+module.order_index+" has been reset. Open it to start again.":"Test progress reset. All eight modules are ready to start again.");
+  setMsg(targetModule?"Test Module "+targetModule.order_index+" has been reset. Open it to start again.":"Test progress reset. All eight modules are ready to start again.");
  }catch(error){setMsg("Could not reset test progress: "+(error instanceof Error?error.message:String(error)));}
  finally{setTestResetBusy(false)}
 }
