@@ -519,6 +519,10 @@ const CONFIG = {
   passMark: 0.8,
   storageKey: "cheche-onboarding-aspectus-ian-v1"
 };
+// Keep the test learner’s new quiz cycle isolated from existing browser-saved answers.
+if (new URLSearchParams(window.location.search).get("testCycle") === "20261103") {
+  CONFIG.storageKey += "-fridahmunji-20261103";
+}
 const TRACKS = {
   know:   {name:"Know Aspectus",   c:"var(--t1)", soft:"var(--t1-soft)", on:"var(--on-t1)"},
   market: {name:"Market Aspectus", c:"var(--t2)", soft:"var(--t2-soft)", on:"var(--on-t2)"},
