@@ -927,7 +927,6 @@ let S = load();
 function load(){ try{ return JSON.parse(localStorage.getItem(CONFIG.storageKey)) || fresh(); }catch(e){ return fresh(); } }
 function fresh(){ return {baseline:null, mods:{}, signoff:{}, questions:""}; }
 let lessonSyncReady = false;
-let progressTimer = null;
 function activeModuleKey(){
  const candidate = view?.name==="module" ? view.id : requestedModule==="baseline"?"m1":requestedModule;
  return /^m[1-8]$/.test(candidate||"") ? candidate : null;
@@ -955,10 +954,7 @@ function broadcastProgress(){
 }
 function save(){
  try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(e){}
- if(lessonSyncReady&&window.parent!==window){
-  if(progressTimer)clearTimeout(progressTimer);
-  progressTimer=setTimeout(broadcastProgress,420);
- }
+ if(lessonSyncReady&&window.parent!==window)broadcastProgress();
 }
 function ms(id){ return S.mods[id] || (S.mods[id] = {quiz:{}, scen:null, task:"", done:false}); }
 function quizScore(m){ const st=ms(m.id); let c=0,n=0; m.quiz.forEach((q,i)=>{ if(st.quiz[i]!=null){n++; if(st.quiz[i]===q.a)c++;} }); return {c,n,total:m.quiz.length}; }
