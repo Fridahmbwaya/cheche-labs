@@ -926,7 +926,40 @@ const WEEK = [
 let S = load();
 function load(){ try{ return JSON.parse(localStorage.getItem(CONFIG.storageKey)) || fresh(); }catch(e){ return fresh(); } }
 function fresh(){ return {baseline:null, mods:{}, signoff:{}, questions:""}; }
-function save(){ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(S)); }catch(e){} }
+let lessonSyncReady = false;
+let progressTimer = null;
+function activeModuleKey(){
+ const candidate = view?.name==="module" ? view.id : requestedModule==="baseline"?"m1":requestedModule;
+ return /^m[1-8]$/.test(candidate||"") ? candidate : null;
+}
+function progressSnapshot(){
+ const id=activeModuleKey();if(!id)return null;
+ const current=S.mods[id]||{};
+ const baselineScreen=view?.name==="baseline";
+ return {
+  source:"aspectus-lesson-sync",type:"progress",moduleOrder:Number(id.slice(1)),
+  stageIndex:baselineScreen?Math.max(0,Number(S._blStep)||0):Math.max(0,Number(current.page)||0),
+  stageCount:baselineScreen?BASELINE.length:Math.max(1,Number(current.totalSteps)||1),
+  lessonState:{
+   mod:current,
+   baseline:id==="m1"?(S.baseline||null):null,
+   bl:id==="m1"?(S._bl||null):null,
+   blStep:id==="m1"?(S._blStep||0):0
+  }
+ };
+}
+function broadcastProgress(){
+ if(!lessonSyncReady||window.parent===window)return;
+ const data=progressSnapshot();
+ if(data)window.parent.postMessage(data,window.location.origin);
+}
+function save(){
+ try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(e){}
+ if(lessonSyncReady&&window.parent!==window){
+  if(progressTimer)clearTimeout(progressTimer);
+  progressTimer=setTimeout(broadcastProgress,420);
+ }
+}
 function ms(id){ return S.mods[id] || (S.mods[id] = {quiz:{}, scen:null, task:"", done:false}); }
 function quizScore(m){ const st=ms(m.id); let c=0,n=0; m.quiz.forEach((q,i)=>{ if(st.quiz[i]!=null){n++; if(st.quiz[i]===q.a)c++;} }); return {c,n,total:m.quiz.length}; }
 function modState(m){ const st=S.mods[m.id]; if(!st) return "new"; if(st.done) return "done"; return (Object.keys(st.quiz).length||st.task||st.scen!=null)?"prog":"new"; }
@@ -1082,6 +1115,7 @@ function moduleView(id){
   const doneBar=app.querySelector(".done-bar");
   if(doneBar)doneBar.classList.add("guided-step");
   const panes=Array.from(app.querySelectorAll(".guided-step"));
+  st.totalSteps=panes.length;
   const max=panes.length-1;st.page=Math.max(0,Math.min(st.page||0,max));
   const active=panes[st.page];
   panes.forEach((p,i)=>p.style.display=i===st.page?"":"none");
@@ -1173,7 +1207,35 @@ function certView(){
     <p class="no-print" style="margin-top:16px"><button class="btn" onclick="window.print()">Print or save as PDF</button></p></div>`;
 }
 
+window.addEventListener("message",function(event){
+ if(event.origin!==window.location.origin||event.source!==window.parent||
+    event.data?.source!=="aspectus-lesson-sync"||event.data?.type!=="hydrate")return;
+ const id=activeModuleKey();
+ if(!id||event.data.moduleOrder!==Number(id.slice(1)))return;
+ const stored=event.data.row?.lesson_state;
+ if(stored&&typeof stored==="object"){
+  if(stored.mod&&typeof stored.mod==="object")S.mods[id]=stored.mod;
+  if(id==="m1"){
+   if(stored.baseline)S.baseline=stored.baseline;
+   if(stored.bl)S._bl=stored.bl;
+   if(Number.isInteger(stored.blStep))S._blStep=stored.blStep;
+  }
+ }
+ if(new URLSearchParams(location.search).get("revisit")==="1"&&S.mods[id]){
+  S.mods[id].page=0;
+ }
+ lessonSyncReady=true;
+ try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(e){}
+ render();
+ broadcastProgress();
+});
 render();
+const startupKey=activeModuleKey();
+if(window.parent!==window&&startupKey){
+ window.parent.postMessage({source:"aspectus-lesson-sync",type:"ready",moduleOrder:Number(startupKey.slice(1))},window.location.origin);
+ // If embedded outside the app, continue using the local copy without losing navigation.
+ setTimeout(()=>{if(!lessonSyncReady){lessonSyncReady=true;broadcastProgress()}},2000);
+}else{lessonSyncReady=true;}
 </script>
 </body>
 </html>

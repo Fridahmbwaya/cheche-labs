@@ -14,6 +14,7 @@ const [screen,setScreen]=useState<"home"|"learning"|"activity">("home");
 const [quizAttempts,setQuizAttempts]=useState<{id:string;learner_id:string;module_id:string;score:number;correct_count:number;question_count:number;passed:boolean;submitted_at:string}[]>([]);
 const [teamNames,setTeamNames]=useState<Record<string,string>>({});
 const [activeLesson,setActiveLesson]=useState(false);
+const [lessonProgress,setLessonProgress]=useState<{learner_id:string;module_id:string;stage_index:number;stage_count:number;updated_at:string}[]>([]);
 const [testResetBusy,setTestResetBusy]=useState(false);
 function openModule(moduleId:string){const moduleIndex=mods.findIndex(m=>m.id===moduleId);const nextIndex=mods.findIndex(m=>m.id===nextModule?.id);const passed=quizAttempts.some(q=>q.module_id===moduleId&&q.learner_id===user?.id&&q.passed);if(!manager&&(moduleIndex<0||(nextIndex>=0&&moduleIndex>nextIndex&&!passed)))return;setSelected(moduleId);setActiveLesson(true)}
 useEffect(()=>{if(!activeLesson)return;const old=document.body.style.overflow;document.body.style.overflow="hidden";const onKey=(e:KeyboardEvent)=>{if(e.key==="Escape")setActiveLesson(false)};window.addEventListener("keydown",onKey);return()=>{document.body.style.overflow=old;window.removeEventListener("keydown",onKey)}},[activeLesson]);
@@ -58,9 +59,14 @@ const assignmentQuizPassed=!!assignmentModule&&quizAttempts.some(q=>q.module_id=
 const latestTeamSubmissions=items.filter((x,i,arr)=>arr.findIndex(v=>v.module_id===x.module_id&&v.learner_id===x.learner_id)===i);
 const pendingTeamSubmissions=latestTeamSubmissions.filter(x=>x.status==="submitted");
 const teamLearners=Object.entries(teamNames).filter(([id])=>id!==user?.id&& !/Brenda|Manager/i.test(teamNames[id]||""));
-const learnerFocus=teamLearners.find(([id])=>id===observedLearner)||teamLearners.find(([,name])=>/Ian/i.test(name))||teamLearners[0];
+const learnerFocus=teamLearners.find(([id])=>id===observedLearner)||teamLearners.find(([,name])=>name.trim()==="Ian")||teamLearners.find(([,name])=>/Ian/i.test(name))||teamLearners[0];
 const focusId=manager&&managerLearningMode==="learner"?learnerFocus?.[0]:user?.id;
 const focusProgress=mods.filter(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===focusId&&q.passed)&&items.some(t=>t.module_id===m.id&&t.learner_id===focusId)).length;
+const focusQuizPassed=mods.filter(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===focusId&&q.passed)).length;
+const focusAssignments=mods.filter(m=>items.some(t=>t.module_id===m.id&&t.learner_id===focusId)).length;
+const focusLessonsStarted=mods.filter(m=>lessonProgress.some(p=>p.module_id===m.id&&p.learner_id===focusId)||quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===focusId)).length;
+const myQuizPassed=mods.filter(m=>quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user?.id&&q.passed)).length;
+const myLessonsStarted=mods.filter(m=>lessonProgress.some(p=>p.module_id===m.id&&p.learner_id===user?.id)||quizAttempts.some(q=>q.module_id===m.id&&q.learner_id===user?.id)).length;
 async function resetTestProgress(moduleId:string|null=null){
  if(!isTestLearner||!user||testResetBusy)return;
  const targetModule=moduleId?mods.find(m=>m.id===moduleId):null;
@@ -100,13 +106,42 @@ async function loadIssues(org:string){const {data,error}=await db.from("aspectus
 async function saveIssue(){if(!user||!manager||issueDetails.trim().length<5)return;setIssueBusy(true);setIssueMessage("");const {error}=await db.from("aspectus_learning_issues").insert({org_id:user.org_id,reported_by:user.id,learner_id:issueLearner||null,module_id:issueModule||null,category:issueCategory,details:issueDetails.trim()});if(error)setIssueMessage(error.message);else{setIssueDetails("");setIssueMessage("Issue logged. It is visible in this manager workspace.");await loadIssues(user.org_id)}setIssueBusy(false)}
 async function changeIssue(id:string,status:"open"|"resolved"){if(!user||!manager)return;const {error}=await db.from("aspectus_learning_issues").update({status,updated_at:new Date().toISOString()}).eq("id",id);if(error)setIssueMessage(error.message);else await loadIssues(user.org_id)}
 async function refresh(){const {data:{user:auth}}=await db.auth.getUser();if(!auth){setUser(null);window.location.replace("/preview/aspectus-welcome.html");return}const p=await db.from("users").select("id,org_id,role,full_name,email").eq("id",auth.id).single();if(p.error||!p.data){setMsg("Account not yet registered for Aspectus.");return}const profile=p.data as Profile;setUser(profile);if(["manager","hr_manager","admin","org_admin"].includes(profile.role))void loadIssues(profile.org_id);
-const [m,s,r,qa,team,ov]=await Promise.all([db.from("modules").select("id,title,order_index").eq("org_id",profile.org_id).order("order_index"),db.from("learning_submissions").select("id,module_id,learner_id,response_text,deliverable_url,attachment_paths,status,submitted_at").eq("org_id",profile.org_id).order("submitted_at",{ascending:false}),db.from("learning_reviews").select("submission_id,decision,publishing_decision,feedback,reviewed_at").eq("org_id",profile.org_id).order("reviewed_at",{ascending:false}),db.from("aspectus_quiz_attempts").select("id,learner_id,module_id,score,correct_count,question_count,passed,submitted_at").eq("org_id",profile.org_id).order("submitted_at",{ascending:false}),db.from("users").select("id,full_name").eq("org_id",profile.org_id),db.from("aspectus_module_overrides").select("id,learner_id,module_id,reason,created_at").eq("org_id",profile.org_id)]);setMods(m.data||[]);setItems(s.data||[]);setReviews(r.data||[]);setQuizAttempts(qa.data||[]);setOverrides(ov.data||[]);setTeamNames(Object.fromEntries((team.data||[]).map(u=>[u.id,u.full_name||"Learner"])));if(m.error||s.error||r.error||qa.error||team.error||ov.error)setMsg([m.error?.message,s.error?.message,r.error?.message,qa.error?.message,team.error?.message,ov.error?.message].filter(Boolean).join("; "))}
+const [m,s,r,qa,team,ov,lp]=await Promise.all([db.from("modules").select("id,title,order_index").eq("org_id",profile.org_id).order("order_index"),db.from("learning_submissions").select("id,module_id,learner_id,response_text,deliverable_url,attachment_paths,status,submitted_at").eq("org_id",profile.org_id).order("submitted_at",{ascending:false}),db.from("learning_reviews").select("submission_id,decision,publishing_decision,feedback,reviewed_at").eq("org_id",profile.org_id).order("reviewed_at",{ascending:false}),db.from("aspectus_quiz_attempts").select("id,learner_id,module_id,score,correct_count,question_count,passed,submitted_at").eq("org_id",profile.org_id).order("submitted_at",{ascending:false}),db.from("users").select("id,full_name").eq("org_id",profile.org_id),db.from("aspectus_module_overrides").select("id,learner_id,module_id,reason,created_at").eq("org_id",profile.org_id),db.from("aspectus_lesson_progress").select("learner_id,module_id,stage_index,stage_count,updated_at").eq("org_id",profile.org_id)]);setMods(m.data||[]);setItems(s.data||[]);setReviews(r.data||[]);setQuizAttempts(qa.data||[]);setOverrides(ov.data||[]);setLessonProgress(lp.data||[]);setTeamNames(Object.fromEntries((team.data||[]).map(u=>[u.id,u.full_name||"Learner"])));if(m.error||s.error||r.error||qa.error||team.error||ov.error||lp.error)setMsg([m.error?.message,s.error?.message,r.error?.message,qa.error?.message,team.error?.message,ov.error?.message,lp.error?.message].filter(Boolean).join("; "))}
 useEffect(()=>{void refresh();const {data:{subscription}}=db.auth.onAuthStateChange(()=>void refresh());return()=>subscription.unsubscribe()},[]);
 useEffect(()=>{
  const handle=async(event:MessageEvent)=>{
-  if(event.origin!==window.location.origin||event.data?.source!=="aspectus-original-quiz"||!user||(manager&&managerLearningMode!=="mine"))return;
+  if(event.origin!==window.location.origin||!user||(manager&&managerLearningMode!=="mine"))return;
   const frame=document.getElementById("aspectus-lesson-frame") as HTMLIFrameElement|null;
   if(!frame||event.source!==frame.contentWindow)return;
+  if(event.data?.source==="aspectus-lesson-sync"){
+   const order=Number(event.data.moduleOrder);
+   const lesson=mods.find(m=>m.order_index===order);
+   if(!lesson)return;
+   if(event.data.type==="ready"){
+    const {data,error}=await db.from("aspectus_lesson_progress")
+       .select("stage_index,stage_count,lesson_state")
+       .eq("learner_id",user.id).eq("module_id",lesson.id).maybeSingle();
+    if(error)setMsg("Could not restore saved lesson steps: "+error.message);
+    frame.contentWindow?.postMessage({source:"aspectus-lesson-sync",type:"hydrate",moduleOrder:order,row:data||null},event.origin);
+   }else if(event.data.type==="progress"){
+    const state=event.data.lessonState;
+    if(!state||typeof state!=="object"||Array.isArray(state)||JSON.stringify(state).length>25000)return;
+    const stageCount=Math.max(1,Math.min(200,Math.trunc(Number(event.data.stageCount)||1)));
+    const stageIndex=Math.max(0,Math.min(stageCount-1,Math.trunc(Number(event.data.stageIndex)||0)));
+    const updatedAt=new Date().toISOString();
+    const {error}=await db.from("aspectus_lesson_progress").upsert({
+     org_id:user.org_id,learner_id:user.id,module_id:lesson.id,
+     stage_index:stageIndex,stage_count:stageCount,lesson_state:state,updated_at:updatedAt
+    },{onConflict:"learner_id,module_id"});
+    if(error)setMsg("We couldn't automatically save the lesson: "+error.message);
+    else setLessonProgress(prev=>{
+     const next=prev.filter(p=>p.learner_id!==user.id||p.module_id!==lesson.id);
+     return [...next,{learner_id:user.id,module_id:lesson.id,stage_index:stageIndex,stage_count:stageCount,updated_at:updatedAt}];
+    });
+   }
+   return;
+  }
+  if(event.data?.source!=="aspectus-original-quiz")return;
   if(event.data.type==="open-assignment"){
    const order=Number(event.data.moduleOrder);
    const current=mods.find(m=>m.order_index===order);
