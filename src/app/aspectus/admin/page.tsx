@@ -99,13 +99,24 @@ export default function AspectusPeopleAdmin(){
    if(error)throw error;
    await loadData(orgId);
    setMode("people");setSelectedId("");setSelectedEmail(email);setChecked(inviteModules);
-   setMessage("Invitation prepared for "+email+". Copy the sign-in instructions below and send them to this person; no invitation email was sent automatically.");
+   const {data:delivery,error:deliveryError}=await db.functions.invoke("aspectus-send-invitation",{body:{email}});
+   if(deliveryError||!delivery?.accepted){
+    let reason=deliveryError?.message||"Email delivery service did not confirm the request.";
+    const context=(deliveryError as {context?:Response}|null)?.context;
+    if(context&&typeof context.json==="function"){
+     const response=await context.json().catch(()=>null);
+     if(response?.error)reason=response.error;
+    }
+    setMessage("Account prepared for "+email+", but the invitation email could not be sent: "+reason+". You can copy the link below while email delivery is resolved.");
+   }else{
+    setMessage("Invitation email requested for "+email+". The account will remain under Invited · waiting for first sign-in until the person joins.");
+   }
   }catch(err){setMessage("Could not create invitation: "+(err instanceof Error?err.message:String(err)))}
   finally{setBusy(false)}
  }
- const joinText=(email:string)=>"Hello! You've been invited to the Aspectus Learning Hub. Open "+window.location.origin+"/preview/aspectus-welcome.html, choose Continue to your Learning Hub, and sign in using "+email+". Follow the link sent to your email to access your personalized learning space.";
+ const joinText=(_email:string)=>"You've been invited to create an account on the Aspectus Learning Hub.\\n\\n"+window.location.origin+"/preview/aspectus-welcome.html";
  function copyInvite(email:string){
-  void navigator.clipboard.writeText(joinText(email)).then(()=>setMessage("Sign-in instructions copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
+  void navigator.clipboard.writeText(joinText(email)).then(()=>setMessage("Account link copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
  }
  const selectedLabel=focused?.full_name||focusedInvite?.full_name||"Selected person";
  const selection=selectedId||selectedEmail;
@@ -155,7 +166,7 @@ export default function AspectusPeopleAdmin(){
       <div className="grid md:grid-cols-2 gap-3 mt-4">{courses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
      </div>
      <button disabled={busy} type="submit" className="rounded-xl px-7 py-4 bg-[#FAA954] font-extrabold disabled:opacity-50">{busy?"Preparing account…":"Prepare account & assignments"} →</button>
-     <p className="text-sm text-[#6B6466]">The account is reserved immediately. The person activates it by requesting their secure sign-in email at the Learning Hub. This screen does not send an email automatically.</p>
+     <p className="text-sm text-[#6B6466]">The account is reserved first, then a secure invitation email is requested automatically. The person's account activates when they follow the emailed link.</p>
     </form>:<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
      <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-6">
       <h2 className="text-xl font-black">Your people</h2><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search name or email" aria-label="Search accounts" className="w-full rounded-xl border border-[#EADFD3] p-3 mt-4"/>
@@ -170,7 +181,7 @@ export default function AspectusPeopleAdmin(){
        <div className="mt-4 p-4 rounded-xl bg-[#FFFBF6] border border-[#EADFD3]"><p className="text-sm font-bold">Role: {((focused?.role||focusedInvite?.role)==="org_admin")?"Super Admin":((focused?.role||focusedInvite?.role)==="manager"||(focused?.role||focusedInvite?.role)==="hr_manager")?"Reviewer":"Learner"}</p><p className="text-xs text-[#6B6466] mt-1">The account role controls permissions. This section changes assigned learning modules only; it does not change the person&apos;s role.</p></div>
        <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(courses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
        <div className="space-y-3 mt-4">{courses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
-       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save module assignments"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy sign-in instructions</button>}</div>
+       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save module assignments"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}</div>
        <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
