@@ -1,0 +1,169 @@
+"use client";
+import {useEffect,useMemo,useState} from "react";
+import {createClient} from "@/lib/supabase/client";
+
+const db=createClient();
+type Member={id:string;email:string;full_name:string|null;role:string;role_title:string|null;department:string|null};
+type Course={id:string;title:string;order_index:number;description:string|null};
+type Invite={email:string;full_name:string;role:string};
+type Assignment={learner_id:string;module_id:string};
+type PendingAssignment={email:string;module_id:string};
+
+export default function AspectusPeopleAdmin(){
+ const [authorized,setAuthorized]=useState<boolean|null>(null);
+ const [message,setMessage]=useState("");
+ const [busy,setBusy]=useState(false);
+ const [orgId,setOrgId]=useState("");
+ const [members,setMembers]=useState<Member[]>([]);
+ const [courses,setCourses]=useState<Course[]>([]);
+ const [assignments,setAssignments]=useState<Assignment[]>([]);
+ const [invites,setInvites]=useState<Invite[]>([]);
+ const [pending,setPending]=useState<PendingAssignment[]>([]);
+ const [mode,setMode]=useState<"people"|"invite">("people");
+ const [selectedId,setSelectedId]=useState("");
+ const [selectedEmail,setSelectedEmail]=useState("");
+ const [checked,setChecked]=useState<string[]>([]);
+ const [inviteEmail,setInviteEmail]=useState("");
+ const [inviteName,setInviteName]=useState("");
+ const [inviteRole,setInviteRole]=useState("employee");
+ const [inviteModules,setInviteModules]=useState<string[]>([]);
+ const [filter,setFilter]=useState("");
+
+ async function loadData(id:string){
+  const [us,ms,as,iv,pa]=await Promise.all([
+   db.from("users").select("id,email,full_name,role,role_title,department").eq("org_id",id).order("full_name"),
+   db.from("modules").select("id,title,order_index,description").eq("org_id",id).order("order_index"),
+   db.from("aspectus_module_assignments").select("learner_id,module_id").eq("org_id",id),
+   db.from("aspectus_pending_accounts").select("email,full_name,role").eq("org_id",id).order("full_name"),
+   db.from("aspectus_pending_module_assignments").select("email,module_id").eq("org_id",id)
+  ]);
+  const errors=[us.error,ms.error,as.error,iv.error,pa.error].filter(Boolean);
+  if(errors.length)throw new Error(errors.map(x=>x?.message).join("; "));
+  setMembers(us.data||[]);setCourses(ms.data||[]);setAssignments(as.data||[]);
+  setInvites(iv.data||[]);setPending(pa.data||[]);
+ }
+ useEffect(()=>{
+  let alive=true;
+  (async()=>{
+   try{
+    const {data:{user}}=await db.auth.getUser();
+    if(!user){window.location.replace("/preview/aspectus-welcome.html");return}
+    const {data:profile,error}=await db.from("users").select("org_id").eq("id",user.id).single();
+    if(error||!profile)throw new Error("Your Aspectus account was not found.");
+    const {data:allowed,error:accessError}=await db.rpc("aspectus_can_admin",{p_org_id:profile.org_id});
+    if(accessError)throw accessError;
+    if(!alive)return;
+    setAuthorized(!!allowed);setOrgId(profile.org_id);
+    if(allowed)await loadData(profile.org_id);
+   }catch(err){if(alive){setMessage(err instanceof Error?err.message:String(err));setAuthorized(false)}}
+  })();
+  return()=>{alive=false};
+ },[]);
+ const focused=members.find(m=>m.id===selectedId);
+ const focusedInvite=invites.find(i=>i.email===selectedEmail);
+ const visible=useMemo(()=>members.filter(m=>(m.full_name||m.email).toLowerCase().includes(filter.toLowerCase())||m.email.toLowerCase().includes(filter.toLowerCase())),[members,filter]);
+ const assignedTo=members.filter(m=>assignments.some(a=>a.learner_id===m.id)).length;
+ function pickMember(m:Member){
+  setSelectedId(m.id);setSelectedEmail("");
+  setChecked(assignments.filter(a=>a.learner_id===m.id).map(a=>a.module_id));
+  setMessage("");
+ }
+ function pickInvite(m:Invite){
+  setSelectedEmail(m.email);setSelectedId("");
+  setChecked(pending.filter(a=>a.email===m.email).map(a=>a.module_id));
+  setMessage("");
+ }
+ function toggle(list:string[],id:string, setter:(ids:string[])=>void){setter(list.includes(id)?list.filter(v=>v!==id):[...list,id])}
+ async function saveAssignments(){
+  if(!orgId||(!selectedId&&!selectedEmail))return;
+  setBusy(true);setMessage("");
+  try{
+   if(selectedId){
+    const {error}=await db.rpc("aspectus_set_member_modules",{p_member_id:selectedId,p_module_ids:checked});
+    if(error)throw error;
+   }else if(focusedInvite){
+    const {error}=await db.rpc("aspectus_invite_member",{p_email:focusedInvite.email,p_full_name:focusedInvite.full_name,p_role:focusedInvite.role,p_module_ids:checked});
+    if(error)throw error;
+   }
+   await loadData(orgId);
+   setMessage("Module selections saved. The person's learning space will update on their next refresh.");
+  }catch(err){setMessage("Could not save assignments: "+(err instanceof Error?err.message:String(err)))}
+  finally{setBusy(false)}
+ }
+ async function createInvite(e:React.FormEvent){
+  e.preventDefault();if(!orgId)return;
+  setBusy(true);setMessage("");
+  try{
+   const email=inviteEmail.trim().toLowerCase();
+   const {error}=await db.rpc("aspectus_invite_member",{p_email:email,p_full_name:inviteName.trim(),p_role:inviteRole,p_module_ids:inviteModules});
+   if(error)throw error;
+   await loadData(orgId);
+   setMode("people");setSelectedId("");setSelectedEmail(email);setChecked(inviteModules);
+   setMessage("Invitation prepared for "+email+". Copy the sign-in instructions below and send them to this person; no invitation email was sent automatically.");
+  }catch(err){setMessage("Could not create invitation: "+(err instanceof Error?err.message:String(err)))}
+  finally{setBusy(false)}
+ }
+ const joinText=(email:string)=>"Hello! You've been invited to the Aspectus Learning Hub. Open "+window.location.origin+"/preview/aspectus-welcome.html, choose Continue to your Learning Hub, and sign in using "+email+". Follow the link sent to your email to access your personalized learning space.";
+ function copyInvite(email:string){
+  void navigator.clipboard.writeText(joinText(email)).then(()=>setMessage("Sign-in instructions copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
+ }
+ const selectedLabel=focused?.full_name||focusedInvite?.full_name||"Selected person";
+ const selection=selectedId||selectedEmail;
+ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] p-5 sm:p-9">
+  <div className="max-w-6xl mx-auto space-y-6">
+   <header className="rounded-[30px] border border-[#EADFD3] bg-white shadow-sm overflow-hidden">
+    <div className="h-2 bg-[#FAA954]"/>
+    <div className="p-6 sm:p-9 flex flex-wrap items-center justify-between gap-5">
+     <div><p className="text-sm font-extrabold tracking-[.17em] text-[#A55F12] uppercase">Aspectus Learning Hub · Administration</p><h1 className="text-3xl sm:text-4xl font-black mt-2">People & learning access</h1><p className="text-base text-[#6B6466] mt-2">Give everyone their own account, learning journey and permissions.</p></div>
+     <a href="/aspectus" className="rounded-xl border border-[#EADFD3] px-5 py-3 font-extrabold hover:bg-[#FEEBD5]">← Back to Learning Hub</a>
+    </div>
+   </header>
+   {message&&<p role="status" className="rounded-xl border-l-4 border-[#FAA954] bg-white p-4 shadow-sm">{message}</p>}
+   {authorized===null&&<div className="rounded-2xl bg-white p-8">Checking your account permissions…</div>}
+   {authorized===false&&<div className="rounded-2xl bg-white border border-[#EADFD3] p-8"><h2 className="text-xl font-extrabold">Account administrator access required</h2><p className="mt-2">Learning and team review remain available from your regular dashboard. Only designated administrators can create accounts and change module access.</p></div>}
+   {authorized&&<>
+    <section className="grid sm:grid-cols-3 gap-4">
+     <div className="rounded-[22px] bg-[#373435] text-white p-5"><p className="text-sm text-white/75">Existing accounts</p><p className="text-3xl font-black mt-2">{members.length}</p></div>
+     <div className="rounded-[22px] bg-[#D3F2E2] p-5"><p className="text-sm text-[#00753E]">Accounts with assignments</p><p className="text-3xl font-black mt-2 text-[#00753E]">{assignedTo}</p></div>
+     <div className="rounded-[22px] bg-[#FEEBD5] p-5"><p className="text-sm text-[#A55F12]">Learning modules in catalog</p><p className="text-3xl font-black mt-2">{courses.length}</p></div>
+    </section>
+    <div className="flex flex-wrap gap-3">
+     <button type="button" onClick={()=>setMode("people")} className={mode==="people"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>Manage people</button>
+     <button type="button" onClick={()=>setMode("invite")} className={mode==="invite"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>+ Add a person</button>
+    </div>
+    {mode==="invite"?<form onSubmit={e=>void createInvite(e)} className="rounded-[28px] border border-[#EADFD3] bg-white p-6 sm:p-8 space-y-5">
+     <div><h2 className="text-2xl font-black">Add a new team member</h2><p className="text-[#6B6466] mt-2">Create their access, choose their role and select which modules they'll see. They sign in with their own email.</p></div>
+     <div className="grid md:grid-cols-2 gap-4">
+      <label className="block font-bold">Full name<input required minLength={2} value={inviteName} onChange={e=>setInviteName(e.target.value)} placeholder="e.g. Sarah" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
+      <label className="block font-bold">Email address<input required type="email" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="name@aspectus..." className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
+     </div>
+     <label className="block font-bold">Account access<select value={inviteRole} onChange={e=>setInviteRole(e.target.value)} className="block mt-2 p-3 rounded-xl border border-[#EADFD3] w-full max-w-lg"><option value="employee">Learner · My assigned modules</option><option value="manager">Manager · Team progress + own learning</option><option value="org_admin">Organization admin · Team oversight + accounts + own learning</option></select></label>
+     <div className="rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-5">
+      <div className="flex flex-wrap justify-between gap-3"><div><h3 className="font-extrabold">Assign learning modules</h3><p className="text-sm text-[#6B6466]">Select only what applies to this person.</p></div><div className="flex gap-3"><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules(courses.map(m=>m.id))}>All</button><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules([])}>None</button></div></div>
+      <div className="grid md:grid-cols-2 gap-3 mt-4">{courses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
+     </div>
+     <button disabled={busy} type="submit" className="rounded-xl px-7 py-4 bg-[#FAA954] font-extrabold disabled:opacity-50">{busy?"Preparing account…":"Prepare account & assignments"} →</button>
+     <p className="text-sm text-[#6B6466]">The account is reserved immediately. The person activates it by requesting their secure sign-in email at the Learning Hub. This screen does not send an email automatically.</p>
+    </form>:<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
+     <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-6">
+      <h2 className="text-xl font-black">Your people</h2><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search name or email" aria-label="Search accounts" className="w-full rounded-xl border border-[#EADFD3] p-3 mt-4"/>
+      <p className="text-sm text-[#6B6466] mt-5 mb-2 font-bold uppercase tracking-widest">Active accounts</p>
+      <div className="space-y-2">{visible.map(m=><button key={m.id} type="button" onClick={()=>pickMember(m)} className={"w-full text-left border rounded-xl p-4 hover:border-[#FAA954] "+(selectedId===m.id?"border-[#FAA954] bg-[#FEEBD5]":"border-[#EADFD3]")}><strong className="block">{m.full_name||m.email}</strong><span className="block text-sm text-[#6B6466] mt-1">{m.email}</span><span className="inline-block mt-2 text-xs font-extrabold uppercase text-[#A55F12]">{m.role==="org_admin"?"Organization admin":m.role}</span></button>)}</div>
+      <p className="text-sm text-[#6B6466] mt-6 mb-2 font-bold uppercase tracking-widest">Invited · waiting for first sign-in</p>
+      <div className="space-y-2">{invites.filter(i=>!members.some(m=>m.email.toLowerCase()===i.email.toLowerCase())).map(i=><button type="button" key={i.email} onClick={()=>pickInvite(i)} className={"w-full text-left border rounded-xl p-4 "+(selectedEmail===i.email?"border-[#FAA954] bg-[#FEEBD5]":"border-[#EADFD3]")}><strong className="block">{i.full_name}</strong><span className="block text-sm text-[#6B6466]">{i.email}</span><span className="text-xs text-[#A55F12] font-extrabold">PENDING · {i.role}</span></button>)}</div>
+     </section>
+     <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-7">
+      {!selection?<div className="py-16 text-center"><p className="text-3xl">📚</p><h3 className="text-xl font-black mt-3">Choose a person</h3><p className="mt-2 text-[#6B6466]">Select an existing account or pending invitation to manage their learning access.</p></div>:<>
+       <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Learning access</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">{focused?.email||focusedInvite?.email}</p></div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {courses.length} assigned</span></div>
+       <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(courses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
+       <div className="space-y-3 mt-4">{courses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
+       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save module assignments"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy sign-in instructions</button>}</div>
+       <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person's learning library, not anyone else's scores, submissions or reviews.</p>
+      </>}
+     </section>
+    </div>}
+    <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">COMING NEXT · COMPANY-WIDE LEARNING</p><h3 className="text-2xl font-black mt-2">More than marketing onboarding.</h3><p className="mt-2 text-white/80">The current eight lessons form the original marketing/onboarding track. Communication, teamwork and leadership will join the catalog as separate learning experiences. Their assignments will use this same account-management screen.</p></aside>
+   </>}
+  </div>
+ </main>
+}
