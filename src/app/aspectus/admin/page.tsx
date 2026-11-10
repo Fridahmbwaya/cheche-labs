@@ -132,7 +132,7 @@ export default function AspectusPeopleAdmin(){
      <button type="button" onClick={()=>setMode("invite")} className={mode==="invite"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>+ Add a person</button>
     </div>
     {mode==="invite"?<form onSubmit={e=>void createInvite(e)} className="rounded-[28px] border border-[#EADFD3] bg-white p-6 sm:p-8 space-y-5">
-     <div><h2 className="text-2xl font-black">Add a new team member</h2><p className="text-[#6B6466] mt-2">Create their access, choose their role and select which modules they'll see. They sign in with their own email.</p></div>
+     <div><h2 className="text-2xl font-black">Add a new team member</h2><p className="text-[#6B6466] mt-2">Create their access, choose their role and select which modules they&apos;ll see. They sign in with their own email.</p></div>
      <div className="grid md:grid-cols-2 gap-4">
       <label className="block font-bold">Full name<input required minLength={2} value={inviteName} onChange={e=>setInviteName(e.target.value)} placeholder="e.g. Sarah" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
       <label className="block font-bold">Email address<input required type="email" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="name@aspectus..." className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
@@ -158,7 +158,7 @@ export default function AspectusPeopleAdmin(){
        <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(courses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
        <div className="space-y-3 mt-4">{courses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
        <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save module assignments"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy sign-in instructions</button>}</div>
-       <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person's learning library, not anyone else's scores, submissions or reviews.</p>
+       <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
     </div>}
