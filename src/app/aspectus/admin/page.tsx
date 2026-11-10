@@ -114,9 +114,9 @@ export default function AspectusPeopleAdmin(){
   }catch(err){setMessage("Could not create invitation: "+(err instanceof Error?err.message:String(err)))}
   finally{setBusy(false)}
  }
- const joinText=(_email:string)=>"You've been invited to create an account on the Aspectus Learning Hub.\n\n"+window.location.origin+"/preview/aspectus-welcome.html";
+ const joinText=()=>"You've been invited to create an account on the Aspectus Learning Hub.\n\n"+window.location.origin+"/preview/aspectus-welcome.html";
  function copyInvite(email:string){
-  void navigator.clipboard.writeText(joinText(email)).then(()=>setMessage("Account link copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
+  void navigator.clipboard.writeText(joinText()).then(()=>setMessage("Account link copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
  }
  const selectedLabel=focused?.full_name||focusedInvite?.full_name||"Selected person";
  const selection=selectedId||selectedEmail;
@@ -166,7 +166,7 @@ export default function AspectusPeopleAdmin(){
       <div className="grid md:grid-cols-2 gap-3 mt-4">{courses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
      </div>
      <button disabled={busy} type="submit" className="rounded-xl px-7 py-4 bg-[#FAA954] font-extrabold disabled:opacity-50">{busy?"Preparing invitation…":"Create account & send invitation"} →</button>
-     <p className="text-sm text-[#6B6466]">The account is reserved first, then a secure invitation email is requested automatically. The person's account activates when they follow the emailed link.</p>
+     <p className="text-sm text-[#6B6466]">The account is reserved first, then a secure invitation email is requested automatically. The person&apos;s account activates when they follow the emailed link.</p>
     </form>:<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
      <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-6">
       <h2 className="text-xl font-black">Your people</h2><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search name or email" aria-label="Search accounts" className="w-full rounded-xl border border-[#EADFD3] p-3 mt-4"/>
