@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
+import LearningOverview from "./LearningOverview";
 
 const db=createClient();
 type Member={id:string;email:string;work_email:string|null;full_name:string|null;role:string;role_title:string|null;department:string|null};
@@ -27,7 +28,8 @@ export default function AspectusPeopleAdmin(){
  const [pendingReviewees,setPendingReviewees]=useState<PendingReviewee[]>([]);
  const [revieweeIds,setRevieweeIds]=useState<string[]>([]);
  const [inviteReviewees,setInviteReviewees]=useState<string[]>([]);
- const [mode,setMode]=useState<"people"|"invite">("people");
+ const [mode,setMode]=useState<"overview"|"mine"|"people"|"invite">("overview");
+ const [currentUserId,setCurrentUserId]=useState("");
  const [selectedId,setSelectedId]=useState("");
  const [selectedEmail,setSelectedEmail]=useState("");
  const [checked,setChecked]=useState<string[]>([]);
@@ -62,6 +64,10 @@ export default function AspectusPeopleAdmin(){
    try{
     const {data:{user}}=await db.auth.getUser();
     if(!user){window.location.replace("/preview/aspectus-welcome.html");return}
+    if(!alive)return;
+    setCurrentUserId(user.id);
+    const requestedView=new URLSearchParams(window.location.search).get("view");
+    setMode(requestedView==="mine"?"mine":requestedView==="people"?"people":"overview");
     const {data:profile,error}=await db.from("users").select("org_id").eq("id",user.id).single();
     if(error||!profile)throw new Error("Your Aspectus account was not found.");
     const {data:allowed,error:accessError}=await db.rpc("aspectus_can_admin",{p_org_id:profile.org_id});
@@ -193,10 +199,18 @@ export default function AspectusPeopleAdmin(){
      <div className="rounded-[22px] bg-[#D3F2E2] p-5"><p className="text-sm text-[#00753E]">Accounts with assignments</p><p className="text-3xl font-black mt-2 text-[#00753E]">{assignedTo}</p></div>
      <div className="rounded-[22px] bg-[#FEEBD5] p-5"><p className="text-sm text-[#A55F12]">Published learning modules</p><p className="text-3xl font-black mt-2">{publishedCourses.length}</p></div>
     </section>
-    <div className="flex flex-wrap gap-3">
-     <button type="button" onClick={()=>setMode("people")} className={mode==="people"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>Manage people</button>
-     <button type="button" onClick={()=>setMode("invite")} className={mode==="invite"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>+ Add a person</button>
-    </div>
+    <nav aria-label="Super Admin learning views" className="flex flex-wrap gap-3">
+     {[
+      {id:"overview",label:"Team learning access"},
+      {id:"mine",label:"My learning"},
+      {id:"people",label:"Manage assignments"},
+      {id:"invite",label:"+ Add a person"}
+     ].map(tab=><button key={tab.id} type="button" aria-current={mode===tab.id?"page":undefined} onClick={()=>setMode(tab.id as "overview"|"mine"|"people"|"invite")} className={mode===tab.id?"rounded-xl bg-[#FAA954] border border-[#DB9A50] px-5 py-3 font-extrabold":"rounded-xl border border-[#EADFD3] bg-white px-5 py-3 font-bold hover:border-[#FAA954]"}>{tab.label}</button>)}
+    </nav>
+    {(mode==="overview"||mode==="mine")&&<LearningOverview view={mode==="mine"?"mine":"team"} currentUserId={currentUserId} courses={courses} tracks={tracks} members={members} invites={invites} assignments={assignments} pending={pending}
+      onManageMember={id=>{const member=members.find(m=>m.id===id);if(member){pickMember(member);setMode("people")}}}
+      onManageInvite={email=>{const invite=invites.find(i=>i.email===email);if(invite){pickInvite(invite);setMode("people")}}}
+    />}
     {mode==="invite"?<form onSubmit={e=>void createInvite(e)} className="rounded-[28px] border border-[#EADFD3] bg-white p-6 sm:p-8 space-y-5">
      <div><h2 className="text-2xl font-black">Add a new team member</h2><p className="text-[#6B6466] mt-2">Create their access, choose their role and select which modules they&apos;ll see. They sign in with their own email.</p></div>
      <div className="grid md:grid-cols-2 gap-4">
@@ -229,7 +243,7 @@ export default function AspectusPeopleAdmin(){
      </section>}
      <button disabled={busy} type="submit" className="rounded-xl px-7 py-4 bg-[#FAA954] font-extrabold disabled:opacity-50">{busy?"Preparing invitation…":"Create account & send invitation"} →</button>
      <p className="text-sm text-[#6B6466]">The account is reserved first, then a secure invitation email is requested automatically. The person&apos;s account activates when they follow the emailed link.</p>
-    </form>:<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
+    </form>:mode==="people"?<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
      <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-6">
       <h2 className="text-xl font-black">Your people</h2><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search name or email" aria-label="Search accounts" className="w-full rounded-xl border border-[#EADFD3] p-3 mt-4"/>
       <p className="text-sm text-[#6B6466] mt-5 mb-2 font-bold uppercase tracking-widest">Active accounts</p>
@@ -253,7 +267,7 @@ export default function AspectusPeopleAdmin(){
        <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
-    </div>}
+    </div>:null}
     <section className="rounded-[26px] bg-white border border-[#EADFD3] p-6 sm:p-8 space-y-5">
       <div><p className="text-xs font-extrabold tracking-[.17em] uppercase text-[#A55F12]">Learning track library</p><h2 className="text-2xl font-black mt-2">Organize learning by capability</h2><p className="text-[#6B6466] mt-2">Published courses can be assigned to staff. Drafts stay private until the content and assessments are ready.</p></div>
       <div className="grid md:grid-cols-2 gap-4">{tracks.map(track=>{
