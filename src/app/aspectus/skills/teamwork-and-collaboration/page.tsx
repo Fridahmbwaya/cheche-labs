@@ -11,11 +11,11 @@ const COURSE_SLUG = "teamwork-and-collaboration";
 
 const stages = [
   { label: "Baseline", title: "What would you send?", time: "4 min" },
-  { label: "Spot", title: "Where did the handover break?", time: "3 min" },
-  { label: "Learn", title: "A better way to hand over work", time: "4 min" },
-  { label: "Decide", title: "What would you do next?", time: "3 min" },
-  { label: "Practise", title: "Build a handover your colleague can use", time: "6 min" },
-  { label: "Apply", title: "Agree how your small team will work", time: "4 min" },
+  { label: "Spot", title: "The enquiry nobody owned", time: "3 min" },
+  { label: "Learn", title: "Close the loop across the team", time: "5 min" },
+  { label: "Decide", title: "Who owns the quotation follow-up?", time: "3 min" },
+  { label: "Practise", title: "Choose your role, solve a real work handover", time: "7 min" },
+  { label: "Apply", title: "Make two changes to everyday teamwork", time: "4 min" },
 ] as const;
 
 type CourseAnswers = {
@@ -23,7 +23,7 @@ type CourseAnswers = {
   confidenceBefore: number;
   gapChoice: string;
   actionChoice: string;
-  role: "sales" | "technical" | "field" | "finance";
+  role: "sales" | "technical" | "field" | "finance" | "marketing" | "leadership";
   handoverKnown: string;
   handoverMissing: string;
   handoverOwner: string;
@@ -45,39 +45,55 @@ const initial: CourseAnswers = {
 const scenarios = {
   sales: {
     icon: "📋", title: "Sales → Technical",
-    description: "A customer has asked for a solar water-heater quote. Sales hopes to respond by Friday, but the site location and hot-water requirements still need to be confirmed before Technical can prepare an accurate estimate.",
-    recipient: "Technical colleague",
-    known: "A customer wants a solar water-heater quotation; the requirements have not yet been verified.",
-    missing: "Site location, approximate hot-water needs and any installation constraints",
+    description: "A regional agent passes an enquiry for a solar water pump to the office. The customer is interested, but nobody has confirmed the site location, water source or what the pump must deliver. Sales needs the next information-gathering step and a technical review before providing a quotation.",
+    recipient: "Sales colleague to contact the customer, then Javis or the technical team to review requirements",
+    known: "Regional agent has passed on a new solar pump enquiry; the customer wants to understand options.",
+    missing: "Site location, water source, intended use, and technical input before a price or timing is promised",
   },
   technical: {
-    icon: "🔧", title: "Technical → Field",
-    description: "A site visit is being planned. The technical team has an outline of the equipment, but the supplier's delivery date is not confirmed. The field colleague needs to know what can safely be scheduled.",
-    recipient: "Field colleague",
-    known: "A site visit is being planned; equipment choice is provisional.",
-    missing: "Confirmed equipment availability and safe visit schedule",
+    icon: "🔧", title: "Technical → Installation",
+    description: "A solar water-heater installation is being discussed. Julius may need to check the site, but the water setup and roof conditions haven't been confirmed. Javis must establish what is needed before the team or customer is given a firm installation date.",
+    recipient: "Javis to agree the checks with Julius before anyone confirms the installation plan",
+    known: "A customer wants a solar water-heater installation; exact site requirements are still being checked.",
+    missing: "Water supply and roof/site details, technical requirements and a feasible installation schedule",
   },
   field: {
-    icon: "☀️", title: "Field → Office",
-    description: "A site survey is finished. The field agent has measurements and notes but one required photo is missing. The office is waiting to finalize its customer recommendation.",
-    recipient: "Office colleague",
-    known: "Measurements and notes have been collected during the site survey.",
-    missing: "A required site photo and confirmation of any site constraints",
+    icon: "📍", title: "Regional agent → Office",
+    description: "An agent in Homa Bay sends photos and a voice note from a prospective customer's site. The office has no clear customer requirement, and the enquiry hasn't been fully recorded in the sales pipeline. Who will obtain the remaining details and update the customer?",
+    recipient: "Named office sales owner, with technical review when the information is complete",
+    known: "A Homa Bay agent has visited a prospective customer's site and shared photos and a voice note.",
+    missing: "Customer need, location and contact details, missing site information and the pipeline next action",
   },
   finance: {
     icon: "🧾", title: "Finance → Sales",
-    description: "A sales colleague asks whether a customer payment has cleared. The bank reference appears in the records, but the payment has not been verified. Sales must know what can be communicated.",
-    recipient: "Sales colleague",
-    known: "A payment reference has been received; settlement is not yet verified.",
-    missing: "Bank confirmation that the payment has cleared",
+    description: "A customer sends Sales a payment screenshot and asks whether an installation can go ahead. Finance has not verified the payment. The team needs one agreed customer update rather than competing promises.",
+    recipient: "Finance or Nereah to confirm payment status; Sales to communicate only the verified outcome",
+    known: "A customer has shared proof of a proposed payment, but receipt is not yet verified.",
+    missing: "Finance confirmation and any scheduling approval before promising an installation date",
+  },
+  marketing: {
+    icon: "📣", title: "Marketing → Technical → Brenda",
+    description: "A draft Energy Tip includes a claim about solar equipment performance and a project photo. Ian or a marketing colleague has prepared it, but the technical statement hasn't been checked by Javis or Julius and Brenda hasn't approved the post. What should happen before publication?",
+    recipient: "Javis or Julius for technical verification, then Brenda for final post approval",
+    known: "A draft Energy Tip and project image are ready for review; nothing has been approved for posting.",
+    missing: "Confirmation of technical claims, image-use clearance and Brenda's approval before publishing",
+  },
+  leadership: {
+    icon: "📊", title: "Team → Weekly pipeline review",
+    description: "Sarah wants a clear sales-pipeline update, but several opportunities have no recent progress note or named next step. Brenda needs to distinguish verified deal status from assumptions before the review.",
+    recipient: "The relevant sales or field action owner to update the pipeline; Brenda to compile an accurate view",
+    known: "The weekly pipeline review is approaching; some opportunity records need verification.",
+    missing: "Current customer status, last verified action, assigned next step and realistic follow-up date",
   },
 } as const;
 
 const agreementOptions = [
-  { id: "owner", title: "Name the next owner", detail: "Before sending a handover, say who is expected to act next." },
-  { id: "confirm", title: "Confirm receipt", detail: "The recipient acknowledges the request or clarifies what's missing." },
-  { id: "early", title: "Flag a blocker early", detail: "Raise issues before they become missed customer promises." },
-  { id: "updates", title: "Agree an update time", detail: "Use one simple time for the next status check." },
+  { id: "owner", title: "Name an owner for every next action", detail: "A new enquiry, technical question or handover has one clearly responsible next person." },
+  { id: "confirm", title: "Acknowledge before assuming", detail: "The receiving colleague confirms what they've accepted or what is still missing." },
+  { id: "pipeline", title: "Keep the pipeline current", detail: "Customer opportunity status, next action, owner and follow-up are recorded in the sales pipeline." },
+  { id: "verify", title: "Check technical claims and promises", detail: "Ask technical colleagues to verify specifications; obtain Brenda's approval before marketing posts." },
+  { id: "early", title: "Raise blockers before the deadline", detail: "Tell the relevant colleague or manager about missing details, delays or risks in time to respond." },
+  { id: "updates", title: "Close the loop with a real update", detail: "Share what changed, what remains open and when the next update will happen." },
 ] as const;
 
 type Session = { userId: string; orgId: string; moduleId: string; admin: boolean };
@@ -179,9 +195,9 @@ export default function TeamworkCollaborationPrototype() {
 
   function validate() {
     if (stage === 1 && answers.gapChoice !== "unclear")
-      return "Look for missing information and unclear ownership, rather than assuming a colleague is the problem.";
+      return "Ask what information was missing, who should have followed up, and what the customer was told. Try again.";
     if (stage === 3 && answers.actionChoice !== "clarify")
-      return "A good next step is to clarify the missing information and the owner before promising a customer deadline.";
+      return "Check the recorded pipeline next action and agree who will follow up. Don't make an unverified customer promise.";
     if (stage === 4 && [answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].some(v => !v.trim()))
       return `You have completed ${[answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].filter(v => v.trim()).length} of 5 required handover fields. Add the missing answers; there is no minimum length.`;
     if (stage === 5 && (answers.agreementChoices.length < 2 || !answers.workHabit.trim()))
@@ -208,9 +224,9 @@ export default function TeamworkCollaborationPrototype() {
   const handoverCompleted = handoverFields.filter(value => value.trim().length > 0).length;
   const stepRequirements = [
     "Optional baseline: write any amount, or skip. There is no minimum word or character count.",
-    "Required: choose the best explanation. If it isn't correct, you'll get a hint and can try again.",
+    "Required: identify the coordination problem. If you choose another answer, you'll get a hint and can try again.",
     "No answer required: read the four handover principles, then continue.",
-    "Required: choose the most useful next action. You can try again if needed.",
+    "Required: select the safest next step for a quotation follow-up. You can try again if needed.",
     `Required: complete all five handover fields (${handoverCompleted}/5 filled). No minimum word or character count.`,
     `Required: choose at least two team agreements (${answers.agreementChoices.length}/2 selected) and write one practical action. No minimum word or character count.`,
   ];
@@ -245,11 +261,12 @@ export default function TeamworkCollaborationPrototype() {
         <div className="h-2 bg-[#FAA954]"/>
         <div className="p-6 sm:p-9">
           <div className="flex flex-wrap gap-2">
-            <Tag>Professional Skills / Course 02</Tag><Tag>For lean teams</Tag><Tag>20–25 min</Tag>
+            <Tag>Professional Skills / Course 02</Tag><Tag>For lean teams</Tag><Tag>25–30 min</Tag>
             {session.admin && <span className="rounded-full bg-[#373435] text-white px-3 py-1.5 text-xs font-extrabold">Private admin preview</span>}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight mt-5 max-w-3xl">Great teamwork isn't about more meetings. It's about better handovers.</h1>
-          <p className="mt-4 text-lg text-[#675E59] max-w-2xl">In a small business, one missing detail can delay everyone. Practise making responsibilities clear, confirming understanding and helping work move forward.</p>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight mt-5 max-w-3xl">A small team works best when nothing gets lost between people.</h1>
+          <p className="mt-4 text-lg text-[#675E59] max-w-2xl">A lead comes from an agent. Sales needs technical input. A quotation needs follow-up. Marketing needs approval. Practise coordinating these everyday Aspectus tasks without assuming someone else has it covered.</p>
+          <p className="mt-3 text-sm text-[#746B64] max-w-2xl">Training situations are illustrative, based on Aspectus roles and established work processes; they do not describe documented incidents or individual errors.</p>
           <div className="flex flex-wrap gap-2 mt-6"><Tag>Understand</Tag><Tag>Demonstrate</Tag><Tag>Apply at work</Tag></div>
         </div>
       </section>
