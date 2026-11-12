@@ -268,6 +268,7 @@ export default function AspectusPeopleAdmin(){
       </>}
      </section>
     </div>:null}
+   {(mode==="people"||mode==="invite")&&<>
     <section className="rounded-[26px] bg-white border border-[#EADFD3] p-6 sm:p-8 space-y-5">
       <div><p className="text-xs font-extrabold tracking-[.17em] uppercase text-[#A55F12]">Learning track library</p><h2 className="text-2xl font-black mt-2">Organize learning by capability</h2><p className="text-[#6B6466] mt-2">Published courses can be assigned to staff. Drafts stay private until the content and assessments are ready.</p></div>
       <div className="grid md:grid-cols-2 gap-4">{tracks.map(track=>{
@@ -285,6 +286,7 @@ export default function AspectusPeopleAdmin(){
       {draftCourses.length>0&&<p className="text-sm text-[#6B6466]">Draft lessons are not assigned automatically. You can preview them as an administrator before publishing to staff.</p>}
     </section>
     <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">CHECHE PROFESSIONAL SKILLS</p><h3 className="text-2xl font-black mt-2">Skills the whole team can practise.</h3><p className="mt-2 text-white/80">Clear Workplace Communication and Teamwork &amp; Collaboration now have interactive draft previews. Each course uses the same account and progress foundation, with exercises adaptable to sales, technical, finance, field and leadership work.</p></aside>
+   </>}
    </>}
   </div>
  </main>
