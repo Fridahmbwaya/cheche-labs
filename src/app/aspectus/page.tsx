@@ -210,28 +210,31 @@ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-5 py-9"><div
  </div>
  <div className="grid sm:grid-cols-3 gap-4">
   <div className="rounded-[23px] bg-[#373435] text-white p-6"><p className="text-white/75 text-sm">Active learner accounts</p><p className="text-3xl font-black mt-3">{teamLearners.length}</p></div>
-  <div className="rounded-[23px] bg-[#FEEBD5] p-6"><p className="text-[#8B572B] text-sm">Learning modules</p><p className="text-3xl font-black mt-3">{mods.length}</p></div>
+  <div className="rounded-[23px] bg-[#FEEBD5] p-6"><p className="text-[#8B572B] text-sm">Published modules</p><p className="text-3xl font-black mt-3">{mods.length}</p></div>
   <div className="rounded-[23px] bg-[#D3F2E2] p-6"><p className="text-[#00753E] text-sm">Submissions awaiting review</p><p className="text-3xl font-black mt-3">{pendingTeamSubmissions.length}</p></div>
  </div>
- <div className="grid md:grid-cols-2 gap-4">
-  <a href="/aspectus/admin" className="block rounded-[26px] bg-[#FAA954] border border-[#E9C08A] p-7 sm:p-8 hover:brightness-95">
-   <p className="font-extrabold text-sm uppercase tracking-widest">Team administration</p>
-   <h2 className="text-2xl font-black mt-4">People &amp; learning access</h2>
-   <p className="text-base mt-3">Invite team members, set learner or reviewer roles, assign modules and decide exactly whose work reviewers may assess.</p>
-   <p className="font-extrabold mt-6">Manage accounts →</p>
+ <div className="grid lg:grid-cols-3 gap-4">
+  <a href="/aspectus/admin?view=overview" className="block rounded-[26px] bg-[#FAA954] border border-[#E9C08A] p-7 hover:brightness-95">
+   <p className="font-extrabold text-sm uppercase tracking-widest">Team learning access</p>
+   <h2 className="text-2xl font-black mt-3">What everyone can study</h2>
+   <p className="text-base mt-3">See Ian&apos;s onboarding and other team assignments, with each person&apos;s courses grouped by learning track.</p>
+   <p className="font-extrabold mt-5">View team learning →</p>
   </a>
-  <button type="button" onClick={()=>go("activity")} className="block text-left rounded-[26px] bg-white border border-[#EADFD3] p-7 sm:p-8 hover:border-[#FAA954]">
+  <a href="/aspectus/admin?view=mine" className="block rounded-[26px] bg-[#FFF1DF] border border-[#E9C08A] p-7 hover:border-[#FAA954]">
+   <p className="font-extrabold text-sm uppercase tracking-widest text-[#8B572B]">My learning</p>
+   <h2 className="text-2xl font-black mt-3">Your learning space</h2>
+   <p className="text-base mt-3 text-[#6B6466]">See your own assigned courses separately and preview the Professional Skills modules in development.</p>
+   <p className="font-extrabold mt-5 text-[#A55F12]">Explore my learning →</p>
+  </a>
+  <button type="button" onClick={()=>go("activity")} className="block text-left rounded-[26px] bg-white border border-[#EADFD3] p-7 hover:border-[#FAA954]">
    <p className="font-extrabold text-sm uppercase tracking-widest text-[#00753E]">Learning oversight</p>
-   <h2 className="text-2xl font-black mt-4">Review submissions</h2>
-   <p className="text-base mt-3 text-[#6B6466]">Monitor learner submissions, feedback and approvals. Designated reviewers handle their own assigned learners.</p>
-   <p className="font-extrabold mt-6">Open review workspace →</p>
+   <h2 className="text-2xl font-black mt-3">Review submissions</h2>
+   <p className="text-base mt-3 text-[#6B6466]">See learner submissions and feedback. This is separate from your personal coursework.</p>
+   <p className="font-extrabold mt-5 text-[#00753E]">Open reviews →</p>
   </button>
  </div>
- <a href="/aspectus/skills/clear-workplace-communication" className="block rounded-[24px] border border-[#EADFD3] bg-white p-6 sm:p-7 hover:border-[#FAA954]">
-  <p className="font-extrabold text-sm tracking-widest uppercase text-[#A55F12]">Professional Skills · Draft preview</p>
-  <h2 className="text-2xl font-black mt-2">Clear Workplace Communication</h2>
-  <p className="mt-2 text-[#6B6466]">Try the baseline and staged first lesson before it becomes available to the wider team. No one has been enrolled automatically.</p>
-  <span className="inline-block mt-4 font-extrabold text-[#A55F12]">Preview Lesson 1 →</span>
+ <a href="/aspectus/admin?view=people" className="block rounded-[24px] border border-[#EADFD3] bg-white p-5 sm:p-6 hover:border-[#FAA954]">
+  <span className="font-extrabold text-[#373435]">Manage people &amp; assignments</span><span className="block mt-2 text-sm text-[#6B6466]">Invite staff, assign published courses and manage reviewer access.</span>
  </a>
  </section>}
 {screen==="home"&&user.role!=="org_admin"&&<section className="space-y-6">
