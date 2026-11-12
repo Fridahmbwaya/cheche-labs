@@ -237,12 +237,13 @@ export default function AspectusPeopleAdmin(){
         <div className="space-y-3 mt-4">{trackCourses.map(m=><div key={m.id} className="rounded-xl bg-white border border-[#EADFD3] p-4">
          <p className="font-bold">{m.title}</p><p className="text-xs text-[#6B6466] mt-1">{m.is_active?"Published · assignable":"Draft · not yet assignable"}</p>
          {!m.is_active&&m.slug==="clear-workplace-communication"&&<a className="inline-block mt-3 underline text-[#A55F12] font-extrabold text-sm" href="/aspectus/skills/clear-workplace-communication">Preview the baseline and Lesson 1 →</a>}
+         {!m.is_active&&m.slug==="teamwork-and-collaboration"&&<a className="inline-block mt-3 underline text-[#A55F12] font-extrabold text-sm" href="/aspectus/skills/teamwork-and-collaboration">Open the Teamwork &amp; Collaboration prototype →</a>}
         </div>)}</div>
        </article>;
       })}</div>
       {draftCourses.length>0&&<p className="text-sm text-[#6B6466]">Draft lessons are not assigned automatically. You can preview them as an administrator before publishing to staff.</p>}
     </section>
-    <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">CHECHE PROFESSIONAL SKILLS</p><h3 className="text-2xl font-black mt-2">Skills the whole team can practise.</h3><p className="mt-2 text-white/80">Clear Workplace Communication is the first course in development. Each course uses the same account and progress foundation, but its lessons can suit sales, technical, finance, field and leadership work.</p></aside>
+    <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">CHECHE PROFESSIONAL SKILLS</p><h3 className="text-2xl font-black mt-2">Skills the whole team can practise.</h3><p className="mt-2 text-white/80">Clear Workplace Communication and Teamwork &amp; Collaboration now have interactive draft previews. Each course uses the same account and progress foundation, with exercises adaptable to sales, technical, finance, field and leadership work.</p></aside>
    </>}
   </div>
  </main>
