@@ -183,9 +183,9 @@ export default function TeamworkCollaborationPrototype() {
     if (stage === 3 && answers.actionChoice !== "clarify")
       return "A good next step is to clarify the missing information and the owner before promising a customer deadline.";
     if (stage === 4 && [answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].some(v => !v.trim()))
-      return "Please fill in each part of the handover. A short answer is fine.";
+      return `You have completed ${[answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].filter(v => v.trim()).length} of 5 required handover fields. Add the missing answers; there is no minimum length.`;
     if (stage === 5 && (answers.agreementChoices.length < 2 || !answers.workHabit.trim()))
-      return "Choose at least two working agreements, and share one action you will try with your team. A short answer is fine.";
+      return "To finish, select at least two team agreements and enter one practical action. No minimum word count applies.";
     return "";
   }
 
@@ -204,6 +204,16 @@ export default function TeamworkCollaborationPrototype() {
     }
   }
 
+  const handoverFields = [answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm];
+  const handoverCompleted = handoverFields.filter(value => value.trim().length > 0).length;
+  const stepRequirements = [
+    "Optional baseline: write any amount, or skip. There is no minimum word or character count.",
+    "Required: choose the best explanation. If it isn't correct, you'll get a hint and can try again.",
+    "No answer required: read the four handover principles, then continue.",
+    "Required: choose the most useful next action. You can try again if needed.",
+    `Required: complete all five handover fields (${handoverCompleted}/5 filled). No minimum word or character count.`,
+    `Required: choose at least two team agreements (${answers.agreementChoices.length}/2 selected) and write one practical action. No minimum word or character count.`,
+  ];
   const scenario = scenarios[answers.role];
   const summary = "TEAMWORK & COLLABORATION · HANDOVER PRACTICE\n\n"
     + "Scenario: " + scenario.title + "\n"
@@ -268,6 +278,10 @@ export default function TeamworkCollaborationPrototype() {
             <p className="text-xs font-bold text-[#6B6466]">{stages[stage].time}</p>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black mt-3">{stages[stage].title}</h2>
+          <div role="note" className="mt-4 rounded-xl border border-[#EADFD3] bg-[#F7F3ED] px-4 py-3">
+            <p className="text-sm font-extrabold text-[#373435]">Before you continue</p>
+            <p className="mt-1 text-sm text-[#6B6466]">{stepRequirements[stage]}</p>
+          </div>
 
           {stage === 0 && <div className="mt-6 space-y-5">
             <p className="text-lg">Imagine you're helping a colleague get a solar quotation ready. Sales knows the customer is interested, but the exact site location and energy requirements have not yet been confirmed. Technical needs those details before promising a completion date.</p>
@@ -339,7 +353,7 @@ export default function TeamworkCollaborationPrototype() {
           </div>}
 
           {stage === 4 && <div className="mt-6 space-y-5">
-            <p className="text-lg">Now practise a handover that could happen in your own role. Choose the situation closest to your work.</p>
+            <p className="text-lg">Now practise a handover that could happen in your own role. Choose the situation closest to your work. Each of the five fields below must have a response, but short answers are welcome.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {(Object.keys(scenarios) as Array<keyof typeof scenarios>).map(role => <button type="button" key={role} onClick={() => change("role", role)}
                 className={"rounded-2xl text-left border-2 p-4 " + (answers.role === role ? "border-[#FAA954] bg-[#FFF2DF]" : "border-[#EADFD3] bg-white")}>
@@ -360,7 +374,7 @@ export default function TeamworkCollaborationPrototype() {
           </div>}
 
           {stage === 5 && <div className="mt-6 space-y-5">
-            <p className="text-lg">A good team doesn't need fifty rules. It needs a few agreements that everyone actually follows. Choose two habits worth testing at Aspectus.</p>
+            <p className="text-lg">A good team doesn't need fifty rules. It needs a few agreements that everyone actually follows. Select at least two habits worth testing at Aspectus.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {agreementOptions.map(option => <label key={option.id} className={"cursor-pointer block rounded-2xl border-2 p-4 " + (answers.agreementChoices.includes(option.id) ? "bg-[#F2FCF6] border-[#00A859]" : "border-[#EADFD3]")}>
                 <span className="flex gap-3 items-start">
@@ -370,7 +384,7 @@ export default function TeamworkCollaborationPrototype() {
                 </span>
               </label>)}
             </div>
-            <label htmlFor="tw-next" className="font-extrabold block">What's one change you'll try in a real handover this week?</label>
+            <label htmlFor="tw-next" className="font-extrabold block">What's one change you'll try in a real handover this week? <span className="font-normal text-[#746B64]">(required, any length)</span></label>
             <textarea id="tw-next" rows={4} className={textareaClass} value={answers.workHabit} onChange={e => change("workHabit", e.target.value)} placeholder="Next time I hand work to a colleague, I will…"/>
             <label className="block font-bold" htmlFor="tw-conf-after">How confident are you in handling a clear handover now?</label>
             <div className="flex items-center flex-wrap gap-3"><input id="tw-conf-after" aria-label="Confidence after learning from 1 to 5" type="range" min="1" max="5" value={answers.confidenceAfter} onChange={e => change("confidenceAfter", Number(e.target.value))} className="flex-1 min-w-40 accent-[#00A859]"/><span className="rounded-lg bg-[#D3F2E2] px-4 py-2 font-black">{answers.confidenceAfter} / 5</span></div>
