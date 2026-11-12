@@ -4,7 +4,8 @@ import {createClient} from "@/lib/supabase/client";
 
 const db=createClient();
 type Member={id:string;email:string;full_name:string|null;role:string;role_title:string|null;department:string|null};
-type Course={id:string;title:string;order_index:number;description:string|null};
+type Course={id:string;title:string;order_index:number;description:string|null;track_id:string|null;is_active:boolean;slug:string|null};
+type Track={id:string;slug:string;title:string;summary:string|null;sort_order:number};
 type Invite={email:string;full_name:string;role:string};
 type Assignment={learner_id:string;module_id:string};
 type PendingAssignment={email:string;module_id:string};
@@ -18,6 +19,7 @@ export default function AspectusPeopleAdmin(){
  const [orgId,setOrgId]=useState("");
  const [members,setMembers]=useState<Member[]>([]);
  const [courses,setCourses]=useState<Course[]>([]);
+ const [tracks,setTracks]=useState<Track[]>([]);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [invites,setInvites]=useState<Invite[]>([]);
  const [pending,setPending]=useState<PendingAssignment[]>([]);
@@ -36,20 +38,21 @@ export default function AspectusPeopleAdmin(){
  const [filter,setFilter]=useState("");
 
  async function loadData(id:string){
-  const [us,ms,as,iv,pa,ra,pr]=await Promise.all([
+  const [us,ms,as,iv,pa,ra,pr,tr]=await Promise.all([
    db.from("users").select("id,email,full_name,role,role_title,department").eq("org_id",id).order("full_name"),
-   db.from("modules").select("id,title,order_index,description").eq("org_id",id).order("order_index"),
+   db.from("modules").select("id,title,order_index,description,track_id,is_active,slug").eq("org_id",id).order("order_index"),
    db.from("aspectus_module_assignments").select("learner_id,module_id").eq("org_id",id),
    db.from("aspectus_pending_accounts").select("email,full_name,role").eq("org_id",id).order("full_name"),
    db.from("aspectus_pending_module_assignments").select("email,module_id").eq("org_id",id),
    db.from("aspectus_reviewer_assignments").select("reviewer_id,learner_id").eq("org_id",id),
-   db.from("aspectus_pending_reviewer_assignments").select("email,learner_id").eq("org_id",id)
+   db.from("aspectus_pending_reviewer_assignments").select("email,learner_id").eq("org_id",id),
+   db.from("learning_tracks").select("id,slug,title,summary,sort_order").eq("org_id",id).order("sort_order")
   ]);
-  const errors=[us.error,ms.error,as.error,iv.error,pa.error,ra.error,pr.error].filter(Boolean);
+  const errors=[us.error,ms.error,as.error,iv.error,pa.error,ra.error,pr.error,tr.error].filter(Boolean);
   if(errors.length)throw new Error(errors.map(x=>x?.message).join("; "));
   setMembers(us.data||[]);setCourses(ms.data||[]);setAssignments(as.data||[]);
   setInvites(iv.data||[]);setPending(pa.data||[]);
-  setReviewerAssignments(ra.data||[]);setPendingReviewees(pr.data||[]);
+  setReviewerAssignments(ra.data||[]);setPendingReviewees(pr.data||[]);setTracks(tr.data||[]);
  }
  useEffect(()=>{
   let alive=true;
@@ -72,6 +75,8 @@ export default function AspectusPeopleAdmin(){
  const focusedInvite=invites.find(i=>i.email===selectedEmail);
  const visible=useMemo(()=>members.filter(m=>(m.full_name||m.email).toLowerCase().includes(filter.toLowerCase())||m.email.toLowerCase().includes(filter.toLowerCase())),[members,filter]);
  const assignedTo=members.filter(m=>assignments.some(a=>a.learner_id===m.id)).length;
+ const publishedCourses=courses.filter(m=>m.is_active);
+ const draftCourses=courses.filter(m=>!m.is_active);
  const availableLearners=members.filter(m=>m.role==="employee");
  const selectedRole=focused?.role||focusedInvite?.role;
  function pickMember(m:Member){
@@ -161,7 +166,7 @@ export default function AspectusPeopleAdmin(){
     <section className="grid sm:grid-cols-3 gap-4">
      <div className="rounded-[22px] bg-[#373435] text-white p-5"><p className="text-sm text-white/75">Existing accounts</p><p className="text-3xl font-black mt-2">{members.length}</p></div>
      <div className="rounded-[22px] bg-[#D3F2E2] p-5"><p className="text-sm text-[#00753E]">Accounts with assignments</p><p className="text-3xl font-black mt-2 text-[#00753E]">{assignedTo}</p></div>
-     <div className="rounded-[22px] bg-[#FEEBD5] p-5"><p className="text-sm text-[#A55F12]">Learning modules in catalog</p><p className="text-3xl font-black mt-2">{courses.length}</p></div>
+     <div className="rounded-[22px] bg-[#FEEBD5] p-5"><p className="text-sm text-[#A55F12]">Published learning modules</p><p className="text-3xl font-black mt-2">{publishedCourses.length}</p></div>
     </section>
     <div className="flex flex-wrap gap-3">
      <button type="button" onClick={()=>setMode("people")} className={mode==="people"?"rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold":"rounded-xl bg-white border border-[#EADFD3] px-5 py-3 font-bold"}>Manage people</button>
@@ -187,8 +192,8 @@ export default function AspectusPeopleAdmin(){
       </label>)}</div>
      </fieldset>
      <div className="rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-5">
-      <div className="flex flex-wrap justify-between gap-3"><div><h3 className="font-extrabold">Step 2 · Assign learning modules</h3><p className="text-sm text-[#6B6466]">Choose what this person will study, regardless of account role. Reviewers do not need modules to review work.</p></div><div className="flex gap-3"><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules(courses.map(m=>m.id))}>All</button><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules([])}>None</button></div></div>
-      <div className="grid md:grid-cols-2 gap-3 mt-4">{courses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
+      <div className="flex flex-wrap justify-between gap-3"><div><h3 className="font-extrabold">Step 2 · Assign learning modules</h3><p className="text-sm text-[#6B6466]">Choose what this person will study, regardless of account role. Reviewers do not need modules to review work.</p></div><div className="flex gap-3"><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules(publishedCourses.map(m=>m.id))}>All</button><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules([])}>None</button></div></div>
+      <div className="grid md:grid-cols-2 gap-3 mt-4">{publishedCourses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
      </div>
      {inviteRole==="manager"&&<section className="rounded-2xl border border-[#EADFD3] bg-[#FFFBF6] p-5 space-y-3">
       <h3 className="font-extrabold">Step 3 · Which learners can this reviewer assess?</h3>
@@ -208,21 +213,36 @@ export default function AspectusPeopleAdmin(){
      </section>
      <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-7">
       {!selection?<div className="py-16 text-center"><p className="text-3xl">📚</p><h3 className="text-xl font-black mt-3">Choose a person</h3><p className="mt-2 text-[#6B6466]">Select an existing account or pending invitation to manage their learning access.</p></div>:<>
-       <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Account permissions & learning</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">{focused?.email||focusedInvite?.email}</p></div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {courses.length} assigned</span></div>
+       <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Account permissions & learning</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">{focused?.email||focusedInvite?.email}</p></div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {publishedCourses.length} assigned</span></div>
        <div className="mt-4 p-4 rounded-xl bg-[#FFFBF6] border border-[#EADFD3]"><p className="text-sm font-bold">Role: {((focused?.role||focusedInvite?.role)==="org_admin")?"Super Admin":((focused?.role||focusedInvite?.role)==="manager"||(focused?.role||focusedInvite?.role)==="hr_manager")?"Reviewer":"Learner"}</p><p className="text-xs text-[#6B6466] mt-1">The account role controls permissions. This section changes assigned learning modules only; it does not change the person&apos;s role.</p></div>
        {(selectedRole==="manager"||selectedRole==="hr_manager")&&<section className="mt-6 rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-4 space-y-3">
         <h4 className="font-extrabold">Learners this reviewer can assess</h4>
         <p className="text-sm text-[#6B6466]">Review access is independent of learning modules. Selected learners appear in the reviewer&apos;s dashboard; everyone else stays private.</p>
         <div className="space-y-2">{availableLearners.map(person=><label key={person.id} className="flex items-center gap-3 rounded-xl bg-white border border-[#EADFD3] p-3 cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[#00A859]" checked={revieweeIds.includes(person.id)} onChange={()=>toggle(revieweeIds,person.id,setRevieweeIds)}/><span><strong className="block">{person.full_name||person.email}</strong><span className="text-xs text-[#6B6466]">{person.email}</span></span></label>)}</div>
        </section>}
-       <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(courses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
-       <div className="space-y-3 mt-4">{courses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
+       <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(publishedCourses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
+       <div className="space-y-3 mt-4">{publishedCourses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
        <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning & review access"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}</div>
        <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
     </div>}
-    <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">COMING NEXT · COMPANY-WIDE LEARNING</p><h3 className="text-2xl font-black mt-2">More than marketing onboarding.</h3><p className="mt-2 text-white/80">The current eight lessons form the original marketing/onboarding track. Communication, teamwork and leadership will join the catalog as separate learning experiences. Their assignments will use this same account-management screen.</p></aside>
+    <section className="rounded-[26px] bg-white border border-[#EADFD3] p-6 sm:p-8 space-y-5">
+      <div><p className="text-xs font-extrabold tracking-[.17em] uppercase text-[#A55F12]">Learning track library</p><h2 className="text-2xl font-black mt-2">Organize learning by capability</h2><p className="text-[#6B6466] mt-2">Published courses can be assigned to staff. Drafts stay private until the content and assessments are ready.</p></div>
+      <div className="grid md:grid-cols-2 gap-4">{tracks.map(track=>{
+       const trackCourses=courses.filter(m=>m.track_id===track.id);
+       return <article key={track.id} className="rounded-[22px] border border-[#EADFD3] bg-[#FFFBF6] p-5">
+        <p className="font-extrabold text-lg">{track.title}</p><p className="text-sm text-[#6B6466] mt-2">{track.summary}</p>
+        <div className="flex gap-2 mt-4"><span className="rounded-full bg-[#D3F2E2] text-[#00753E] text-xs px-3 py-1 font-extrabold">{trackCourses.filter(m=>m.is_active).length} published</span><span className="rounded-full bg-[#FEEBD5] text-[#945D21] text-xs px-3 py-1 font-extrabold">{trackCourses.filter(m=>!m.is_active).length} drafts</span></div>
+        <div className="space-y-3 mt-4">{trackCourses.map(m=><div key={m.id} className="rounded-xl bg-white border border-[#EADFD3] p-4">
+         <p className="font-bold">{m.title}</p><p className="text-xs text-[#6B6466] mt-1">{m.is_active?"Published · assignable":"Draft · not yet assignable"}</p>
+         {!m.is_active&&m.slug==="clear-workplace-communication"&&<a className="inline-block mt-3 underline text-[#A55F12] font-extrabold text-sm" href="/aspectus/skills/clear-workplace-communication">Preview the baseline and Lesson 1 →</a>}
+        </div>)}</div>
+       </article>;
+      })}</div>
+      {draftCourses.length>0&&<p className="text-sm text-[#6B6466]">Draft lessons are not assigned automatically. You can preview them as an administrator before publishing to staff.</p>}
+    </section>
+    <aside className="rounded-[24px] p-6 bg-[#373435] text-white"><p className="text-sm font-extrabold tracking-widest text-[#FAA954]">CHECHE PROFESSIONAL SKILLS</p><h3 className="text-2xl font-black mt-2">Skills the whole team can practise.</h3><p className="mt-2 text-white/80">Clear Workplace Communication is the first course in development. Each course uses the same account and progress foundation, but its lessons can suit sales, technical, finance, field and leadership work.</p></aside>
    </>}
   </div>
  </main>
