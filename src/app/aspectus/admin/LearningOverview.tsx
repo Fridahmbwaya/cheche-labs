@@ -42,6 +42,7 @@ export default function LearningOverview(p:Props){
    <p className="text-xs font-black uppercase tracking-[.16em] text-[#A55F12]">My learning / Separate from team oversight</p>
    <h2 className="text-2xl sm:text-3xl font-black mt-3">{current?.full_name?.split(" ")[0]||"Your"} learning space</h2>
    <p className="mt-3 text-[#6B6466] max-w-3xl">Your own learning and the courses you supervise are different. Being a Super Admin lets you oversee everyone and preview draft content; it does not automatically enroll you in a colleague&apos;s modules.</p>
+   <a className="inline-block mt-5 rounded-xl bg-[#FAA954] px-5 py-3.5 font-extrabold hover:brightness-95" href="/aspectus/preview">Explore Ian's eight onboarding modules in any order →</a>
    <div className="flex flex-wrap gap-2 mt-5">
     <span className={pill+" bg-[#D3F2E2] text-[#006B3B]"}>{ownModules.length} published modules assigned to you</span>
     <span className={pill+" bg-[#FEEBD5] text-[#8B572B]"}>{professionalDrafts.length} Professional Skills previews</span>
@@ -108,6 +109,7 @@ export default function LearningOverview(p:Props){
      </div>)}
      {extra.length>0&&<div><p className="text-sm uppercase tracking-wide font-black text-[#A55F12]">Other assigned learning</p><ul className="space-y-2 mt-2">{extra.map(m=><li key={m.id} className="rounded-xl bg-[#F8F6F3] p-3 text-sm font-semibold">{m.title}</li>)}</ul></div>}
      {orphanDrafts.length>0&&<p className="rounded-lg bg-[#FFF2DF] p-3 text-xs text-[#8B572B]">Attention: {orphanDrafts.length} unpublished course assignment{orphanDrafts.length===1?"":"s"} on this account. They are not published for regular learners.</p>}
+     {assigned.some(c=>p.tracks.some(t=>t.slug==="aspectus-onboarding"&&t.id===c.track_id))&&<a href="/aspectus/preview" className="block rounded-xl bg-[#FEEBD5] px-4 py-3 text-sm font-extrabold hover:bg-[#FAA954]">Preview this onboarding as a learner →</a>}
      <button type="button" onClick={()=>person.invited?p.onManageInvite(person.email):p.onManageMember(person.id)} className="rounded-xl border border-[#EADFD3] bg-white px-4 py-3 font-extrabold text-sm hover:border-[#FAA954]">View or change access →</button>
     </div>
    </article>;
