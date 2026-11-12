@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 type Course = { id:string;title:string;order_index:number;track_id:string|null;is_active:boolean;slug:string|null };
