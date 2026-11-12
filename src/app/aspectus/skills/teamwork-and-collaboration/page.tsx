@@ -178,16 +178,14 @@ export default function TeamworkCollaborationPrototype() {
   }
 
   function validate() {
-    if (stage === 0 && answers.baseline.trim().length < 30)
-      return "Write the handover message you would send, even if you're unsure. This is a baseline, not a grade.";
     if (stage === 1 && answers.gapChoice !== "unclear")
       return "Look for missing information and unclear ownership, rather than assuming a colleague is the problem.";
     if (stage === 3 && answers.actionChoice !== "clarify")
       return "A good next step is to clarify the missing information and the owner before promising a customer deadline.";
-    if (stage === 4 && [answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].some(v => v.trim().length < 8))
-      return "Complete all five parts of the handover. Each should have a useful, specific answer.";
-    if (stage === 5 && (answers.agreementChoices.length < 2 || answers.workHabit.trim().length < 20))
-      return "Choose at least two working agreements, and explain one action you will try with your team.";
+    if (stage === 4 && [answers.handoverKnown, answers.handoverMissing, answers.handoverOwner, answers.handoverWhen, answers.handoverConfirm].some(v => !v.trim()))
+      return "Please fill in each part of the handover. A short answer is fine.";
+    if (stage === 5 && (answers.agreementChoices.length < 2 || !answers.workHabit.trim()))
+      return "Choose at least two working agreements, and share one action you will try with your team. A short answer is fine.";
     return "";
   }
 
@@ -273,15 +271,15 @@ export default function TeamworkCollaborationPrototype() {
 
           {stage === 0 && <div className="mt-6 space-y-5">
             <p className="text-lg">Imagine you're helping a colleague get a solar quotation ready. Sales knows the customer is interested, but the exact site location and energy requirements have not yet been confirmed. Technical needs those details before promising a completion date.</p>
-            <Callout><strong className="text-sm tracking-wide uppercase text-[#A55F12]">Baseline · Before learning</strong><p className="mt-2">Write the WhatsApp handover you'd naturally send to the technical colleague. Don't worry about being perfect. This is for a before-and-after comparison, not a test.</p></Callout>
-            <label className="block font-extrabold" htmlFor="tw-baseline">Your message</label>
+            <Callout><strong className="text-sm tracking-wide uppercase text-[#A55F12]">Baseline · Before learning</strong><p className="mt-2">Write the WhatsApp handover you'd naturally send to the technical colleague. There are no right answers or minimum length here. A short or imperfect message is useful for comparing how you learn.</p></Callout>
+            <label className="block font-extrabold" htmlFor="tw-baseline">Your message <span className="font-normal text-[#746B64]">(optional, any length)</span></label>
             <textarea id="tw-baseline" rows={5} className={textareaClass} value={answers.baseline} onChange={e => change("baseline", e.target.value)} placeholder="Hi, we've had a quotation request…"/>
             <label className="block font-bold" htmlFor="tw-conf-before">How confident are you with work handovers today?</label>
             <div className="flex flex-wrap items-center gap-3">
               <input id="tw-conf-before" aria-label="Confidence before learning from 1 to 5" type="range" min="1" max="5" value={answers.confidenceBefore} onChange={e => change("confidenceBefore", Number(e.target.value))} className="flex-1 min-w-40 accent-[#00A859]"/>
               <span className="rounded-lg bg-[#FEEBD5] px-4 py-2 font-black">{answers.confidenceBefore} / 5</span>
             </div>
-            <p className="text-sm text-[#746B64]">Use fictional or de-identified details only. Don't include real customers' names or contact information.</p>
+            <p className="text-sm text-[#746B64]">Even a one-line response is useful. You can also continue without writing a baseline. Use fictional or de-identified details only; do not include real customer names or contact information.</p>
           </div>}
 
           {stage === 1 && <div className="mt-6 space-y-5">
@@ -392,7 +390,7 @@ export default function TeamworkCollaborationPrototype() {
                 className="rounded-xl border border-[#EADFD3] px-5 py-3 font-extrabold disabled:opacity-40">{busy ? "Saving…" : "Save progress"}</button>
             </div>
             <button type="button" disabled={busy || (stage === stages.length - 1 && answers.completed)} onClick={() => { void continueForward(); }}
-              className="rounded-xl bg-[#FAA954] px-6 py-3 font-extrabold disabled:opacity-50">{busy ? "Saving…" : stage === stages.length - 1 ? answers.completed ? "Saved ✓" : "Finish preview →" : "Save & continue →"}</button>
+              className="rounded-xl bg-[#FAA954] px-6 py-3 font-extrabold disabled:opacity-50">{busy ? "Saving…" : stage === stages.length - 1 ? answers.completed ? "Saved ✓" : "Finish preview →" : stage === 0 ? (answers.baseline.trim() ? "Save baseline & continue →" : "Skip baseline & continue →") : "Save & continue →"}</button>
           </div>
         </section>
       </div>
