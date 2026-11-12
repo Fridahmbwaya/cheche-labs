@@ -3,10 +3,10 @@ import {useEffect,useMemo,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
 
 const db=createClient();
-type Member={id:string;email:string;full_name:string|null;role:string;role_title:string|null;department:string|null};
+type Member={id:string;email:string;work_email:string|null;full_name:string|null;role:string;role_title:string|null;department:string|null};
 type Course={id:string;title:string;order_index:number;description:string|null;track_id:string|null;is_active:boolean;slug:string|null};
 type Track={id:string;slug:string;title:string;summary:string|null;sort_order:number};
-type Invite={email:string;full_name:string;role:string};
+type Invite={email:string;work_email:string|null;full_name:string;role:string};
 type Assignment={learner_id:string;module_id:string};
 type PendingAssignment={email:string;module_id:string};
 type ReviewerAssignment={reviewer_id:string;learner_id:string};
@@ -32,6 +32,8 @@ export default function AspectusPeopleAdmin(){
  const [selectedEmail,setSelectedEmail]=useState("");
  const [checked,setChecked]=useState<string[]>([]);
  const [inviteEmail,setInviteEmail]=useState("");
+ const [inviteWorkEmail,setInviteWorkEmail]=useState("");
+ const [selectedWorkEmail,setSelectedWorkEmail]=useState("");
  const [inviteName,setInviteName]=useState("");
  const [inviteRole,setInviteRole]=useState("employee");
  const [inviteModules,setInviteModules]=useState<string[]>([]);
@@ -39,10 +41,10 @@ export default function AspectusPeopleAdmin(){
 
  async function loadData(id:string){
   const [us,ms,as,iv,pa,ra,pr,tr]=await Promise.all([
-   db.from("users").select("id,email,full_name,role,role_title,department").eq("org_id",id).order("full_name"),
+   db.from("users").select("id,email,work_email,full_name,role,role_title,department").eq("org_id",id).order("full_name"),
    db.from("modules").select("id,title,order_index,description,track_id,is_active,slug").eq("org_id",id).order("order_index"),
    db.from("aspectus_module_assignments").select("learner_id,module_id").eq("org_id",id),
-   db.from("aspectus_pending_accounts").select("email,full_name,role").eq("org_id",id).order("full_name"),
+   db.from("aspectus_pending_accounts").select("email,work_email,full_name,role").eq("org_id",id).order("full_name"),
    db.from("aspectus_pending_module_assignments").select("email,module_id").eq("org_id",id),
    db.from("aspectus_reviewer_assignments").select("reviewer_id,learner_id").eq("org_id",id),
    db.from("aspectus_pending_reviewer_assignments").select("email,learner_id").eq("org_id",id),
@@ -80,13 +82,13 @@ export default function AspectusPeopleAdmin(){
  const availableLearners=members.filter(m=>m.role==="employee");
  const selectedRole=focused?.role||focusedInvite?.role;
  function pickMember(m:Member){
-  setSelectedId(m.id);setSelectedEmail("");
+  setSelectedId(m.id);setSelectedEmail("");setSelectedWorkEmail(m.work_email||"");
   setChecked(assignments.filter(a=>a.learner_id===m.id).map(a=>a.module_id));
   setRevieweeIds(reviewerAssignments.filter(a=>a.reviewer_id===m.id).map(a=>a.learner_id));
   setMessage("");
  }
  function pickInvite(m:Invite){
-  setSelectedEmail(m.email);setSelectedId("");
+  setSelectedEmail(m.email);setSelectedId("");setSelectedWorkEmail(m.work_email||"");
   setChecked(pending.filter(a=>a.email===m.email).map(a=>a.module_id));
   setRevieweeIds(pendingReviewees.filter(a=>a.email===m.email).map(a=>a.learner_id));
   setMessage("");
@@ -106,6 +108,8 @@ export default function AspectusPeopleAdmin(){
    }else if(focusedInvite){
     const {error}=await db.rpc("aspectus_invite_member",{p_email:focusedInvite.email,p_full_name:focusedInvite.full_name,p_role:focusedInvite.role,p_module_ids:checked});
     if(error)throw error;
+    const {error:workError}=await db.rpc("aspectus_set_pending_work_email",{p_email:focusedInvite.email,p_work_email:selectedWorkEmail});
+    if(workError)throw workError;
     if(focusedInvite.role==="manager"){
      const {error:reviewError}=await db.rpc("aspectus_set_pending_reviewees",{p_email:focusedInvite.email,p_learner_ids:revieweeIds});
      if(reviewError)throw reviewError;
@@ -123,12 +127,16 @@ export default function AspectusPeopleAdmin(){
    const email=inviteEmail.trim().toLowerCase();
    const {error}=await db.rpc("aspectus_invite_member",{p_email:email,p_full_name:inviteName.trim(),p_role:inviteRole,p_module_ids:inviteModules});
    if(error)throw error;
+   if(inviteWorkEmail.trim()){
+    const {error:workError}=await db.rpc("aspectus_set_pending_work_email",{p_email:email,p_work_email:inviteWorkEmail.trim()});
+    if(workError)throw workError;
+   }
    if(inviteRole==="manager"){
     const {error:reviewError}=await db.rpc("aspectus_set_pending_reviewees",{p_email:email,p_learner_ids:inviteReviewees});
     if(reviewError)throw reviewError;
    }
    await loadData(orgId);
-   setMode("people");setSelectedId("");setSelectedEmail(email);setChecked(inviteModules);setRevieweeIds(inviteRole==="manager"?inviteReviewees:[]);
+   setMode("people");setSelectedId("");setSelectedEmail(email);setSelectedWorkEmail(inviteWorkEmail.trim());setChecked(inviteModules);setRevieweeIds(inviteRole==="manager"?inviteReviewees:[]);
    const {data:delivery,error:deliveryError}=await db.functions.invoke("aspectus-send-invitation",{body:{email}});
    if(deliveryError||!delivery?.accepted){
     let reason=deliveryError?.message||"Email delivery service did not confirm the request.";
@@ -144,7 +152,24 @@ export default function AspectusPeopleAdmin(){
   }catch(err){setMessage("Could not create invitation: "+(err instanceof Error?err.message:String(err)))}
   finally{setBusy(false)}
  }
- const joinText=()=>"You've been invited to create an account on the Aspectus Learning Hub.\n\n"+window.location.origin+"/preview/aspectus-welcome.html";
+ async function resendInvitation(email:string){
+   setBusy(true);setMessage("");
+   try{
+    const {data:delivery,error}=await db.functions.invoke("aspectus-send-invitation",{body:{email}});
+    if(error||!delivery?.accepted){
+     let reason=error?.message||"The email service did not accept the request.";
+     const context=(error as {context?:Response}|null)?.context;
+     if(context&&typeof context.json==="function"){
+      const response=await context.json().catch(()=>null);
+      if(response?.error)reason=response.error;
+     }
+     throw new Error(reason);
+    }
+    setMessage("Invitation requested for "+email+". Inbox delivery must still be confirmed by the recipient.");
+   }catch(err){setMessage("Could not send invitation to "+email+": "+(err instanceof Error?err.message:String(err)))}
+   finally{setBusy(false)}
+  }
+  const joinText=()=>"You've been invited to create an account on the Aspectus Learning Hub.\n\n"+window.location.origin+"/preview/aspectus-welcome.html";
  function copyInvite(email:string){
   void navigator.clipboard.writeText(joinText()).then(()=>setMessage("Account link copied for "+email)).catch(()=>setMessage("Copy failed. Share the Learning Hub welcome link and the person's registered email address."));
  }
@@ -176,8 +201,9 @@ export default function AspectusPeopleAdmin(){
      <div><h2 className="text-2xl font-black">Add a new team member</h2><p className="text-[#6B6466] mt-2">Create their access, choose their role and select which modules they&apos;ll see. They sign in with their own email.</p></div>
      <div className="grid md:grid-cols-2 gap-4">
       <label className="block font-bold">Full name<input required minLength={2} value={inviteName} onChange={e=>setInviteName(e.target.value)} placeholder="e.g. Sarah" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
-      <label className="block font-bold">Email address<input required type="email" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="name@aspectus..." className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>
+      <label className="block font-bold">Sign-in &amp; invitation email<input required type="email" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="name@gmail.com" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/><span className="text-sm block mt-1 font-normal text-[#6B6466]">Use an inbox that receives sign-in links.</span></label>
      </div>
+     <label className="block font-bold">Work email (optional)<input type="email" value={inviteWorkEmail} onChange={e=>setInviteWorkEmail(e.target.value)} placeholder="name@aspectuskenya.com" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/><span className="text-sm block mt-1 font-normal text-[#6B6466]">For company records only. Sign-in emails go to the address above.</span></label>
      <fieldset className="space-y-3">
       <legend className="text-lg font-extrabold">Step 1 · Choose what this person can do</legend>
       <p className="text-sm text-[#6B6466]">Account role controls permissions. Assigned modules are chosen separately in Step 2.</p>
@@ -209,12 +235,13 @@ export default function AspectusPeopleAdmin(){
       <p className="text-sm text-[#6B6466] mt-5 mb-2 font-bold uppercase tracking-widest">Active accounts</p>
       <div className="space-y-2">{visible.map(m=><button key={m.id} type="button" onClick={()=>pickMember(m)} className={"w-full text-left border rounded-xl p-4 hover:border-[#FAA954] "+(selectedId===m.id?"border-[#FAA954] bg-[#FEEBD5]":"border-[#EADFD3]")}><strong className="block">{m.full_name||m.email}</strong><span className="block text-sm text-[#6B6466] mt-1">{m.email}</span><span className="inline-block mt-2 text-xs font-extrabold uppercase text-[#A55F12]">{m.role==="org_admin"?"Super Admin":m.role==="manager"||m.role==="hr_manager"?"Reviewer":"Learner"}</span></button>)}</div>
       <p className="text-sm text-[#6B6466] mt-6 mb-2 font-bold uppercase tracking-widest">Invited · waiting for first sign-in</p>
-      <div className="space-y-2">{invites.filter(i=>!members.some(m=>m.email.toLowerCase()===i.email.toLowerCase())).map(i=><button type="button" key={i.email} onClick={()=>pickInvite(i)} className={"w-full text-left border rounded-xl p-4 "+(selectedEmail===i.email?"border-[#FAA954] bg-[#FEEBD5]":"border-[#EADFD3]")}><strong className="block">{i.full_name}</strong><span className="block text-sm text-[#6B6466]">{i.email}</span><span className="text-xs text-[#A55F12] font-extrabold">PENDING · {i.role==="org_admin"?"Super Admin":i.role==="manager"?"Reviewer":"Learner"}</span></button>)}</div>
+      <div className="space-y-2">{invites.filter(i=>!members.some(m=>m.email.toLowerCase()===i.email.toLowerCase())).map(i=><button type="button" key={i.email} onClick={()=>pickInvite(i)} className={"w-full text-left border rounded-xl p-4 "+(selectedEmail===i.email?"border-[#FAA954] bg-[#FEEBD5]":"border-[#EADFD3]")}><strong className="block">{i.full_name}</strong><span className="block text-sm text-[#6B6466]">Sign-in: {i.email}</span>{i.work_email&&<span className="block text-xs text-[#6B6466]">Work: {i.work_email}</span>}<span className="text-xs text-[#A55F12] font-extrabold">PENDING · {i.role==="org_admin"?"Super Admin":i.role==="manager"?"Reviewer":"Learner"}</span></button>)}</div>
      </section>
      <section className="rounded-[28px] bg-white border border-[#EADFD3] p-5 sm:p-7">
       {!selection?<div className="py-16 text-center"><p className="text-3xl">📚</p><h3 className="text-xl font-black mt-3">Choose a person</h3><p className="mt-2 text-[#6B6466]">Select an existing account or pending invitation to manage their learning access.</p></div>:<>
-       <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Account permissions & learning</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">{focused?.email||focusedInvite?.email}</p></div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {publishedCourses.length} assigned</span></div>
+       <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Account permissions & learning</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">Sign-in: {focused?.email||focusedInvite?.email}</p>{(focused?.work_email||focusedInvite?.work_email)&&<p className="text-sm text-[#6B6466] mt-1">Work: {focused?.work_email||focusedInvite?.work_email}</p>}</div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {publishedCourses.length} assigned</span></div>
        <div className="mt-4 p-4 rounded-xl bg-[#FFFBF6] border border-[#EADFD3]"><p className="text-sm font-bold">Role: {((focused?.role||focusedInvite?.role)==="org_admin")?"Super Admin":((focused?.role||focusedInvite?.role)==="manager"||(focused?.role||focusedInvite?.role)==="hr_manager")?"Reviewer":"Learner"}</p><p className="text-xs text-[#6B6466] mt-1">The account role controls permissions. This section changes assigned learning modules only; it does not change the person&apos;s role.</p></div>
+       {focusedInvite&&<label className="block mt-5 font-bold text-sm">Work email (optional; not used for sign-in)<input type="email" value={selectedWorkEmail} onChange={e=>setSelectedWorkEmail(e.target.value)} placeholder="name@aspectuskenya.com" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>}
        {(selectedRole==="manager"||selectedRole==="hr_manager")&&<section className="mt-6 rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-4 space-y-3">
         <h4 className="font-extrabold">Learners this reviewer can assess</h4>
         <p className="text-sm text-[#6B6466]">Review access is independent of learning modules. Selected learners appear in the reviewer&apos;s dashboard; everyone else stays private.</p>
@@ -222,7 +249,7 @@ export default function AspectusPeopleAdmin(){
        </section>}
        <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(publishedCourses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
        <div className="space-y-3 mt-4">{publishedCourses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
-       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning & review access"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}</div>
+       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning & review access"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}{focusedInvite&&<button disabled={busy} type="button" onClick={()=>void resendInvitation(focusedInvite.email)} className="rounded-xl border border-[#FAA954] bg-[#FFFBF6] px-5 py-3 font-extrabold disabled:opacity-50">Send invitation to sign-in email</button>}</div>
        <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
