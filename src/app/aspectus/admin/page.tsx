@@ -8,6 +8,8 @@ type Course={id:string;title:string;order_index:number;description:string|null};
 type Invite={email:string;full_name:string;role:string};
 type Assignment={learner_id:string;module_id:string};
 type PendingAssignment={email:string;module_id:string};
+type ReviewerAssignment={reviewer_id:string;learner_id:string};
+type PendingReviewee={email:string;learner_id:string};
 
 export default function AspectusPeopleAdmin(){
  const [authorized,setAuthorized]=useState<boolean|null>(null);
@@ -19,6 +21,10 @@ export default function AspectusPeopleAdmin(){
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [invites,setInvites]=useState<Invite[]>([]);
  const [pending,setPending]=useState<PendingAssignment[]>([]);
+ const [reviewerAssignments,setReviewerAssignments]=useState<ReviewerAssignment[]>([]);
+ const [pendingReviewees,setPendingReviewees]=useState<PendingReviewee[]>([]);
+ const [revieweeIds,setRevieweeIds]=useState<string[]>([]);
+ const [inviteReviewees,setInviteReviewees]=useState<string[]>([]);
  const [mode,setMode]=useState<"people"|"invite">("people");
  const [selectedId,setSelectedId]=useState("");
  const [selectedEmail,setSelectedEmail]=useState("");
@@ -30,17 +36,20 @@ export default function AspectusPeopleAdmin(){
  const [filter,setFilter]=useState("");
 
  async function loadData(id:string){
-  const [us,ms,as,iv,pa]=await Promise.all([
+  const [us,ms,as,iv,pa,ra,pr]=await Promise.all([
    db.from("users").select("id,email,full_name,role,role_title,department").eq("org_id",id).order("full_name"),
    db.from("modules").select("id,title,order_index,description").eq("org_id",id).order("order_index"),
    db.from("aspectus_module_assignments").select("learner_id,module_id").eq("org_id",id),
    db.from("aspectus_pending_accounts").select("email,full_name,role").eq("org_id",id).order("full_name"),
-   db.from("aspectus_pending_module_assignments").select("email,module_id").eq("org_id",id)
+   db.from("aspectus_pending_module_assignments").select("email,module_id").eq("org_id",id),
+   db.from("aspectus_reviewer_assignments").select("reviewer_id,learner_id").eq("org_id",id),
+   db.from("aspectus_pending_reviewer_assignments").select("email,learner_id").eq("org_id",id)
   ]);
-  const errors=[us.error,ms.error,as.error,iv.error,pa.error].filter(Boolean);
+  const errors=[us.error,ms.error,as.error,iv.error,pa.error,ra.error,pr.error].filter(Boolean);
   if(errors.length)throw new Error(errors.map(x=>x?.message).join("; "));
   setMembers(us.data||[]);setCourses(ms.data||[]);setAssignments(as.data||[]);
   setInvites(iv.data||[]);setPending(pa.data||[]);
+  setReviewerAssignments(ra.data||[]);setPendingReviewees(pr.data||[]);
  }
  useEffect(()=>{
   let alive=true;
@@ -63,14 +72,18 @@ export default function AspectusPeopleAdmin(){
  const focusedInvite=invites.find(i=>i.email===selectedEmail);
  const visible=useMemo(()=>members.filter(m=>(m.full_name||m.email).toLowerCase().includes(filter.toLowerCase())||m.email.toLowerCase().includes(filter.toLowerCase())),[members,filter]);
  const assignedTo=members.filter(m=>assignments.some(a=>a.learner_id===m.id)).length;
+ const availableLearners=members.filter(m=>m.role==="employee");
+ const selectedRole=focused?.role||focusedInvite?.role;
  function pickMember(m:Member){
   setSelectedId(m.id);setSelectedEmail("");
   setChecked(assignments.filter(a=>a.learner_id===m.id).map(a=>a.module_id));
+  setRevieweeIds(reviewerAssignments.filter(a=>a.reviewer_id===m.id).map(a=>a.learner_id));
   setMessage("");
  }
  function pickInvite(m:Invite){
   setSelectedEmail(m.email);setSelectedId("");
   setChecked(pending.filter(a=>a.email===m.email).map(a=>a.module_id));
+  setRevieweeIds(pendingReviewees.filter(a=>a.email===m.email).map(a=>a.learner_id));
   setMessage("");
  }
  function toggle(list:string[],id:string, setter:(ids:string[])=>void){setter(list.includes(id)?list.filter(v=>v!==id):[...list,id])}
@@ -81,12 +94,20 @@ export default function AspectusPeopleAdmin(){
    if(selectedId){
     const {error}=await db.rpc("aspectus_set_member_modules",{p_member_id:selectedId,p_module_ids:checked});
     if(error)throw error;
+    if(focused?.role==="manager"||focused?.role==="hr_manager"){
+     const {error:reviewError}=await db.rpc("aspectus_set_reviewer_learners",{p_reviewer_id:selectedId,p_learner_ids:revieweeIds});
+     if(reviewError)throw reviewError;
+    }
    }else if(focusedInvite){
     const {error}=await db.rpc("aspectus_invite_member",{p_email:focusedInvite.email,p_full_name:focusedInvite.full_name,p_role:focusedInvite.role,p_module_ids:checked});
     if(error)throw error;
+    if(focusedInvite.role==="manager"){
+     const {error:reviewError}=await db.rpc("aspectus_set_pending_reviewees",{p_email:focusedInvite.email,p_learner_ids:revieweeIds});
+     if(reviewError)throw reviewError;
+    }
    }
    await loadData(orgId);
-   setMessage("Module selections saved. The person's learning space will update on their next refresh.");
+   setMessage("Learning access and reviewer assignments saved. Changes will appear on the next refresh.");
   }catch(err){setMessage("Could not save assignments: "+(err instanceof Error?err.message:String(err)))}
   finally{setBusy(false)}
  }
@@ -97,8 +118,12 @@ export default function AspectusPeopleAdmin(){
    const email=inviteEmail.trim().toLowerCase();
    const {error}=await db.rpc("aspectus_invite_member",{p_email:email,p_full_name:inviteName.trim(),p_role:inviteRole,p_module_ids:inviteModules});
    if(error)throw error;
+   if(inviteRole==="manager"){
+    const {error:reviewError}=await db.rpc("aspectus_set_pending_reviewees",{p_email:email,p_learner_ids:inviteReviewees});
+    if(reviewError)throw reviewError;
+   }
    await loadData(orgId);
-   setMode("people");setSelectedId("");setSelectedEmail(email);setChecked(inviteModules);
+   setMode("people");setSelectedId("");setSelectedEmail(email);setChecked(inviteModules);setRevieweeIds(inviteRole==="manager"?inviteReviewees:[]);
    const {data:delivery,error:deliveryError}=await db.functions.invoke("aspectus-send-invitation",{body:{email}});
    if(deliveryError||!delivery?.accepted){
     let reason=deliveryError?.message||"Email delivery service did not confirm the request.";
@@ -153,7 +178,7 @@ export default function AspectusPeopleAdmin(){
       <p className="text-sm text-[#6B6466]">Account role controls permissions. Assigned modules are chosen separately in Step 2.</p>
       <div className="grid md:grid-cols-3 gap-3">{[
        {value:"employee",name:"Learner",description:"Takes assigned lessons, quizzes and practical assignments. Sees only their own progress and feedback.",access:"Cannot review others or manage accounts."},
-       {value:"manager",name:"Reviewer",description:"Reviews submissions, approves work and requests revisions. May also take assigned learning modules.",access:"Reviewer access is currently company-wide; limiting reviewers to particular learners is a separate improvement."},
+       {value:"manager",name:"Reviewer",description:"Reviews submissions, approves work and requests revisions. May also take assigned learning modules.",access:"Only sees learners explicitly assigned to this reviewer. Reviewer assignments are selected in Step 3."},
        {value:"org_admin",name:"Super Admin",description:"Manages accounts, modules and team progress, including review oversight.",access:"Full administration access — assign only to a trusted administrator."}
       ].map(option=><label key={option.value} className={"cursor-pointer block rounded-2xl border-2 p-4 "+(inviteRole===option.value?"border-[#FAA954] bg-[#FFF4E6]":"border-[#EADFD3] bg-white")}>
        <span className="flex items-center gap-2"><input type="radio" name="inviteRole" value={option.value} checked={inviteRole===option.value} onChange={()=>setInviteRole(option.value)} className="h-5 w-5 accent-[#FAA954]"/><strong className="text-lg">{option.name}</strong></span>
@@ -165,6 +190,12 @@ export default function AspectusPeopleAdmin(){
       <div className="flex flex-wrap justify-between gap-3"><div><h3 className="font-extrabold">Step 2 · Assign learning modules</h3><p className="text-sm text-[#6B6466]">Choose what this person will study, regardless of account role. Reviewers do not need modules to review work.</p></div><div className="flex gap-3"><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules(courses.map(m=>m.id))}>All</button><button type="button" className="font-bold text-sm underline" onClick={()=>setInviteModules([])}>None</button></div></div>
       <div className="grid md:grid-cols-2 gap-3 mt-4">{courses.map(m=><label key={m.id} className="flex gap-3 items-start bg-white border border-[#EADFD3] rounded-xl p-3 cursor-pointer"><input type="checkbox" checked={inviteModules.includes(m.id)} onChange={()=>toggle(inviteModules,m.id,setInviteModules)} className="mt-1 accent-[#00A859] w-5 h-5"/><span><strong className="block">{m.title}</strong><span className="text-xs text-[#6B6466]">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
      </div>
+     {inviteRole==="manager"&&<section className="rounded-2xl border border-[#EADFD3] bg-[#FFFBF6] p-5 space-y-3">
+      <h3 className="font-extrabold">Step 3 · Which learners can this reviewer assess?</h3>
+      <p className="text-sm text-[#6B6466]">Only the people selected here appear in this reviewer&apos;s progress and submission queue. Learners can have more than one reviewer.</p>
+      {availableLearners.length===0?<p className="text-sm">No active learners yet. You can assign learners after they create accounts.</p>:
+      <div className="grid md:grid-cols-2 gap-2">{availableLearners.map(person=><label key={person.id} className="flex gap-3 items-center rounded-xl border border-[#EADFD3] p-3 bg-white cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[#00A859]" checked={inviteReviewees.includes(person.id)} onChange={()=>toggle(inviteReviewees,person.id,setInviteReviewees)}/><span><strong className="block">{person.full_name||person.email}</strong><span className="text-xs text-[#6B6466]">{person.email}</span></span></label>)}</div>}
+     </section>}
      <button disabled={busy} type="submit" className="rounded-xl px-7 py-4 bg-[#FAA954] font-extrabold disabled:opacity-50">{busy?"Preparing invitation…":"Create account & send invitation"} →</button>
      <p className="text-sm text-[#6B6466]">The account is reserved first, then a secure invitation email is requested automatically. The person&apos;s account activates when they follow the emailed link.</p>
     </form>:<div className="grid lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-5">
@@ -179,9 +210,14 @@ export default function AspectusPeopleAdmin(){
       {!selection?<div className="py-16 text-center"><p className="text-3xl">📚</p><h3 className="text-xl font-black mt-3">Choose a person</h3><p className="mt-2 text-[#6B6466]">Select an existing account or pending invitation to manage their learning access.</p></div>:<>
        <div className="flex flex-wrap justify-between gap-4 items-start"><div><p className="text-xs font-extrabold uppercase tracking-widest text-[#A55F12]">Account permissions & learning</p><h3 className="text-2xl font-black mt-2">{selectedLabel}</h3><p className="text-sm text-[#6B6466] mt-1">{focused?.email||focusedInvite?.email}</p></div><span className="rounded-full px-4 py-2 text-xs bg-[#D3F2E2] font-extrabold text-[#00753E]">{checked.length} of {courses.length} assigned</span></div>
        <div className="mt-4 p-4 rounded-xl bg-[#FFFBF6] border border-[#EADFD3]"><p className="text-sm font-bold">Role: {((focused?.role||focusedInvite?.role)==="org_admin")?"Super Admin":((focused?.role||focusedInvite?.role)==="manager"||(focused?.role||focusedInvite?.role)==="hr_manager")?"Reviewer":"Learner"}</p><p className="text-xs text-[#6B6466] mt-1">The account role controls permissions. This section changes assigned learning modules only; it does not change the person&apos;s role.</p></div>
+       {(selectedRole==="manager"||selectedRole==="hr_manager")&&<section className="mt-6 rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-4 space-y-3">
+        <h4 className="font-extrabold">Learners this reviewer can assess</h4>
+        <p className="text-sm text-[#6B6466]">Review access is independent of learning modules. Selected learners appear in the reviewer&apos;s dashboard; everyone else stays private.</p>
+        <div className="space-y-2">{availableLearners.map(person=><label key={person.id} className="flex items-center gap-3 rounded-xl bg-white border border-[#EADFD3] p-3 cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[#00A859]" checked={revieweeIds.includes(person.id)} onChange={()=>toggle(revieweeIds,person.id,setRevieweeIds)}/><span><strong className="block">{person.full_name||person.email}</strong><span className="text-xs text-[#6B6466]">{person.email}</span></span></label>)}</div>
+       </section>}
        <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(courses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
        <div className="space-y-3 mt-4">{courses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
-       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save module assignments"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}</div>
+       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning & review access"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}</div>
        <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
       </>}
      </section>
