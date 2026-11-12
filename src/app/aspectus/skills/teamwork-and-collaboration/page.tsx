@@ -45,10 +45,10 @@ const initial: CourseAnswers = {
 const scenarios = {
   sales: {
     icon: "📋", title: "Sales → Technical",
-    description: "A school has asked for a solar quotation. Sales has a general description of the request, but the exact location and energy requirements are not yet confirmed. Technical is waiting to assess feasibility.",
+    description: "A customer has asked for a solar water-heater quote. Sales hopes to respond by Friday, but the site location and hot-water requirements still need to be confirmed before Technical can prepare an accurate estimate.",
     recipient: "Technical colleague",
-    known: "A school has requested a solar quotation; scope and feasibility are not yet confirmed.",
-    missing: "Exact site location, estimated loads or current electricity use",
+    known: "A customer wants a solar water-heater quotation; the requirements have not yet been verified.",
+    missing: "Site location, approximate hot-water needs and any installation constraints",
   },
   technical: {
     icon: "🔧", title: "Technical → Field",
@@ -284,7 +284,7 @@ export default function TeamworkCollaborationPrototype() {
           </div>
 
           {stage === 0 && <div className="mt-6 space-y-5">
-            <p className="text-lg">Imagine you're helping a colleague get a solar quotation ready. Sales knows the customer is interested, but the exact site location and energy requirements have not yet been confirmed. Technical needs those details before promising a completion date.</p>
+            <p className="text-lg">It's Wednesday morning. A customer has called Aspectus asking for a solar water-heater quote. Sales would like to give them an update by Friday, but Technical doesn't yet have the site location or the customer's hot-water requirements. You're passing the enquiry from Sales to Technical.</p>
             <Callout><strong className="text-sm tracking-wide uppercase text-[#A55F12]">Baseline · Before learning</strong><p className="mt-2">Write the WhatsApp handover you'd naturally send to the technical colleague. There are no right answers or minimum length here. A short or imperfect message is useful for comparing how you learn.</p></Callout>
             <label className="block font-extrabold" htmlFor="tw-baseline">Your message <span className="font-normal text-[#746B64]">(optional, any length)</span></label>
             <textarea id="tw-baseline" rows={5} className={textareaClass} value={answers.baseline} onChange={e => change("baseline", e.target.value)} placeholder="Hi, we've had a quotation request…"/>
@@ -297,23 +297,23 @@ export default function TeamworkCollaborationPrototype() {
           </div>}
 
           {stage === 1 && <div className="mt-6 space-y-5">
-            <p className="text-lg">A quote is needed for a fictional school. Read this short exchange between two colleagues:</p>
+            <p className="text-lg">It's Wednesday at Aspectus. A customer has asked for a solar water-heater quotation, and Sales hopes to send an estimate by Friday. See what happens in the team WhatsApp chat.</p>
             <div className="space-y-3 rounded-2xl bg-[#F5F2ED] p-5">
-              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 9:04 AM</p><p className="mt-1">“Please do the school quote for Friday. Sent you the details.”</p></div>
-              <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-[#DCF4E7] p-4 border border-[#BCE5CB]"><p className="text-xs font-extrabold text-[#00753E]">Technical · 11:20 AM</p><p className="mt-1">“Which site? Do you have the load estimate?”</p></div>
-              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 3:15 PM</p><p className="mt-1">“I thought you had it. The customer is following up.”</p></div>
+              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 9:04 AM</p><p className="mt-1">“Morning! We've got a customer asking for a solar water-heater quote. Any chance we can send it by Friday?”</p></div>
+              <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-[#DCF4E7] p-4 border border-[#BCE5CB]"><p className="text-xs font-extrabold text-[#00753E]">Technical · 11:20 AM</p><p className="mt-1">“Possibly, but I'll need the site location and roughly how much hot water they need. Who's checking that with the customer?”</p></div>
+              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 3:15 PM</p><p className="mt-1">“Oh, I thought you were calling them for those details. I said I'd update them this afternoon.”</p></div>
             </div>
             <p className="font-extrabold text-lg">What is the main collaboration failure?</p>
             <div className="space-y-3">
               {[
-                { id: "speed", text: "Technical should have worked faster, regardless of the missing details." },
-                { id: "unclear", text: "Nobody confirmed the information needed, who would get it, or the realistic next update." },
-                { id: "formal", text: "There wasn't a formal meeting or written departmental report." },
+                { id: "speed", text: "The main problem is that Technical hasn't drafted an estimate yet." },
+                { id: "unclear", text: "Neither person confirmed who would get the missing details, when they'd be ready, or what to tell the customer." },
+                { id: "formal", text: "The customer didn't give enough information, so there was nothing the team could do." },
               ].map(option => <label key={option.id} className={"block cursor-pointer rounded-xl border-2 p-4 " + (answers.gapChoice === option.id ? "border-[#FAA954] bg-[#FFF4E6]" : "border-[#EADFD3]")}>
                 <input type="radio" name="tw-gap" checked={answers.gapChoice === option.id} onChange={() => change("gapChoice", option.id)} className="accent-[#FAA954] w-4 h-4 mr-3"/>{option.text}
               </label>)}
             </div>
-            {answers.gapChoice === "unclear" && <Callout tone="green"><strong>That's it.</strong> A handover is not finished just because a message was sent. The next person needs enough context to accept the work or ask a useful question.</Callout>}
+            {answers.gapChoice === "unclear" && <Callout tone="green"><strong>That's it.</strong> Each colleague thought the other would contact the customer. A proper handover makes the next action, its owner and the follow-up clear.</Callout>}
           </div>}
 
           {stage === 2 && <div className="mt-6 space-y-5">
@@ -329,21 +329,21 @@ export default function TeamworkCollaborationPrototype() {
             <Callout tone="green"><p className="font-extrabold">The key habit: close the loop.</p><p className="mt-2">The sender gives the information. The recipient confirms what they'll do or what they still need. The sender confirms the shared understanding. A message being delivered is not the same as the work being accepted.</p></Callout>
             <div className="rounded-2xl border border-[#EADFD3] p-5 space-y-3">
               <p className="text-sm font-black tracking-wide uppercase text-[#A55F12]">How that sounds</p>
-              <p><strong>Sales:</strong> “We need a quote for the school. Could you check what information technical requires? I'll request the missing site location and load details.”</p>
-              <p><strong>Technical:</strong> “Understood. I need the exact location and load estimate before I can confirm the scope or a date. Please send them when available.”</p>
-              <p><strong>Sales:</strong> “Got it. I'll update the customer that we're verifying the details before giving a timeline.”</p>
+              <p><strong>Sales:</strong> “I've got a solar water-heater enquiry. I'll confirm the customer's location and hot-water needs today. Once I send those, could you tell me when an estimate is realistic?”</p>
+              <p><strong>Technical:</strong> “Yes. Send those details through and I'll check what else we need before we commit to a quote date.”</p>
+              <p><strong>Sales:</strong> “Thanks. I'll let the customer know we're confirming the requirements and will come back with a realistic timeline.”</p>
             </div>
             <p className="text-sm text-[#746B64]">Adapted teaching principles: clear responsibilities and working agreements (Atlassian Team Playbook); confirming understanding (AHRQ TeamSTEPPS). This four-part checklist is Cheche's practice tool.</p>
           </div>}
 
           {stage === 3 && <div className="mt-6 space-y-5">
-            <p className="text-lg">The customer was told the quote might be ready on Friday. It's Thursday afternoon, and Technical still doesn't have the site location or load details.</p>
+            <p className="text-lg">It's now Thursday afternoon. The customer is expecting an update tomorrow, but the site location and hot-water requirements still haven't been confirmed.</p>
             <p className="font-extrabold text-lg">What should the team do first?</p>
             <div className="space-y-3">
               {[
                 { id: "wait", text: "Wait until Friday. It's someone else's responsibility to notice the problem." },
-                { id: "promise", text: "Tell the customer Friday is still guaranteed to keep them happy." },
-                { id: "clarify", text: "Agree who will obtain the missing details, ask Technical for a feasible timing, and update the customer without guessing." },
+                { id: "promise", text: "Promise the customer they'll have a finished quote by Friday, even though the information is missing." },
+                { id: "clarify", text: "Agree who will contact the customer for the missing details, ask Technical for a realistic timeline, and give the customer an honest update." },
               ].map(option => <label key={option.id} className={"block cursor-pointer rounded-xl border-2 p-4 " + (answers.actionChoice === option.id ? "border-[#FAA954] bg-[#FFF4E6]" : "border-[#EADFD3]")}>
                 <input type="radio" name="tw-decision" checked={answers.actionChoice === option.id} onChange={() => change("actionChoice", option.id)} className="accent-[#FAA954] w-4 h-4 mr-3"/>{option.text}
               </label>)}
@@ -361,7 +361,7 @@ export default function TeamworkCollaborationPrototype() {
                 <strong className="block mt-2">{scenarios[role].title}</strong>
               </button>)}
             </div>
-            <Callout><p className="text-xs font-extrabold tracking-wide uppercase text-[#A55F12]">Your fictional scenario</p><p className="mt-2">{scenario.description}</p></Callout>
+            <Callout><p className="text-xs font-extrabold tracking-wide uppercase text-[#A55F12]">Your practice situation</p><p className="mt-2">{scenario.description}</p></Callout>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2"><label htmlFor="tw-known" className="font-bold block mb-2">1. What is known now?</label><textarea id="tw-known" rows={3} className={textareaClass} value={answers.handoverKnown} onChange={e => change("handoverKnown", e.target.value)} placeholder={scenario.known}/></div>
               <div className="sm:col-span-2"><label htmlFor="tw-missing" className="font-bold block mb-2">2. What information is still needed?</label><textarea id="tw-missing" rows={3} className={textareaClass} value={answers.handoverMissing} onChange={e => change("handoverMissing", e.target.value)} placeholder={scenario.missing}/></div>
