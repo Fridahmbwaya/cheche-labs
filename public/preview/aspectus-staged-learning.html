@@ -520,9 +520,17 @@ const CONFIG = {
   storageKey: "cheche-onboarding-aspectus-ian-v1"
 };
 
-// Browser-only lesson progress is scoped to the authenticated learner ID supplied by the host application.
-const learnerId = new URLSearchParams(window.location.search).get("learner");
-if (learnerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(learnerId)) {
+// Each admin's browser-only lesson preview is independent of real learner progress.
+// The host verifies Super Admin permissions before loading this public lesson content.
+const lessonParams = new URLSearchParams(window.location.search);
+const isAdminPreview = lessonParams.get("preview") === "1";
+const learnerId = lessonParams.get("learner");
+const previewerId = lessonParams.get("previewer");
+const validUuid = value => !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+if (isAdminPreview) {
+  CONFIG.storageKey = "cheche-aspectus-onboarding-admin-preview-v1-" + (validUuid(previewerId) ? previewerId.toLowerCase() : "no-user");
+  CONFIG.learner = "Preview learner";
+} else if (validUuid(learnerId)) {
   CONFIG.storageKey += "-profile-" + learnerId.toLowerCase();
 }
 const TRACKS = {
@@ -948,7 +956,7 @@ function progressSnapshot(){
  };
 }
 function broadcastProgress(){
- if(!lessonSyncReady||window.parent===window)return;
+ if(isAdminPreview||!lessonSyncReady||window.parent===window)return;
  const data=progressSnapshot();
  if(data)window.parent.postMessage(data,window.location.origin);
 }
@@ -1052,7 +1060,7 @@ function moduleView(id){
     ${m.scenario?`<div class="stage"><p class="label">What would you do?</p><p class="qt"><b>${m.scenario.q}</b></p>${m.scenario.o.map((o,j)=>{ let cls=""; if(st.scen!=null){ if(o.ok) cls="right"; else if(j===st.scen) cls="wrong"; } return `<button class="opt ${cls}" data-s="${j}" ${st.scen!=null?"disabled":""}>${o.t}</button>`; }).join("")}${st.scen!=null?`<div class="fb">${m.scenario.o[st.scen].fb}${m.scenario.o[st.scen].ok?"":" The highlighted option is the stronger response."}</div>`:""}</div>`:""}
     <div class="stage"><p class="label">Quick check · you need ${Math.round(CONFIG.passMark*100)}% to complete the module</p>${quizHTML(m.quiz, st.quiz, "q")}
       ${allAnswered && !passed?`<div class="retry-notice"><strong>Retry the quiz to unlock your assignment.</strong><p>Review the explanations above, then try again.</p><button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button></div>`:""}</div>
-    <div class="done-bar"><div><p class="label">STEP 2 · APPLY YOUR LEARNING</p><h3 style="margin:5px 0 7px">Ready to put it into practice?</h3><p style="margin:0">Your quiz score: ${q.c}/${q.total}. ${passed?"Next, share your practical assignment with Brenda.":"Retry the quiz to unlock your assignment."}</p><p style="margin:9px 0 0;font-size:.9rem;color:#6B6466">${m.task.prompt}</p></div>${allAnswered&&!passed?`<button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button>`:`<button class="btn green" id="complete" ${allAnswered&&passed?"":"disabled"}>Continue to assignment →</button>`}
+    <div class="done-bar"><div><p class="label">${isAdminPreview?"ADMIN PRACTICE · NOT A REAL SUBMISSION":"STEP 2 · APPLY YOUR LEARNING"}</p><h3 style="margin:5px 0 7px">${isAdminPreview?"You've explored the lesson":"Ready to put it into practice?"}</h3><p style="margin:0">Your quiz score: ${q.c}/${q.total}. ${isAdminPreview?"This is a private preview. It does not generate an assignment for Brenda or change any learner records.":passed?"Next, share your practical assignment with Brenda.":"Retry the quiz to unlock your assignment."}</p><p style="margin:9px 0 0;font-size:.9rem;color:#6B6466">${m.task.prompt}</p></div>${isAdminPreview?`<button class="btn green" id="complete">Choose another module →</button>`:allAnswered&&!passed?`<button type="button" class="btn orange retry-quiz-action">↻ Retry quiz →</button>`:`<button class="btn green" id="complete" ${allAnswered&&passed?"":"disabled"}>Continue to assignment →</button>`}
     </div></div>`;
   // Present one small learning step at a time, preserving the original content and quizzes.
   const steps=[];
@@ -1128,7 +1136,7 @@ function moduleView(id){
   controls.querySelector("#prevStep").onclick=()=>{st.page--;save();moduleView(id);window.scrollTo(0,0);};
   const forward=controls.querySelector("#forwardStep");if(forward)forward.onclick=()=>{st.page=Math.min(max,st.page+1);save();moduleView(id);window.scrollTo(0,0);};
   app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ st.scen=+b.dataset.s; save(); moduleView(id); });
-  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(result.n===result.total && new URLSearchParams(window.location.search).get("revisit")!=="1"){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
+  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ st.quiz[+b.dataset.q.slice(1)] = +b.dataset.o; save(); const result=quizScore(m); if(!isAdminPreview && result.n===result.total && new URLSearchParams(window.location.search).get("revisit")!=="1"){window.parent.postMessage({source:"aspectus-original-quiz",type:"quiz-result",moduleOrder:MODULES.findIndex(x=>x.id===m.id)+1,correct:result.c,total:result.total,answers:st.quiz},"*");} const y=window.scrollY; moduleView(id); window.scrollTo(0,y); });
   // The practical assignment is managed by the parent learner page, not this lesson.
   // Both the final knowledge-check screen and the completion screen restart at question one.
   app.querySelectorAll(".retry-quiz-action").forEach(button=>button.addEventListener("click",event=>{
@@ -1140,7 +1148,14 @@ function moduleView(id){
     moduleView(id);
     window.scrollTo(0,0);
   }));
-  const c=document.getElementById("complete"); if(c) c.onclick=()=>{if(!allAnswered||!passed)return;window.parent.postMessage({source:"aspectus-original-quiz",type:"open-assignment",moduleOrder:idx+1},"*");};
+  const c=document.getElementById("complete"); if(c) c.onclick=()=>{
+    if(isAdminPreview){
+      window.parent.postMessage({source:"aspectus-admin-preview",type:"return-to-library"},window.location.origin);
+      return;
+    }
+    if(!allAnswered||!passed)return;
+    window.parent.postMessage({source:"aspectus-original-quiz",type:"open-assignment",moduleOrder:idx+1},window.location.origin);
+  };
   const n=document.getElementById("nextMod"); if(n) n.onclick=()=>go("module",{id:nextM.id});
 }
 
@@ -1227,7 +1242,7 @@ window.addEventListener("message",function(event){
 });
 render();
 const startupKey=activeModuleKey();
-if(window.parent!==window&&startupKey){
+if(!isAdminPreview&&window.parent!==window&&startupKey){
  window.parent.postMessage({source:"aspectus-lesson-sync",type:"ready",moduleOrder:Number(startupKey.slice(1))},window.location.origin);
  // If embedded outside the app, continue using the local copy without losing navigation.
  setTimeout(()=>{if(!lessonSyncReady){lessonSyncReady=true;broadcastProgress()}},2000);
