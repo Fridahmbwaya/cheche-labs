@@ -301,36 +301,38 @@ export default function TeamworkCollaborationPrototype() {
           </div>
 
           {stage === 0 && <div className="mt-6 space-y-5">
-            <p className="text-lg">It's Wednesday morning. A customer has called Aspectus asking for a solar water-heater quote. Sales would like to give them an update by Friday, but Technical doesn't yet have the site location or the customer's hot-water requirements. You're passing the enquiry from Sales to Technical.</p>
-            <Callout><strong className="text-sm tracking-wide uppercase text-[#A55F12]">Baseline · Before learning</strong><p className="mt-2">Write the WhatsApp handover you'd naturally send to the technical colleague. There are no right answers or minimum length here. A short or imperfect message is useful for comparing how you learn.</p></Callout>
-            <label className="block font-extrabold" htmlFor="tw-baseline">Your message <span className="font-normal text-[#746B64]">(optional, any length)</span></label>
-            <textarea id="tw-baseline" rows={5} className={textareaClass} value={answers.baseline} onChange={e => change("baseline", e.target.value)} placeholder="Hi, we've had a quotation request…"/>
-            <label className="block font-bold" htmlFor="tw-conf-before">How confident are you with work handovers today?</label>
+            <p className="text-lg">Imagine you're covering the office sales inbox. An Aspectus agent on the Coast sends a quick WhatsApp: “Client is interested in a solar water pump. They want a quote ASAP.” They haven't said where the site is, what water source they have or what the pump is needed for. You don't know whether anyone has entered the lead in the sales pipeline.</p>
+            <Callout><strong className="text-sm tracking-wide uppercase text-[#A55F12]">Before learning: your natural response</strong><p className="mt-2">What would you WhatsApp back to the agent or office team so the enquiry can move forward? Write what you'd actually say, not an ideal textbook answer.</p></Callout>
+            <label className="block font-extrabold" htmlFor="tw-baseline">Your message <span className="font-normal text-[#746B64]">(optional; no minimum length)</span></label>
+            <textarea id="tw-baseline" rows={5} className={textareaClass} value={answers.baseline} onChange={e => change("baseline", e.target.value)} placeholder="Hi, thanks for the lead. Could you…"/>
+            <label className="block font-bold" htmlFor="tw-conf-before">How confident are you that work doesn't get lost when it passes between colleagues?</label>
             <div className="flex flex-wrap items-center gap-3">
               <input id="tw-conf-before" aria-label="Confidence before learning from 1 to 5" type="range" min="1" max="5" value={answers.confidenceBefore} onChange={e => change("confidenceBefore", Number(e.target.value))} className="flex-1 min-w-40 accent-[#00A859]"/>
               <span className="rounded-lg bg-[#FEEBD5] px-4 py-2 font-black">{answers.confidenceBefore} / 5</span>
             </div>
-            <p className="text-sm text-[#746B64]">Even a one-line response is useful. You can also continue without writing a baseline. Use fictional or de-identified details only; do not include real customer names or contact information.</p>
+            <p className="text-sm text-[#746B64]">This is a learning baseline, not a graded assessment. Even a one-line response is useful, and you may skip it. Please use no real customer names, phone numbers or confidential project details.</p>
           </div>}
 
           {stage === 1 && <div className="mt-6 space-y-5">
-            <p className="text-lg">It's Wednesday at Aspectus. A customer has asked for a solar water-heater quotation, and Sales hopes to send an estimate by Friday. See what happens in the team WhatsApp chat.</p>
+            <p className="text-lg">The same pump enquiry has reached the office. Notice what each person thinks is happening.</p>
             <div className="space-y-3 rounded-2xl bg-[#F5F2ED] p-5">
-              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 9:04 AM</p><p className="mt-1">“Morning! We've got a customer asking for a solar water-heater quote. Any chance we can send it by Friday?”</p></div>
-              <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-[#DCF4E7] p-4 border border-[#BCE5CB]"><p className="text-xs font-extrabold text-[#00753E]">Technical · 11:20 AM</p><p className="mt-1">“Possibly, but I'll need the site location and roughly how much hot water they need. Who's checking that with the customer?”</p></div>
-              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Sales · 3:15 PM</p><p className="mt-1">“Oh, I thought you were calling them for those details. I said I'd update them this afternoon.”</p></div>
+              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Coast sales agent · 9:10 AM</p><p className="mt-1">“Morning, I spoke to someone interested in a solar pump. Can we get a quote out today? I've shared the contact.”</p></div>
+              <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-[#DCF4E7] p-4 border border-[#BCE5CB]"><p className="text-xs font-extrabold text-[#00753E]">Office sales · 9:45 AM</p><p className="mt-1">“Which site is it, and what's the water source? Also, has the enquiry gone into the pipeline?”</p></div>
+              <div className="max-w-[92%] rounded-2xl rounded-tl-sm bg-white p-4 border border-[#EADFD3]"><p className="text-xs font-extrabold text-[#8B6A4A]">Coast sales agent · 11:15 AM</p><p className="mt-1">“I thought Technical would call for those details. I just sent what I had on WhatsApp.”</p></div>
+              <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-[#DCF4E7] p-4 border border-[#BCE5CB]"><p className="text-xs font-extrabold text-[#00753E]">Technical · 1:00 PM</p><p className="mt-1">“I haven't received enough site information to advise on the pump or estimate a quotation timeline.”</p></div>
             </div>
-            <p className="font-extrabold text-lg">What is the main collaboration failure?</p>
+            <p className="font-extrabold text-lg">What actually went wrong?</p>
             <div className="space-y-3">
               {[
-                { id: "speed", text: "The main problem is that Technical hasn't drafted an estimate yet." },
-                { id: "unclear", text: "Neither person confirmed who would get the missing details, when they'd be ready, or what to tell the customer." },
-                { id: "formal", text: "The customer didn't give enough information, so there was nothing the team could do." },
+                { id: "speed", text: "Technical took too long; they should have prepared a quotation without the site details." },
+                { id: "unclear", text: "The lead was passed around, but no one confirmed who would collect the missing information, record the opportunity and update the customer." },
+                { id: "formal", text: "The team needed a formal meeting before speaking to the customer." },
               ].map(option => <label key={option.id} className={"block cursor-pointer rounded-xl border-2 p-4 " + (answers.gapChoice === option.id ? "border-[#FAA954] bg-[#FFF4E6]" : "border-[#EADFD3]")}>
                 <input type="radio" name="tw-gap" checked={answers.gapChoice === option.id} onChange={() => change("gapChoice", option.id)} className="accent-[#FAA954] w-4 h-4 mr-3"/>{option.text}
               </label>)}
             </div>
-            {answers.gapChoice === "unclear" && <Callout tone="green"><strong>That's it.</strong> Each colleague thought the other would contact the customer. A proper handover makes the next action, its owner and the follow-up clear.</Callout>}
+            {answers.gapChoice === "unclear" && <Callout tone="green"><strong>Exactly.</strong><p className="mt-2">Sending a WhatsApp is not the same as handing over responsibility. Someone needs to capture the enquiry, take ownership of missing information and agree when the customer will hear back. Technical should not have to guess requirements.</p></Callout>}
+            {answers.gapChoice && answers.gapChoice !== "unclear" && <Callout><strong>Look beyond individual speed.</strong><p className="mt-1">Where did ownership become unclear, and what information does the next person need?</p></Callout>}
           </div>}
 
           {stage === 2 && <div className="mt-6 space-y-5">
