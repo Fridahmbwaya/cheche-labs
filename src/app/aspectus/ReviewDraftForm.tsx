@@ -168,7 +168,7 @@ export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewe
  }
  if(submitted)return <section className="rounded-xl border border-[#00A859]/30 bg-[#F2FAF5] p-5" role="status">
   <p className="font-extrabold text-[#006F43]">Review submitted successfully.</p>
-  <p className="text-sm mt-2 text-[#006F43]">The private draft has been cleared. Ian's assignment status now reflects your review decision.</p>
+  <p className="text-sm mt-2 text-[#006F43]">The private draft has been cleared. Ian&apos;s assignment status now reflects your review decision.</p>
  </section>;
 
  return <section className="pt-3 border-t border-[#EADFD3] space-y-4">
