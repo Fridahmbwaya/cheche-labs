@@ -157,11 +157,16 @@ export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewe
    setSubmitted(true);
    setStatus("submitted");
    try{window.localStorage.removeItem(key)}catch{/* Final review is stored in the Hub. */}
-   await onReviewed();
+   try{
+    await onReviewed();
+   }catch{
+    // Review is already committed; a failed dashboard refresh is not a failed review.
+    setError("The review was submitted, but the dashboard could not refresh. Refresh the page to see the updated status.");
+   }
   }catch(caught){
    // Keep the local draft if a final decision fails, so reviewers can safely retry.
-   setError("The review was not confirmed on this screen: "+(caught instanceof Error?caught.message:String(caught))+". Check the review status before trying again.");
-   if(!submitted)setStatus("error");
+   setError("The review was not confirmed: "+(caught instanceof Error?caught.message:String(caught))+". Check the review status before trying again.");
+   setStatus("error");
    submittingRef.current=false;
    setSubmitting(false);
   }
