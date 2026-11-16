@@ -107,23 +107,41 @@ export default function AspectusPeopleAdmin(){
    if(selectedId){
     const {error}=await db.rpc("aspectus_set_member_modules",{p_member_id:selectedId,p_module_ids:checked});
     if(error)throw error;
-    if(focused?.role==="manager"||focused?.role==="hr_manager"){
-     const {error:reviewError}=await db.rpc("aspectus_set_reviewer_learners",{p_reviewer_id:selectedId,p_learner_ids:revieweeIds});
-     if(reviewError)throw reviewError;
-    }
    }else if(focusedInvite){
     const {error}=await db.rpc("aspectus_invite_member",{p_email:focusedInvite.email,p_full_name:focusedInvite.full_name,p_role:focusedInvite.role,p_module_ids:checked});
     if(error)throw error;
     const {error:workError}=await db.rpc("aspectus_set_pending_work_email",{p_email:focusedInvite.email,p_work_email:selectedWorkEmail});
     if(workError)throw workError;
-    if(focusedInvite.role==="manager"){
-     const {error:reviewError}=await db.rpc("aspectus_set_pending_reviewees",{p_email:focusedInvite.email,p_learner_ids:revieweeIds});
-     if(reviewError)throw reviewError;
-    }
    }
    await loadData(orgId);
-   setMessage("Learning access and reviewer assignments saved. Changes will appear on the next refresh.");
+   setMessage("Learning modules saved. Reviewer access was not changed.");
   }catch(err){setMessage("Could not save assignments: "+(err instanceof Error?err.message:String(err)))}
+  finally{setBusy(false)}
+ }
+ async function saveReviewerAccess(){
+  if(!orgId||(!selectedId&&!selectedEmail)||(selectedRole!=="manager"&&selectedRole!=="hr_manager"))return;
+  const existing=selectedId
+    ?reviewerAssignments.filter(a=>a.reviewer_id===selectedId).map(a=>a.learner_id)
+    :pendingReviewees.filter(a=>a.email===selectedEmail).map(a=>a.learner_id);
+  const removed=existing.filter(id=>!revieweeIds.includes(id));
+  const added=revieweeIds.filter(id=>!existing.includes(id));
+  if(!removed.length&&!added.length){setMessage("Reviewer access is already up to date.");return;}
+  if(removed.length){
+   const labels=removed.map(id=>members.find(m=>m.id===id)?.full_name||"a learner").join(", ");
+   if(!window.confirm("Remove this reviewer's access to "+labels+"?\n\nTheir work stays saved, but it will disappear from this reviewer's dashboard until access is restored."))return;
+  }
+  setBusy(true);setMessage("");
+  try{
+   if(selectedId){
+    const {error}=await db.rpc("aspectus_set_reviewer_learners",{p_reviewer_id:selectedId,p_learner_ids:revieweeIds});
+    if(error)throw error;
+   }else if(focusedInvite){
+    const {error}=await db.rpc("aspectus_set_pending_reviewees",{p_email:focusedInvite.email,p_learner_ids:revieweeIds});
+    if(error)throw error;
+   }
+   await loadData(orgId);
+   setMessage("Reviewer access saved for "+revieweeIds.length+" learner"+(revieweeIds.length===1?"":"s")+". No learning progress was changed.");
+  }catch(err){setMessage("Could not update reviewer access: "+(err instanceof Error?err.message:String(err)))}
   finally{setBusy(false)}
  }
  async function createInvite(e:React.FormEvent){
@@ -257,14 +275,19 @@ export default function AspectusPeopleAdmin(){
        <div className="mt-4 p-4 rounded-xl bg-[#FFFBF6] border border-[#EADFD3]"><p className="text-sm font-bold">Role: {((focused?.role||focusedInvite?.role)==="org_admin")?"Super Admin":((focused?.role||focusedInvite?.role)==="manager"||(focused?.role||focusedInvite?.role)==="hr_manager")?"Reviewer":"Learner"}</p><p className="text-xs text-[#6B6466] mt-1">The account role controls permissions. This section changes assigned learning modules only; it does not change the person&apos;s role.</p></div>
        {focusedInvite&&<label className="block mt-5 font-bold text-sm">Work email (optional; not used for sign-in)<input type="email" value={selectedWorkEmail} onChange={e=>setSelectedWorkEmail(e.target.value)} placeholder="name@aspectuskenya.com" className="block w-full border border-[#EADFD3] rounded-xl p-3 mt-2"/></label>}
        {(selectedRole==="manager"||selectedRole==="hr_manager")&&<section className="mt-6 rounded-2xl bg-[#FFFBF6] border border-[#EADFD3] p-4 space-y-3">
-        <h4 className="font-extrabold">Learners this reviewer can assess</h4>
-        <p className="text-sm text-[#6B6466]">Review access is independent of learning modules. Selected learners appear in the reviewer&apos;s dashboard; everyone else stays private.</p>
+        <h4 className="font-extrabold">Reviewer permissions — save separately</h4>
+        <p className="text-sm text-[#6B6466]">Choose learners this person may review. Saving the learning-module assignments below will not change these review permissions.</p>
         <div className="space-y-2">{availableLearners.map(person=><label key={person.id} className="flex items-center gap-3 rounded-xl bg-white border border-[#EADFD3] p-3 cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[#00A859]" checked={revieweeIds.includes(person.id)} onChange={()=>toggle(revieweeIds,person.id,setRevieweeIds)}/><span><strong className="block">{person.full_name||person.email}</strong><span className="text-xs text-[#6B6466]">{person.email}</span></span></label>)}</div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#EADFD3] pt-4">
+         <p className="text-xs text-[#6B6466]">{revieweeIds.length} learner{revieweeIds.length===1?"":"s"} selected</p>
+         <button type="button" disabled={busy} onClick={()=>void saveReviewerAccess()} className="rounded-xl bg-[#373435] px-5 py-3 text-sm font-extrabold text-white disabled:opacity-50">Save reviewer access</button>
+        </div>
+        <p className="text-xs text-[#6B6466]">Removing review access requires confirmation. Existing work is never deleted.</p>
        </section>}
        <div className="mt-6 flex gap-3"><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked(publishedCourses.map(m=>m.id))}>Select all</button><button type="button" className="text-sm font-extrabold underline" onClick={()=>setChecked([])}>Clear</button></div>
        <div className="space-y-3 mt-4">{publishedCourses.map(m=><label key={m.id} className={"flex gap-3 rounded-xl border p-4 cursor-pointer "+(checked.includes(m.id)?"bg-[#F3FFF8] border-[#9ADAB9]":"bg-[#FFFBF6] border-[#EADFD3]")}><input type="checkbox" className="mt-1 accent-[#00A859] w-5 h-5" checked={checked.includes(m.id)} onChange={()=>toggle(checked,m.id,setChecked)}/><span><strong>{m.title}</strong><span className="text-sm block text-[#6B6466] mt-1">Module {m.order_index.toString().padStart(2,"0")}</span></span></label>)}</div>
-       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning & review access"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}{focusedInvite&&<button disabled={busy} type="button" onClick={()=>void resendInvitation(focusedInvite.email)} className="rounded-xl border border-[#FAA954] bg-[#FFFBF6] px-5 py-3 font-extrabold disabled:opacity-50">Send invitation to sign-in email</button>}</div>
-       <p className="mt-4 text-sm text-[#6B6466]">Changes affect only this person&apos;s learning library, not anyone else&apos;s scores, submissions or reviews.</p>
+       <div className="mt-6 flex flex-wrap items-center gap-3"><button type="button" disabled={busy} onClick={()=>void saveAssignments()} className="bg-[#FAA954] rounded-xl px-6 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save learning modules only"}</button>{focusedInvite&&<button type="button" onClick={()=>copyInvite(focusedInvite.email)} className="rounded-xl border px-5 py-3 font-extrabold">Copy account link</button>}{focusedInvite&&<button disabled={busy} type="button" onClick={()=>void resendInvitation(focusedInvite.email)} className="rounded-xl border border-[#FAA954] bg-[#FFFBF6] px-5 py-3 font-extrabold disabled:opacity-50">Send invitation to sign-in email</button>}</div>
+       <p className="mt-4 text-sm text-[#6B6466]">Module assignments and reviewer permissions now have separate Save buttons. Neither action deletes learner progress, quizzes or submissions.</p>
       </>}
      </section>
     </div>:null}
