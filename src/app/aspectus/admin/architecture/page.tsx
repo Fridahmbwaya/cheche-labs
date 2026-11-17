@@ -66,25 +66,25 @@ export default function Architecture(){
   return()=>{active=false};
  },[]);
  if(allowed!=="yes")return <main className="min-h-screen bg-[#FFFBF6] grid place-items-center px-4"><div className="max-w-lg rounded-2xl bg-white border border-[#EADFD3] p-8"><h1 className="text-2xl font-black">Platform flow map</h1><p className="mt-3">{allowed==="checking"?"Checking access…":error}</p><Link className="inline-block mt-5 text-[#A15F16] font-bold underline" href="/aspectus">Back to Hub</Link></div></main>;
- return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-4 sm:px-6 py-8">
+ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] text-lg leading-relaxed px-4 sm:px-6 py-8">
   <div className="max-w-6xl mx-auto space-y-6">
    <header className="rounded-[28px] bg-white border border-[#EADFD3] overflow-hidden"><div className="h-2 bg-[#FAA954]"/><div className="p-6 sm:p-9 flex flex-wrap justify-between gap-4 items-center">
-    <div><p className="text-xs uppercase tracking-[.16em] font-black text-[#A15F16]">Aspectus · Pilot architecture v0.1</p><h1 className="text-3xl sm:text-4xl font-black mt-2">What leads where?</h1><p className="mt-3 text-base text-[#6B6466] max-w-2xl">A source-audited walkthrough of roles, screens, buttons, permissions and saved data. It distinguishes what exists in code from what still needs a live signed-in test.</p></div>
+    <div><p className="text-base uppercase tracking-[.16em] font-black text-[#A15F16]">Aspectus · Pilot architecture v0.1</p><h1 className="text-3xl sm:text-4xl font-black mt-2">What leads where?</h1><p className="mt-3 text-lg text-[#6B6466] max-w-2xl">A source-audited walkthrough of roles, screens, buttons, permissions and saved data. It distinguishes what exists in code from what still needs a live signed-in test.</p></div>
     <div className="flex gap-2"><Link href="/aspectus" className="rounded-xl border border-[#EADFD3] px-4 py-3 font-bold">← Back to Hub</Link><Link href="/aspectus/admin/health" className="rounded-xl bg-[#FAA954] px-4 py-3 font-extrabold">Health ↗</Link></div>
    </div></header>
    <div className="rounded-xl bg-[#FFF2DF] border-l-4 border-[#9B1D20] p-5"><strong>Audit status:</strong> Routes, navigation handlers and permissions are inspected. This is <strong>not</strong> a completed cross-account browser test. Following a link opens a real route; entries described as a “screen” are stateful views inside /aspectus, not independent URLs.</div>
-   <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">{summary.map(s=><div key={s[0]} className="rounded-2xl bg-white border border-[#EADFD3] p-5"><h2 className="font-black text-lg">{s[0]}</h2><p className="text-sm mt-2 text-[#6B6466]">{s[1]}</p><p className="text-sm font-bold text-[#A15F16] mt-4">{s[2]}</p></div>)}</section>
+   <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">{summary.map(s=><div key={s[0]} className="rounded-2xl bg-white border border-[#EADFD3] p-5"><h2 className="font-black text-lg">{s[0]}</h2><p className="text-lg mt-2 text-[#6B6466]">{s[1]}</p><p className="text-lg font-bold text-[#A15F16] mt-4">{s[2]}</p></div>)}</section>
    <section className="rounded-[26px] bg-white border border-[#EADFD3] p-5 sm:p-7">
     <h2 className="text-2xl font-black">Walk the journey by role</h2><p className="mt-2 text-[#6B6466]">Select a role to see every step, the actual button labels and the handoffs.</p>
-    <div role="group" aria-label="Choose role to inspect" className="flex flex-wrap gap-2 mt-5">{(Object.keys(names) as Role[]).map(k=><button key={k} type="button" onClick={()=>setRole(k)} aria-pressed={role===k} className={"rounded-xl px-4 py-3 font-extrabold text-sm border "+(role===k?"bg-[#373435] text-white border-[#373435]":"bg-white border-[#EADFD3] hover:border-[#FAA954]")}>{names[k]}</button>)}</div>
+    <div role="group" aria-label="Choose role to inspect" className="flex flex-wrap gap-2 mt-5">{(Object.keys(names) as Role[]).map(k=><button key={k} type="button" onClick={()=>setRole(k)} aria-pressed={role===k} className={"rounded-xl px-4 py-3 font-extrabold text-lg border "+(role===k?"bg-[#373435] text-white border-[#373435]":"bg-white border-[#EADFD3] hover:border-[#FAA954]")}>{names[k]}</button>)}</div>
     <div className="mt-7 space-y-4">{journeys[role].map((step,i)=><article key={step.heading} className={flowLine}>
      <div className="flex items-center flex-wrap gap-3"><span className="inline-flex w-10 h-10 rounded-xl bg-[#FEEBD5] text-[#8B572B] items-center justify-center font-black">{String(i+1).padStart(2,"0")}</span><h3 className="text-xl font-black">{step.heading}</h3></div>
      <div className="rounded-2xl border border-[#EADFD3] bg-[#FFFCF8] p-4 sm:p-5 mt-3 space-y-3">
-      <p className="text-sm font-bold text-[#A15F16]">Screen: {step.where}</p>
-      <div><strong className="text-sm">Buttons and destinations</strong><ul className="list-disc list-inside space-y-2 mt-2 text-base">{step.buttons.map(b=><li key={b}>{b}</li>)}</ul></div>
+      <p className="text-lg font-bold text-[#A15F16]">Screen: {step.where}</p>
+      <div><strong className="text-lg">Buttons and destinations</strong><ul className="list-disc list-inside space-y-2 mt-2 text-lg">{step.buttons.map(b=><li key={b}>{b}</li>)}</ul></div>
       <div className="border-t border-[#EADFD3] pt-3"><p><strong>Leads to:</strong> {step.leads}</p><p className="text-[#6B6466] mt-2"><strong>Saved/visible data:</strong> {step.data}</p></div>
-      {step.note&&<p className="rounded-lg bg-[#FFF0E9] p-3 text-sm text-[#9B1D20]"><strong>Watch-out:</strong> {step.note}</p>}
-      <Link href={step.route} className="inline-block text-[#A15F16] underline font-extrabold text-sm">Open actual route ↗</Link>
+      {step.note&&<p className="rounded-lg bg-[#FFF0E9] p-3 text-lg text-[#9B1D20]"><strong>Watch-out:</strong> {step.note}</p>}
+      <Link href={step.route} className="inline-block text-[#A15F16] underline font-extrabold text-lg">Open actual route ↗</Link>
      </div></article>)}</div>
    </section>
    <div className="grid lg:grid-cols-2 gap-4">
