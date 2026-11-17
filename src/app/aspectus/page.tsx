@@ -245,6 +245,10 @@ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-5 py-9"><div
  <a href="/aspectus/admin?view=people" className="block rounded-[24px] border border-[#EADFD3] bg-white p-5 sm:p-6 hover:border-[#FAA954]">
   <span className="font-extrabold text-[#373435]">Manage people &amp; assignments</span><span className="block mt-2 text-sm text-[#6B6466]">Invite staff, assign published courses and manage reviewer access.</span>
  </a>
+ <a href="/aspectus/admin/health" className="block rounded-[24px] border border-[#EADFD3] bg-[#FFF9F0] p-5 sm:p-6 hover:border-[#FAA954]">
+  <span className="font-extrabold text-[#373435]">Learning Hub health ↗</span>
+  <span className="block mt-2 text-sm text-[#6B6466]">Check saved progress, pending reviews, reviewer access and reported saving errors. Read-only.</span>
+ </a>
  </section>}
 {screen==="home"&&user.role!=="org_admin"&&<section className="space-y-6">
 {canManageAccounts&&<a href="/aspectus/admin" className="block rounded-[26px] border border-[#EADFD3] bg-[#373435] p-5 sm:p-6 text-white hover:border-[#FAA954] transition-colors">
