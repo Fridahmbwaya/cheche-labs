@@ -67,7 +67,7 @@ export default function AspectusPeopleAdmin(){
     if(!alive)return;
     setCurrentUserId(user.id);
     const requestedView=new URLSearchParams(window.location.search).get("view");
-    setMode(requestedView==="mine"?"mine":requestedView==="people"?"people":"overview");
+    setMode(requestedView==="mine"?"mine":requestedView==="people"?"people":requestedView==="invite"?"invite":"overview");
     const {data:profile,error}=await db.from("users").select("org_id").eq("id",user.id).single();
     if(error||!profile)throw new Error("Your Aspectus account was not found.");
     const {data:allowed,error:accessError}=await db.rpc("aspectus_can_admin",{p_org_id:profile.org_id});
@@ -225,6 +225,7 @@ export default function AspectusPeopleAdmin(){
       {id:"invite",label:"+ Add a person"}
      ].map(tab=><button key={tab.id} type="button" aria-current={mode===tab.id?"page":undefined} onClick={()=>setMode(tab.id as "overview"|"mine"|"people"|"invite")} className={mode===tab.id?"rounded-xl bg-[#FAA954] border border-[#DB9A50] px-5 py-3 font-extrabold":"rounded-xl border border-[#EADFD3] bg-white px-5 py-3 font-bold hover:border-[#FAA954]"}>{tab.label}</button>)}
      <a href="/aspectus/admin/health" className="rounded-xl border border-[#FAA954] bg-[#FFFBF6] px-5 py-3 font-extrabold hover:bg-[#FEEBD5]">Learning Hub health ↗</a>
+      <a href="/aspectus/admin/architecture" className="rounded-xl border border-[#EADFD3] bg-white px-5 py-3 font-extrabold hover:border-[#FAA954]">Workflow map ↗</a>
     </nav>
     {(mode==="overview"||mode==="mine")&&<LearningOverview view={mode==="mine"?"mine":"team"} currentUserId={currentUserId} courses={courses} tracks={tracks} members={members} invites={invites} assignments={assignments} pending={pending}
       onManageMember={id=>{const member=members.find(m=>m.id===id);if(member){pickMember(member);setMode("people")}}}
