@@ -106,7 +106,7 @@ export default function AspectusHealth(){
    const key=submission.learner_id+":"+submission.module_id;
    if(!latestByCourse.has(key))latestByCourse.set(key,submission);
   }
-  const recentSubmissions=[...latestByCourse.values()];
+  const recentSubmissions=Array.from(latestByCourse.values());
   const pending=recentSubmissions.filter(s=>s.status==="submitted");
   const uncovered=learnersWithCourses.filter(m=>assignedReviewer(m.id).length===0);
   const rows=learnersWithCourses.map(m=>{
