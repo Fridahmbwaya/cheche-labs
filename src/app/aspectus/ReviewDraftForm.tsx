@@ -2,6 +2,7 @@
 
 import {useCallback,useEffect,useRef,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
+import {logAspectusSaveFailure} from "@/lib/aspectus-save-health";
 
 const db=createClient();
 type PublishingDecision="not_reviewed"|"approved_to_publish"|"needs_changes"|"do_not_publish";
@@ -10,6 +11,7 @@ type Draft={feedback:string;publishing_decision:PublishingDecision};
 type SaveStatus="loading"|"clean"|"editing"|"saving"|"saved"|"recovered"|"error"|"submitted";
 type Props={
  submissionId:string;
+ moduleId:string;
  orgId:string;
  reviewerId:string;
  onReviewed:()=>Promise<void>;
@@ -27,7 +29,7 @@ function parseBackup(key:string):Draft|null{
  }catch{return null;}
 }
 
-export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewed}:Props){
+export default function ReviewDraftForm({submissionId,moduleId,orgId,reviewerId,onReviewed}:Props){
  const [draft,setDraft]=useState<Draft>(empty);
  const [ready,setReady]=useState(false);
  const [status,setStatus]=useState<SaveStatus>("loading");
@@ -98,6 +100,7 @@ export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewe
     feedback:snapshot.feedback,publishing_decision:snapshot.publishing_decision
    },{onConflict:"reviewer_id,submission_id"});
    if(saveError){
+    void logAspectusSaveFailure({orgId,actorId:reviewerId,moduleId,operation:"review_draft",errorCode:saveError.code});
     setError("Cloud save failed: "+saveError.message+". Your edits are retained in this browser. Use Retry save when connected.");
     setStatus("error");
     return;
@@ -114,7 +117,7 @@ export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewe
   });
   queue.current=task.catch(()=>undefined);
   return task;
- },[key,orgId,ready,reviewerId,submissionId]);
+ },[key,orgId,ready,reviewerId,submissionId,moduleId]);
 
  useEffect(()=>{
   if(!ready||revision<=persistedVersion.current||submittingRef.current)return;
@@ -153,7 +156,10 @@ export default function ReviewDraftForm({submissionId,orgId,reviewerId,onReviewe
     p_publishing_decision:snapshot.publishing_decision,
     p_feedback:snapshot.feedback
    });
-   if(reviewError)throw reviewError;
+   if(reviewError){
+    void logAspectusSaveFailure({orgId,actorId:reviewerId,moduleId,operation:"review_decision",errorCode:reviewError.code});
+    throw reviewError;
+   }
    setSubmitted(true);
    setStatus("submitted");
    try{window.localStorage.removeItem(key)}catch{/* Final review is stored in the Hub. */}
