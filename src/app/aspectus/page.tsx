@@ -257,6 +257,10 @@ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-5 py-9"><div
   <span className="font-extrabold text-[#373435]">Learning Hub health ↗</span>
   <span className="block mt-2 text-sm text-[#6B6466]">Check saved progress, pending reviews, reviewer access and reported saving errors. Read-only.</span>
  </a>
+ <a href="/aspectus/admin/architecture" className="block rounded-[24px] border border-[#EADFD3] bg-white p-5 sm:p-6 hover:border-[#FAA954]">
+  <span className="font-extrabold text-[#373435]">Platform architecture &amp; workflow map ↗</span>
+  <span className="block mt-2 text-sm text-[#6B6466]">Trace every learner, reviewer, Super Admin and test-account flow button by button. Read-only.</span>
+ </a>
  <a href="/aspectus/leadership/strategy-to-execution" className="block rounded-[24px] border border-[#E8D1AF] bg-white p-5 sm:p-6 hover:border-[#FAA954]">
   <span className="inline-block rounded-full bg-[#FFF0DA] px-3 py-1.5 text-xs font-black uppercase tracking-wider text-[#9B1D20]">Pilot · Not final</span>
   <span className="block mt-3 font-extrabold text-[#373435]">Leadership working session: From Strategy to Execution →</span>
