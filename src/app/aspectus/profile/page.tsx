@@ -84,13 +84,13 @@ export default function AspectusProfile(){
   setBusy(false);
  }
  const initial=(profile?.full_name||profile?.email||"A").trim().slice(0,1).toUpperCase();
- return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-4 sm:px-7 py-8">
+ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] text-lg leading-relaxed px-4 sm:px-7 py-8">
   <div className="max-w-3xl mx-auto space-y-6">
    <header className="rounded-[26px] overflow-hidden border border-[#EADFD3] bg-white">
     <div className="h-2 bg-[#FAA954]"/>
     <div className="p-6 sm:p-9 flex flex-wrap justify-between gap-4 items-center">
-     <div><p className="text-sm font-black uppercase tracking-[.14em] text-[#A15F16]">Aspectus Learning Hub</p><h1 className="text-3xl sm:text-4xl font-black mt-2">My profile</h1><p className="text-base mt-2 text-[#6B6466]">Your identity and personal learning journey, in one place.</p></div>
-     <Link className="rounded-xl border border-[#EADFD3] px-4 py-3 text-base font-bold" href="/aspectus">← Back to Hub</Link>
+     <div><p className="text-lg font-black uppercase tracking-[.14em] text-[#A15F16]">Aspectus Learning Hub</p><h1 className="text-3xl sm:text-4xl font-black mt-2">My profile</h1><p className="text-lg mt-2 text-[#6B6466]">Your identity and personal learning journey, in one place.</p></div>
+     <Link className="rounded-xl border border-[#EADFD3] px-4 py-3 text-lg font-bold" href="/aspectus">← Back to Hub</Link>
     </div>
    </header>
    {loading&&<div className="rounded-2xl border border-[#EADFD3] bg-white p-6">Loading your profile…</div>}
@@ -102,27 +102,27 @@ export default function AspectusProfile(){
      <div className="flex-1 min-w-[210px]">
       <h2 className="text-2xl font-black">{profile.full_name||"Team member"}</h2>
       <p className="text-[#6B6466] mt-1">{profile.role_title||labelForRole(profile.role)}{profile.department?" · "+profile.department:""}</p>
-      <p className="text-base text-[#6B6466] mt-2">{profile.email}</p>
-      {profile.work_email&&profile.work_email!==profile.email&&<p className="text-sm text-[#6B6466] mt-1">Work email: {profile.work_email}</p>}
-      <span className="inline-block rounded-full bg-[#D3F2E2] text-[#00753E] px-3 py-1.5 text-sm font-bold mt-3">{labelForRole(profile.role)}</span>
+      <p className="text-lg text-[#6B6466] mt-2">{profile.email}</p>
+      {profile.work_email&&profile.work_email!==profile.email&&<p className="text-lg text-[#6B6466] mt-1">Work email: {profile.work_email}</p>}
+      <span className="inline-block rounded-full bg-[#D3F2E2] text-[#00753E] px-3 py-1.5 text-lg font-bold mt-3">{labelForRole(profile.role)}</span>
      </div>
     </div>
     <div className="border-t border-[#EADFD3] pt-6 space-y-4">
-     <div><h3 className="font-black text-xl">Profile picture</h3><p className="text-base mt-2 text-[#6B6466]">Choose a square or portrait photograph. We'll crop it to a circle for display. JPG, PNG or WebP; maximum 2 MB.</p></div>
+     <div><h3 className="font-black text-xl">Profile picture</h3><p className="text-lg mt-2 text-[#6B6466]">Choose a square or portrait photograph. We'll crop it to a circle for display. JPG, PNG or WebP; maximum 2 MB.</p></div>
      <label className="inline-flex items-center gap-3 rounded-xl border-2 border-dashed border-[#E8CFAE] bg-[#FFF8ED] px-5 py-4 font-extrabold cursor-pointer hover:border-[#FAA954]">📷 Choose a photo
       <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e=>choose(e.target.files?.[0])}/>
      </label>
-     {picked&&<p className="text-sm text-[#6B6466]">{picked.name} · {(picked.size/1024).toFixed(0)} KB · Preview above</p>}
+     {picked&&<p className="text-lg text-[#6B6466]">{picked.name} · {(picked.size/1024).toFixed(0)} KB · Preview above</p>}
      <div className="flex flex-wrap gap-3">
       <button type="button" disabled={!picked||busy} onClick={()=>void upload()} className="rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold disabled:opacity-50">{busy?"Saving…":"Save profile photo"}</button>
       {profile.avatar_url&&<button type="button" disabled={busy} onClick={()=>void remove()} className="rounded-xl border border-[#EADFD3] px-5 py-3 font-bold disabled:opacity-50">Remove photo</button>}
      </div>
     </div>
-    <div className="rounded-2xl bg-[#FFF9F0] border border-[#EADFD3] p-5"><h3 className="font-black text-lg">Your learning profile</h3><p className="text-base mt-2 text-[#6B6466]">Your actual saved quizzes, lesson steps and practical work can already tell the story of your progress. This is evidence-based, not an AI judgment of your ability.</p><Link href="/aspectus/learning-profile" className="inline-block mt-3 text-[#A15F16] font-extrabold underline">View my learning profile →</Link></div>
+    <div className="rounded-2xl bg-[#FFF9F0] border border-[#EADFD3] p-5"><h3 className="font-black text-lg">Your learning profile</h3><p className="text-lg mt-2 text-[#6B6466]">Your actual saved quizzes, lesson steps and practical work can already tell the story of your progress. This is evidence-based, not an AI judgment of your ability.</p><Link href="/aspectus/learning-profile" className="inline-block mt-3 text-[#A15F16] font-extrabold underline">View my learning profile →</Link></div>
    </section>}
    {message&&<p role="status" className="rounded-xl border border-[#BCE8CF] bg-[#D3F2E2] p-4 font-semibold text-[#00753E]">{message}</p>}
    {error&&<p role="alert" className="rounded-xl border border-[#9B1D20]/30 bg-[#FFF2EF] p-4 font-semibold text-[#9B1D20]">{error}</p>}
-   <p className="text-sm text-[#6B6466]">Photos are kept in private Aspectus storage and can be viewed by active colleagues in the same organization. Only you can change your own picture. This does not change your role, assigned modules or course progress.</p>
+   <p className="text-lg text-[#6B6466]">Photos are kept in private Aspectus storage and can be viewed by active colleagues in the same organization. Only you can change your own picture. This does not change your role, assigned modules or course progress.</p>
   </div>
  </main>;
 }
