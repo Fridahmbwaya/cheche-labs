@@ -68,25 +68,25 @@ export default function LearningProfile(){
   rows.find(r=>!r.attempts.some(a=>a.passed))||null;
  const nextAction=actionRow?(actionRow.submission?.status==="revision_requested"?"Review feedback, revise your project and resubmit":
    actionRow.attempts.some(a=>a.passed)?"Complete and submit the practical assignment":"Continue the lesson and attempt the knowledge check"):"Review your completed work and reflect on what you can apply";
- return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] px-4 sm:px-7 py-8">
+ return <main className="min-h-screen bg-[#FFFBF6] text-[#373435] text-lg leading-relaxed px-4 sm:px-7 py-8">
   <div className="max-w-5xl mx-auto space-y-6">
    <header className="rounded-[26px] border border-[#EADFD3] bg-white overflow-hidden">
     <div className="h-2 bg-[#FAA954]"/><div className="p-6 sm:p-9 flex flex-wrap justify-between items-center gap-4">
-     <div><p className="text-sm uppercase tracking-[.14em] font-black text-[#A15F16]">Aspectus · Learning record pilot</p><h1 className="text-3xl sm:text-4xl font-black mt-2">My learning profile</h1><p className="text-[#6B6466] mt-3">An evidence-based view of how your learning is developing.</p></div>
+     <div><p className="text-lg uppercase tracking-[.14em] font-black text-[#A15F16]">Aspectus · Learning record pilot</p><h1 className="text-3xl sm:text-4xl font-black mt-2">My learning profile</h1><p className="text-[#6B6466] mt-3">An evidence-based view of how your learning is developing.</p></div>
      <div className="flex flex-wrap gap-2"><button onClick={()=>void load()} disabled={loading} className="rounded-xl bg-[#FAA954] px-4 py-3 font-extrabold disabled:opacity-50">↻ Refresh</button><Link href="/aspectus/profile" className="rounded-xl border border-[#EADFD3] px-4 py-3 font-bold">← My profile</Link></div>
     </div>
    </header>
    {loading&&<p className={card}>Reading your saved learning records…</p>}
    {error&&<p role="alert" className={card+" text-[#9B1D20]"}>{error}</p>}
    {data&&!loading&&<>
-    <div className="rounded-2xl border-l-4 border-[#FAA954] bg-[#FFF3DF] p-5 text-base"><strong>First version — not AI-personalized yet.</strong> This profile summarizes verified actions and suggests a next step using simple, transparent rules. It does not assess your personality, intelligence or potential.</div>
+    <div className="rounded-2xl border-l-4 border-[#FAA954] bg-[#FFF3DF] p-5 text-lg"><strong>First version — not AI-personalized yet.</strong> This profile summarizes verified actions and suggests a next step using simple, transparent rules. It does not assess your personality, intelligence or potential.</div>
     <div className="grid sm:grid-cols-4 gap-3">
-     {[["Assigned units",rows.length],["Lessons started",started],["Quizzes passed",passed],["Projects submitted",submitted]].map(([label,val])=><div key={label} className={card}><p className="text-sm text-[#6B6466]">{label}</p><p className="text-3xl font-black mt-3">{val}</p></div>)}
+     {[["Assigned units",rows.length],["Lessons started",started],["Quizzes passed",passed],["Projects submitted",submitted]].map(([label,val])=><div key={label} className={card}><p className="text-lg text-[#6B6466]">{label}</p><p className="text-3xl font-black mt-3">{val}</p></div>)}
     </div>
     <section className={card+" space-y-3"}>
-     <p className="text-xs uppercase tracking-widest text-[#A15F16] font-black">Suggested next action · Based on your records</p>
+     <p className="text-base uppercase tracking-widest text-[#A15F16] font-black">Suggested next action · Based on your records</p>
      <h2 className="text-xl sm:text-2xl font-black">{nextAction}</h2>
-     <p className="text-base text-[#6B6466]">{actionRow?("In "+actionRow.title+". This suggestion comes from recorded quiz and assignment status, not an AI model."):("No unfinished assigned modules were found in your records.")}</p>
+     <p className="text-lg text-[#6B6466]">{actionRow?("In "+actionRow.title+". This suggestion comes from recorded quiz and assignment status, not an AI model."):("No unfinished assigned modules were found in your records.")}</p>
      <Link href="/aspectus" className="inline-block rounded-xl bg-[#FAA954] px-5 py-3 font-extrabold">Go to my learning home →</Link>
     </section>
     <section className={card+" space-y-4"}>
@@ -95,13 +95,13 @@ export default function LearningProfile(){
      {rows.map(r=>{
       const passedQuiz=r.attempts.find(q=>q.passed);
       return <article key={r.id} className="rounded-2xl border border-[#EADFD3] bg-[#FFFCF8] p-4 sm:p-5">
-       <div className="flex flex-wrap justify-between gap-2 items-start"><div><p className="text-sm text-[#A15F16] font-bold">MODULE {String(r.order_index).padStart(2,"0")}</p><h3 className="font-black text-lg mt-1">{r.title}</h3></div><span className="text-sm rounded-full bg-white px-3 py-2 border border-[#EADFD3]">{r.submission?.status==="approved"||r.submission?.status==="approved_with_changes"?"Reviewed":r.submission?.status==="revision_requested"?"Changes requested":r.submission?.status==="submitted"?"Awaiting review":passedQuiz?"Quiz passed":r.stage?"In progress":"Not started"}</span></div>
-       <div className="mt-4 flex flex-wrap gap-3 text-sm"><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Lesson steps: {r.stage?(r.stage.stage_index+1)+"/"+r.stage.stage_count:"Not recorded"}</span><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Quiz: {passedQuiz?"Passed ("+passedQuiz.score+"%)":r.attempts.length?"Attempted ("+r.attempts[0].score+"%)":"Not attempted"}</span><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Project: {r.submission?r.submission.status.replaceAll("_"," "):"Not submitted"}</span></div>
-       {r.review&&<p className="text-sm text-[#6B6466] mt-3">Last recorded review: {r.review.decision.replaceAll("_"," ")} · {stamp(r.review.reviewed_at)}. Full feedback remains in your Hub.</p>}
+       <div className="flex flex-wrap justify-between gap-2 items-start"><div><p className="text-lg text-[#A15F16] font-bold">MODULE {String(r.order_index).padStart(2,"0")}</p><h3 className="font-black text-lg mt-1">{r.title}</h3></div><span className="text-lg rounded-full bg-white px-3 py-2 border border-[#EADFD3]">{r.submission?.status==="approved"||r.submission?.status==="approved_with_changes"?"Reviewed":r.submission?.status==="revision_requested"?"Changes requested":r.submission?.status==="submitted"?"Awaiting review":passedQuiz?"Quiz passed":r.stage?"In progress":"Not started"}</span></div>
+       <div className="mt-4 flex flex-wrap gap-3 text-lg"><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Lesson steps: {r.stage?(r.stage.stage_index+1)+"/"+r.stage.stage_count:"Not recorded"}</span><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Quiz: {passedQuiz?"Passed ("+passedQuiz.score+"%)":r.attempts.length?"Attempted ("+r.attempts[0].score+"%)":"Not attempted"}</span><span className="rounded-lg bg-white px-3 py-2 border border-[#EADFD3]">Project: {r.submission?r.submission.status.replaceAll("_"," "):"Not submitted"}</span></div>
+       {r.review&&<p className="text-lg text-[#6B6466] mt-3">Last recorded review: {r.review.decision.replaceAll("_"," ")} · {stamp(r.review.reviewed_at)}. Full feedback remains in your Hub.</p>}
       </article>
      })}
     </section>
-    <section className={card}><h2 className="text-xl font-black">How this will become adaptive</h2><p className="mt-2 text-[#6B6466]">The next stage connects individual answers to explicit skill tags, examines repeated patterns across questions and applied work, and suggests an appropriate next practice activity. Reviewers will still judge real-world submissions; learners should be able to inspect and correct recommendations.</p><p className="text-sm mt-3 font-semibold text-[#9B1D20]">Not yet built: per-answer skill scoring, AI-generated coaching, cross-course mastery, or personalized lesson branching.</p></section>
+    <section className={card}><h2 className="text-xl font-black">How this will become adaptive</h2><p className="mt-2 text-[#6B6466]">The next stage connects individual answers to explicit skill tags, examines repeated patterns across questions and applied work, and suggests an appropriate next practice activity. Reviewers will still judge real-world submissions; learners should be able to inspect and correct recommendations.</p><p className="text-lg mt-3 font-semibold text-[#9B1D20]">Not yet built: per-answer skill scoring, AI-generated coaching, cross-course mastery, or personalized lesson branching.</p></section>
    </>}
   </div>
  </main>;
