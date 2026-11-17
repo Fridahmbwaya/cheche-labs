@@ -2,6 +2,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
+import {logAspectusSaveFailure} from "@/lib/aspectus-save-health";
 import ReviewDraftForm from "./ReviewDraftForm";
 // Aspectus preview uses its dedicated Supabase project through branch-scoped Vercel environment variables.
 const db=createClient();
@@ -141,7 +142,10 @@ useEffect(()=>{
      org_id:user.org_id,learner_id:user.id,module_id:lesson.id,
      stage_index:stageIndex,stage_count:stageCount,lesson_state:state,updated_at:updatedAt
     },{onConflict:"learner_id,module_id"});
-    if(error)setMsg("We couldn't automatically save the lesson: "+error.message);
+    if(error){
+     setMsg("We couldn't automatically save the lesson: "+error.message);
+     void logAspectusSaveFailure({orgId:user.org_id,actorId:user.id,moduleId:lesson.id,operation:"lesson_progress",errorCode:error.code});
+    }
     else setLessonProgress(prev=>{
      const next=prev.filter(p=>p.learner_id!==user.id||p.module_id!==lesson.id);
      return [...next,{learner_id:user.id,module_id:lesson.id,stage_index:stageIndex,stage_count:stageCount,updated_at:updatedAt}];
@@ -165,6 +169,7 @@ useEffect(()=>{
   if(payload.type==="quiz-result"){
    const {data,error}=await db.rpc("aspectus_submit_quiz",{p_module_id:mod.id,p_answers:payload.answers});const result=Array.isArray(data)?data[0]:data;
    setMsg(error?("Quiz result could not be saved: "+error.message):("Module "+order+" quiz saved: "+result.score+"%. Your reviewer can see your result."));
+   if(error)void logAspectusSaveFailure({orgId:user.org_id,actorId:user.id,moduleId:mod.id,operation:"quiz_result",errorCode:error.code});
    if(!error)void refresh();
   }
 
@@ -184,11 +189,16 @@ async function submit(){
    const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
    const objectKey=user.id+"/"+assignmentModule.id+"/"+crypto.randomUUID()+"-"+safe;
    const upload=await db.storage.from("aspectus-assignments").upload(objectKey,file,{contentType:file.type,upsert:false});
-   if(upload.error){setMsg("File upload failed: "+upload.error.message);return}
+   if(upload.error){
+    setMsg("File upload failed: "+upload.error.message);
+    void logAspectusSaveFailure({orgId:user.org_id,actorId:user.id,moduleId:assignmentModule.id,operation:"assignment_upload",errorCode:(upload.error as {code?:string}).code});
+    return;
+   }
    uploaded.push(objectKey);
   }
   const {error}=await db.from("learning_submissions").insert({org_id:user.org_id,learner_id:user.id,module_id:assignmentModule.id,assignment_key:"module-"+assignmentModule.order_index+"-project",response_text:answer.trim(),deliverable_url:link.trim()||null,attachment_paths:uploaded,status:"submitted"});
   setMsg(error?"Submission failed: "+error.message:"Submitted for review.");
+  if(error)void logAspectusSaveFailure({orgId:user.org_id,actorId:user.id,moduleId:assignmentModule.id,operation:"assignment_submission",errorCode:error.code});
   if(!error){setConfirmation({title:assignmentModule.title,time:new Date().toLocaleString("en-KE")});setAnswer("");setLink("");setUploadFiles([]);await refresh()}
  }finally{setUploading(false)}
 }
